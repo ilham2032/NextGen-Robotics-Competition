@@ -6,10 +6,7 @@ const MENTOR_STORAGE_KEY = "nextgen_mentors"
 const MENTOR_SESSION_KEY = "nextgen_mentor_session"
 const MEMBER_STORAGE_KEY = "nextgen_members"
 
-const defaultTeams: Team[] = [
-  { id: "team-1", name: "Robo Falcons", school: "NextGen High School", members: 4 },
-  { id: "team-2", name: "Blue Sparks", school: "Innovation Academy", members: 3 },
-]
+const defaultTeams: Team[] = []
 
 const defaultCategories: Category[] = [
   {

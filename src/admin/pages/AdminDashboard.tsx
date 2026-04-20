@@ -1,13 +1,14 @@
 import { useMemo, useState } from "react"
 import { useNavigate } from "react-router"
 import { logoutAdmin } from "../auth"
-import { createId, getCategories, getTeams, saveCategories, saveTeams } from "../storage"
-import type { Category, Team } from "../types"
+import { createId, getCategories, getMembers, getTeams, saveCategories, saveTeams } from "../storage"
+import type { Category, Member, Team } from "../types"
 
 const AdminDashboard = () => {
   const navigate = useNavigate()
 
   const [teams, setTeams] = useState<Team[]>(() => getTeams())
+  const [members, setMembers] = useState<Member[]>(() => getMembers())
   const [categories, setCategories] = useState<Category[]>(() => getCategories())
 
   const [teamName, setTeamName] = useState("")
@@ -20,13 +21,19 @@ const AdminDashboard = () => {
   const [categoryPdfDataUrl, setCategoryPdfDataUrl] = useState("")
   const [categoryError, setCategoryError] = useState("")
 
-  const stats = useMemo(
-    () => [
-      { label: "Total Teams", value: teams.length },
-      { label: "Total Categories", value: categories.length },
-    ],
-    [teams.length, categories.length],
-  )
+  const stats = useMemo(() => {
+    const uniqueCountries = new Set(teams.map(t => t.school).filter(Boolean))
+    const mentorTeams = teams.filter(t => t.mentorId)
+    const adminTeams = teams.filter(t => !t.mentorId)
+    return {
+      totalTeams: teams.length,
+      totalCategories: categories.length,
+      totalMembers: members.length,
+      totalCountries: uniqueCountries.size,
+      mentorTeams: mentorTeams.length,
+      adminTeams: adminTeams.length
+    }
+  }, [teams, categories, members])
 
   const handleLogout = () => {
     logoutAdmin()
@@ -121,8 +128,9 @@ const AdminDashboard = () => {
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-b from-blue-50 to-white px-4 pb-16 pt-14 lg:px-10">
-      <div className="mx-auto max-w-6xl mb-9">
+    <section className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 px-4 pb-16 pt-14 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        {/* Header */}
         <header className="rounded-3xl border border-blue-200 bg-gradient-to-r from-blue-700 to-cyan-600 p-7 text-white shadow-xl">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
@@ -137,14 +145,23 @@ const AdminDashboard = () => {
             </button>
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            {stats.map((item) => (
-              <div key={item.label} className="rounded-xl border border-white/35 bg-white/10 px-4 py-3">
-                <p className="text-xs tracking-wide text-blue-100 uppercase">{item.label}</p>
-                <p className="mt-1 text-2xl font-bold text-white">{item.value}</p>
-              </div>
-            ))}
-            <p className="text-sm text-white">Use the forms below to add teams and categories. Changes are saved automatically and reflected on the public participants and regulations pages.</p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-xl border border-white/35 bg-white/10 px-4 py-3">
+              <p className="text-xs tracking-wide text-blue-100 uppercase">Total Teams</p>
+              <p className="mt-1 text-2xl font-bold text-white">{stats.totalTeams}</p>
+            </div>
+            <div className="rounded-xl border border-white/35 bg-white/10 px-4 py-3">
+              <p className="text-xs tracking-wide text-blue-100 uppercase">Participants</p>
+              <p className="mt-1 text-2xl font-bold text-white">{stats.totalMembers}</p>
+            </div>
+            <div className="rounded-xl border border-white/35 bg-white/10 px-4 py-3">
+              <p className="text-xs tracking-wide text-blue-100 uppercase">Countries</p>
+              <p className="mt-1 text-2xl font-bold text-white">{stats.totalCountries}</p>
+            </div>
+            <div className="rounded-xl border border-white/35 bg-white/10 px-4 py-3">
+              <p className="text-xs tracking-wide text-blue-100 uppercase">Categories</p>
+              <p className="mt-1 text-2xl font-bold text-white">{stats.totalCategories}</p>
+            </div>
           </div>
         </header>
 

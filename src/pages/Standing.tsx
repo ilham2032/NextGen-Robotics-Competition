@@ -8,3 +8,4 @@ const Standing = () => {
 }
 
 export default Standing
+

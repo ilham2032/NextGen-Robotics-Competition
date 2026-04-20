@@ -1,41 +1,93 @@
 const Contact = () => {
   return (
-    <div className="mt-25">
-     <h1 className="font-display text-4xl lg:text-5xl font-bold text-blue-600 text-center">Contact Us</h1>
-     <div className="flex justify-between mt-26">
-      <div className="ml-8">
-        <h2 className="font-display text-3xl lg:text-5xl font-bold text-blue-600">Get in Touch</h2>
-          <p className="text-slate-600 mt-4 text-sm lg:text-base max-w-2xl">We would love to hear from you! Whether you have questions about the competition, want to become a sponsor, or just want to say hello, feel free to reach out to us.</p>
-        <div>
-        <h3 className="font-display text-xl lg:text-2xl font-bold text-black pb-8 pt-8">Email: <a href="mailto:info@yourcompany.com">info@yourcompany.com</a></h3>
+    <section className="min-h-screen bg-white px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-5xl">
+        {/* Header */}
+        <div className="text-center mt-10">
+          <p className="text-sm font-bold tracking-[0.2em] text-blue-600 uppercase">NextGen Robotics Competition</p>
+          <h1 className="mt-2 font-display text-3xl font-bold text-slate-800 sm:text-4xl">Contact Us</h1>
+          <p className="mt-3 text-slate-600 max-w-xl mx-auto mb-6">We would love to hear from you! Whether you have questions about the competition, want to become a sponsor, or just want to say hello, feel free to reach out to us.</p>
+        </div>
 
-        <h3 className="font-display text-xl lg:text-2xl font-bold text-black pb-8">Phone: 
-          +994 55 718 68 58
-        </h3>
+        <div className="grid gap-8 lg:grid-cols-2">
+          {/* Contact Info */}
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
+            <h2 className="font-display text-xl font-bold text-slate-800 mb-5">Get in Touch</h2>
+            
+            <div className="space-y-5">
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase mb-1">Email</p>
+                <a href="mailto:nextgenazer@gmail.com" className="text-base font-semibold text-blue-600 hover:text-blue-700">nextgenazer@gmail.com</a>
+              </div>
 
-        <h3 className="font-display text-xl lg:text-2xl font-bold text-black pb-8">
-          Address:
-          123 Robotics Ave, Tech City, Azerbaijan
-        </h3>
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase mb-1">Phone</p>
+                <p className="text-base font-semibold text-slate-800">+994 55 718 68 58</p>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase mb-1">Address</p>
+                <p className="text-base font-semibold text-slate-800">Baku, Azerbaijan</p>
+              </div>
+            </div>
+
+            {/* Volunteer Link */}
+            <div className="mt-8 pt-5 border-t border-slate-200">
+              <p className="text-sm text-slate-600 mb-3">Want to become a volunteer?</p>
+              <a 
+                href="https://docs.google.com/forms/d/e/1FAIpQLSd1sDtuykGlYbrVnl3HDxb6VryI7hzCmgc2W2q6LqPfrJ8IbQ/viewform?usp=publish_editor" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+              >
+                Volunteer Registration
+              </a>
+            </div>
+          </div>
+
+          {/* Contact Form */}
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
+            <h2 className="font-display text-xl font-bold text-slate-800 mb-5">Send us a Message</h2>
+            
+            <form className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Name</label>
+                <input 
+                  type="text" 
+                  placeholder="Your Name" 
+                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
+                <input 
+                  type="email" 
+                  placeholder="Your Email" 
+                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Message</label>
+                <textarea 
+                  placeholder="Your Message" 
+                  rows={4}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none resize-none"
+                ></textarea>
+              </div>
+              
+              <button 
+                type="submit" 
+                className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+              >
+                Send Message
+              </button>
+            </form>
+          </div>
         </div>
       </div>
-
-      <div className="mr-8">
-        <h2 className="font-display text-3xl lg:text-5xl font-bold text-blue-600">Send us a Message</h2>
-        <div>
-          <form action="nextgenazer@gmail.com">
-            <input type="text" placeholder="Your Name" className="w-full border border-gray-300 rounded-md p-3 mt-4"/>
-            <input type="email" placeholder="Your Email" className="w-full border border-gray-300 rounded-md p-3 mt-4"/>
-            <textarea placeholder="Your Message" className="w-full border border-gray-300 rounded-md p-3 mt-4 h-32"></textarea>
-            <button type="submit" className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition">Send Message</button>
-          </form>
-        </div>
-      </div>
-
-      </div>
-      
-      <h3 className="text-center font-bold font-display text-black text-3xl lg:text-2xl mt-24">Want to become volunteer in NextGen Robotics Competition? Visit: <a  href='https://docs.google.com/forms/d/e/1FAIpQLSd1sDtuykGlYbrVnl3HDxb6VryI7hzCmgc2W2q6LqPfrJ8IbQ/viewform?usp=publish-editor' className="text-blue-600 hover:underline">Volunteer Page</a></h3>
-    </div>
+    </section>
   )
 }
 
