@@ -1,10 +1,40 @@
+import { Link } from "react-router"
+
 const minisumo = () => {
   return (
-      <main className='min-h-screen bg-white py-12 px-6'>
-      <div className='max-w-4xl mx-auto'>
-        <header className='text-center mb-16 pt-10'>
-          <h1 className='text-5xl font-bold text-slate-900 mb-4'>Mini Sumo Regulations</h1>
-          <p className='text-lg text-slate-600'>Adapted from All Japan Robot Sumo Tournament standards for Mini Sumo category</p>
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 py-20">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-32 h-32 border border-white rounded-full"></div>
+          <div className="absolute bottom-10 right-10 w-48 h-48 border border-white rounded-full"></div>
+          <div className="absolute top-1/2 left-1/4 w-24 h-24 border border-white rounded-full"></div>
+        </div>
+        <div className="relative mx-auto max-w-6xl px-6 text-center">
+          <span className="inline-block rounded-full bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-200 mb-4">
+            NEXTGEN ROBOTICS COMPETITION 2026
+          </span>
+          <h1 className="font-display text-5xl md:text-6xl font-bold text-white mb-4">
+            Mini Sumo
+          </h1>
+          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+            Autonomous & RC robot sumo competition - Push your opponent out of the ring
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link
+              to="/regulations"
+              className="rounded-lg bg-white/10 border border-white/30 px-6 py-3 text-white font-semibold hover:bg-white/20 transition"
+            >
+              ← Back to Regulations
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <div className="max-w-4xl mx-auto px-6 py-12">
+        <header className="text-center mb-16 pt-10">
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">Mini Sumo Regulations</h1>
+          <p className="text-lg text-slate-600">Adapted from All Japan Robot Sumo Tournament standards</p>
         </header>
 
         <section className='mb-12'>
@@ -286,6 +316,20 @@ const minisumo = () => {
             <p>Yuko Point: First to touch outside loses.</p>
             <p>Assistant cannot become operator if injured.</p>
           </div>
+        </section>
+
+        {/* Contact Section */}
+        <section className="rounded-2xl bg-gradient-to-r from-blue-600 to-blue-800 p-8 text-center mt-12">
+          <h3 className="text-2xl font-bold text-white mb-4">Questions about Mini Sumo?</h3>
+          <p className="text-blue-100 mb-6">
+            Contact our technical team for clarifications on regulations
+          </p>
+          <Link
+            to="/contact"
+            className="inline-block rounded-lg bg-white px-8 py-3 font-semibold text-blue-700 hover:bg-blue-50 transition"
+          >
+            Contact Us
+          </Link>
         </section>
       </div>
     </main>

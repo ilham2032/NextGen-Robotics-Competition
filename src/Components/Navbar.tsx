@@ -39,7 +39,6 @@ const Navbar = () => {
                 <a
                   className='font-display text-[15px] xl:text-lg font-medium text-white bg-blue-500 hover:bg-blue-700 py-2 px-3 xl:px-4 rounded-2xl transition-colors'
                   href='/user/auth'
-                  target='_blank'
                   rel='noopener noreferrer'
                 >
                   Sign UP

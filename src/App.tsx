@@ -19,6 +19,11 @@ import UserAuth from './mentor/pages/UserAuth'
 import UserDashboard from './mentor/pages/UserDashboard'
 import ProtectedMentorRoute from './mentor/ProtectedMentorRoute'
 import Legoline from './Rules/legoline'
+import LineFollower from './Rules/linefollower'
+import Drone from './Rules/drone'
+import LegoSumo3kg from './Rules/3kglegosumo'
+import LegoSumo from './Rules/legosumo'
+import BotsCombat from './Rules/botscombat'
 import Partners from './pages/Sponsors'
 import NextGenAzerbaijan1st from './news/nextgenaze1st'
 import Teamszone from './teamszone/teamszone'
@@ -48,7 +53,12 @@ const App = () => {
           <Route path='/user/dashboard' element={<ProtectedMentorRoute><UserDashboard/></ProtectedMentorRoute>}/>
           <Route path='/regulations/mini-sumo' element={<Minisumo/>}/>
           <Route path='/regulations/mini-sumo-kids' element={<Minisumokids/>}/>
-          <Route path='/regulations/lego-line' element={<Legoline/>}/> 
+          <Route path='/regulations/lego-line' element={<Legoline/>}/>
+          <Route path='/regulations/line-follower' element={<LineFollower/>}/>
+          <Route path='/regulations/drone-race' element={<Drone/>}/>
+          <Route path='/regulations/lego-sumo-3kg' element={<LegoSumo3kg/>}/>
+          <Route path='/regulations/lego-sumo' element={<LegoSumo/>}/>
+          <Route path='/regulations/bots-combat' element={<BotsCombat/>}/> 
           <Route path='/news/nextgen1' element={<NextGenAzerbaijan1st/>}/>
           <Route path='/teamszone' element={<Teamszone/>}/>
       </Routes>
