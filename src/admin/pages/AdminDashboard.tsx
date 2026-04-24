@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react"
 import { useNavigate } from "react-router"
 import { logoutAdmin } from "../auth"
-import { createId, getCategories, getMembers, getTeams, saveCategories, saveTeams } from "../storage"
-import type { Category, Member, Team } from "../types"
+import { createId, getCategories, getMembers, getTeams, saveCategories, saveTeams, getReferees, saveReferees } from "../storage"
+import type { Category, Member, Team, Referee } from "../types"
 
 const AdminDashboard = () => {
   const navigate = useNavigate()
@@ -10,6 +10,7 @@ const AdminDashboard = () => {
   const [teams, setTeams] = useState<Team[]>(() => getTeams())
   const [members, setMembers] = useState<Member[]>(() => getMembers())
   const [categories, setCategories] = useState<Category[]>(() => getCategories())
+  const [referees, setReferees] = useState<Referee[]>(() => getReferees())
 
   const [teamName, setTeamName] = useState("")
   const [teamSchool, setTeamSchool] = useState("")
@@ -20,6 +21,12 @@ const AdminDashboard = () => {
   const [categoryPdfName, setCategoryPdfName] = useState("")
   const [categoryPdfDataUrl, setCategoryPdfDataUrl] = useState("")
   const [categoryError, setCategoryError] = useState("")
+
+  const [refereeName, setRefereeName] = useState("")
+  const [refereeSurname, setRefereeSurname] = useState("")
+  const [refereeEmail, setRefereeEmail] = useState("")
+  const [refereePassword, setRefereePassword] = useState("")
+  const [refereeRole, setRefereeRole] = useState<'referee' | 'judge' | 'organizer'>('referee')
 
   const stats = useMemo(() => {
     const uniqueCountries = new Set(teams.map(t => t.school).filter(Boolean))
@@ -127,6 +134,48 @@ const AdminDashboard = () => {
     saveCategories(nextCategories)
   }
 
+  const handleAddReferee = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const existingReferees = getReferees()
+    const email = refereeEmail.trim().toLowerCase()
+
+    if (existingReferees.some((referee) => referee.email === email)) {
+      alert("A referee with this email already exists.")
+      return
+    }
+
+    // Simple password hashing (in production, use proper crypto)
+    const salt = Math.random().toString(36).substring(2, 15)
+    const passwordHash = btoa(refereePassword + salt)
+
+    const newReferee: Referee = {
+      id: createId("referee"),
+      name: refereeName.trim(),
+      surname: refereeSurname.trim(),
+      email,
+      passwordHash,
+      passwordSalt: salt,
+      role: refereeRole,
+    }
+
+    const nextReferees = [newReferee, ...referees]
+    setReferees(nextReferees)
+    saveReferees(nextReferees)
+
+    setRefereeName("")
+    setRefereeSurname("")
+    setRefereeEmail("")
+    setRefereePassword("")
+    setRefereeRole('referee')
+  }
+
+  const handleRemoveReferee = (refereeId: string) => {
+    const nextReferees = referees.filter((referee) => referee.id !== refereeId)
+    setReferees(nextReferees)
+    saveReferees(nextReferees)
+  }
+
   return (
     <section className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 px-4 pb-16 pt-14 lg:px-8">
       <div className="mx-auto max-w-6xl">
@@ -165,7 +214,7 @@ const AdminDashboard = () => {
           </div>
         </header>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-2">
+        <div className="mt-8 grid gap-8 lg:grid-cols-3">
           <div className="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
             <h2 className="font-display text-3xl font-semibold text-blue-900">Control Teams</h2>
             <p className="mt-1 text-sm text-slate-600">Add and manage participating teams.</p>
@@ -281,6 +330,85 @@ const AdminDashboard = () => {
                     <p className="mt-1 text-xs text-blue-700">PDF: {category.pdfName || "No file"}</p>
                     <button
                       onClick={() => handleRemoveCategory(category.id)}
+                      className="mt-2 text-sm font-semibold text-red-600 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  </article>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-green-100 bg-white p-6 shadow-sm">
+            <h2 className="font-display text-3xl font-semibold text-green-900">Manage Referees</h2>
+            <p className="mt-1 text-sm text-slate-600">Create accounts for referees, judges, and organizers.</p>
+
+            <form className="mt-5 space-y-3" onSubmit={handleAddReferee}>
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="text"
+                  value={refereeName}
+                  onChange={(event) => setRefereeName(event.target.value)}
+                  placeholder="First name"
+                  className="w-full rounded-xl border border-green-200 px-4 py-2.5 focus:border-green-500 focus:outline-none"
+                  required
+                />
+                <input
+                  type="text"
+                  value={refereeSurname}
+                  onChange={(event) => setRefereeSurname(event.target.value)}
+                  placeholder="Last name"
+                  className="w-full rounded-xl border border-green-200 px-4 py-2.5 focus:border-green-500 focus:outline-none"
+                  required
+                />
+              </div>
+              <input
+                type="email"
+                value={refereeEmail}
+                onChange={(event) => setRefereeEmail(event.target.value)}
+                placeholder="Email address"
+                className="w-full rounded-xl border border-green-200 px-4 py-2.5 focus:border-green-500 focus:outline-none"
+                required
+              />
+              <input
+                type="password"
+                value={refereePassword}
+                onChange={(event) => setRefereePassword(event.target.value)}
+                placeholder="Password"
+                className="w-full rounded-xl border border-green-200 px-4 py-2.5 focus:border-green-500 focus:outline-none"
+                required
+                minLength={6}
+              />
+              <select
+                value={refereeRole}
+                onChange={(event) => setRefereeRole(event.target.value as 'referee' | 'judge' | 'organizer')}
+                className="w-full rounded-xl border border-green-200 px-4 py-2.5 focus:border-green-500 focus:outline-none"
+                required
+              >
+                <option value="referee">Referee</option>
+                <option value="judge">Judge</option>
+                <option value="organizer">Organizer</option>
+              </select>
+              <button
+                type="submit"
+                className="w-full rounded-xl bg-green-600 py-2.5 font-semibold text-white transition hover:bg-green-700"
+              >
+                Create Referee Account
+              </button>
+            </form>
+
+            <div className="mt-5 space-y-3">
+              {referees.length === 0 ? (
+                <p className="text-sm text-slate-500">No referees yet.</p>
+              ) : (
+                referees.map((referee) => (
+                  <article key={referee.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="font-semibold text-slate-900">{referee.name} {referee.surname}</p>
+                    <p className="text-sm text-slate-600">{referee.email}</p>
+                    <p className="text-xs text-green-700 capitalize">Role: {referee.role}</p>
+                    <button
+                      onClick={() => handleRemoveReferee(referee.id)}
                       className="mt-2 text-sm font-semibold text-red-600 hover:text-red-700"
                     >
                       Remove

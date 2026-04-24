@@ -1,10 +1,14 @@
-import type { Category, Member, Mentor, Team } from "./types"
+import type { Category, Member, Mentor, Team, Referee, MatchResult, CompetitionResult } from "./types"
 
 const TEAM_STORAGE_KEY = "nextgen_admin_teams"
 const CATEGORY_STORAGE_KEY = "nextgen_admin_categories"
 const MENTOR_STORAGE_KEY = "nextgen_mentors"
 const MENTOR_SESSION_KEY = "nextgen_mentor_session"
 const MEMBER_STORAGE_KEY = "nextgen_members"
+const REFEREE_STORAGE_KEY = "nextgen_referees"
+const REFEREE_SESSION_KEY = "nextgen_referee_session"
+const MATCH_RESULTS_KEY = "nextgen_match_results"
+const COMPETITION_RESULTS_KEY = "nextgen_competition_results"
 
 const defaultTeams: Team[] = []
 
@@ -135,4 +139,32 @@ export const getMembers = (): Member[] => parseStoredList<Member>(localStorage.g
 
 export const saveMembers = (members: Member[]): void => {
   localStorage.setItem(MEMBER_STORAGE_KEY, JSON.stringify(members))
+}
+
+export const getReferees = (): Referee[] => parseStoredList<Referee>(localStorage.getItem(REFEREE_STORAGE_KEY)) ?? []
+
+export const saveReferees = (referees: Referee[]): void => {
+  localStorage.setItem(REFEREE_STORAGE_KEY, JSON.stringify(referees))
+}
+
+export const setRefereeSession = (refereeId: string): void => {
+  localStorage.setItem(REFEREE_SESSION_KEY, refereeId)
+}
+
+export const getRefereeSession = (): string | null => localStorage.getItem(REFEREE_SESSION_KEY)
+
+export const clearRefereeSession = (): void => {
+  localStorage.removeItem(REFEREE_SESSION_KEY)
+}
+
+export const getMatchResults = (): MatchResult[] => parseStoredList<MatchResult>(localStorage.getItem(MATCH_RESULTS_KEY)) ?? []
+
+export const saveMatchResults = (results: MatchResult[]): void => {
+  localStorage.setItem(MATCH_RESULTS_KEY, JSON.stringify(results))
+}
+
+export const getCompetitionResults = (): CompetitionResult[] => parseStoredList<CompetitionResult>(localStorage.getItem(COMPETITION_RESULTS_KEY)) ?? []
+
+export const saveCompetitionResults = (results: CompetitionResult[]): void => {
+  localStorage.setItem(COMPETITION_RESULTS_KEY, JSON.stringify(results))
 }

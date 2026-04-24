@@ -38,3 +38,38 @@ export type Member = {
   email: string
   phone: string
 }
+
+export type Referee = {
+  id: string
+  name: string
+  surname: string
+  email: string
+  passwordHash: string
+  passwordSalt: string
+  role: 'referee' | 'judge' | 'organizer'
+}
+
+export type MatchResult = {
+  id: string
+  categoryId: string
+  team1Id: string
+  team2Id: string
+  team1Score: number
+  team2Score: number
+  winnerId: string | null // null for draw
+  refereeId: string
+  round: number
+  matchDate: string
+  notes?: string
+}
+
+export type CompetitionResult = {
+  id: string
+  categoryId: string
+  teamId: string
+  position: number // 1st, 2nd, 3rd place
+  totalScore: number
+  matchesPlayed: number
+  refereeId: string
+  finalized: boolean
+}

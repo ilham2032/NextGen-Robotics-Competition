@@ -18,6 +18,9 @@ import ProtectedAdminRoute from './admin/ProtectedAdminRoute'
 import UserAuth from './mentor/pages/UserAuth'
 import UserDashboard from './mentor/pages/UserDashboard'
 import ProtectedMentorRoute from './mentor/ProtectedMentorRoute'
+import RefereeLogin from './referee/pages/RefereeLogin'
+import ProtectedRefereeRoute from './referee/ProtectedRefereeRoute'
+import RefereeDashboard from './referee/pages/RefereeDashboard'
 import Legoline from './Rules/legoline'
 import LineFollower from './Rules/linefollower'
 import Drone from './Rules/drone'
@@ -27,10 +30,19 @@ import BotsCombat from './Rules/botscombat'
 import Partners from './pages/Sponsors'
 import NextGenAzerbaijan1st from './news/nextgenaze1st'
 import Teamszone from './teamszone/teamszone'
+import TeamRegistration from './teamszone/registration/TeamRegistration'
+import TeamMiniSumo from './teamszone/categoryteams/teamminisumo'
+import Team1kgSumo from './teamszone/categoryteams/team1kgsumo'
+import Team3kgSumo from './teamszone/categoryteams/team3kgsumo'
+import TeamLineFollower from './teamszone/categoryteams/teamlinefollower'
+import TeamLegoLine from './teamszone/categoryteams/teamlegoline'
+import TeamDrone from './teamszone/categoryteams/teamdrone'
+import TeamStartupJr from './teamszone/categoryteams/teamstartupjr'
+import TeamStartupSenior from './teamszone/categoryteams/teamstartupsenior'
 
 const App = () => {
   const location = useLocation()
-  const isPortalRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/user')
+  const isPortalRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/user') || location.pathname.startsWith('/referee')
 
   return (
     <div>
@@ -51,6 +63,8 @@ const App = () => {
           <Route path='/admin' element={<ProtectedAdminRoute><AdminPage/></ProtectedAdminRoute>}/>
           <Route path='/user/auth' element={<UserAuth/>}/>
           <Route path='/user/dashboard' element={<ProtectedMentorRoute><UserDashboard/></ProtectedMentorRoute>}/>
+          <Route path='/referee/login' element={<RefereeLogin/>}/>
+          <Route path='/referee/dashboard' element={<ProtectedRefereeRoute><RefereeDashboard/></ProtectedRefereeRoute>}/>
           <Route path='/regulations/mini-sumo' element={<Minisumo/>}/>
           <Route path='/regulations/mini-sumo-kids' element={<Minisumokids/>}/>
           <Route path='/regulations/lego-line' element={<Legoline/>}/>
@@ -61,6 +75,15 @@ const App = () => {
           <Route path='/regulations/bots-combat' element={<BotsCombat/>}/> 
           <Route path='/news/nextgen1' element={<NextGenAzerbaijan1st/>}/>
           <Route path='/teamszone' element={<Teamszone/>}/>
+          <Route path='/teamszone/register' element={<TeamRegistration/>}/>
+          <Route path='/teamszone/mini-sumo' element={<ProtectedRefereeRoute><TeamMiniSumo/></ProtectedRefereeRoute>}/>
+          <Route path='/teamszone/1kg-lego-sumo' element={<ProtectedRefereeRoute><Team1kgSumo/></ProtectedRefereeRoute>}/>
+          <Route path='/teamszone/3kg-lego-sumo' element={<ProtectedRefereeRoute><Team3kgSumo/></ProtectedRefereeRoute>}/>
+          <Route path='/teamszone/line-follower' element={<ProtectedRefereeRoute><TeamLineFollower/></ProtectedRefereeRoute>}/>
+          <Route path='/teamszone/lego-line' element={<ProtectedRefereeRoute><TeamLegoLine/></ProtectedRefereeRoute>}/>
+          <Route path='/teamszone/drone' element={<ProtectedRefereeRoute><TeamDrone/></ProtectedRefereeRoute>}/>
+          <Route path='/teamszone/start-up-junior' element={<ProtectedRefereeRoute><TeamStartupJr/></ProtectedRefereeRoute>}/>
+          <Route path='/teamszone/start-up-senior' element={<ProtectedRefereeRoute><TeamStartupSenior/></ProtectedRefereeRoute>}/>
       </Routes>
       {!isPortalRoute && <Footer/>}
     </div>
