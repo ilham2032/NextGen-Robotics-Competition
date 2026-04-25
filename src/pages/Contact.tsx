@@ -1,15 +1,17 @@
 const Contact = () => {
   return (
-    <section className="min-h-screen bg-white px-4 py-16 sm:px-6">
+    <section className="min-h-screen bg-slate-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
       <div className="mx-auto max-w-5xl">
         {/* Header */}
-        <div className="text-center mt-10">
-          <p className="text-sm font-bold tracking-[0.2em] text-blue-600 uppercase">NextGen Robotics Competition</p>
-          <h1 className="mt-2 font-display text-3xl font-bold text-slate-800 sm:text-4xl">Contact Us</h1>
-          <p className="mt-3 text-slate-600 max-w-xl mx-auto mb-6">We would love to hear from you! Whether you have questions about the competition, want to become a sponsor, or just want to say hello, feel free to reach out to us.</p>
+        <div className="rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 px-6 py-10 text-white shadow-lg sm:px-8">
+          <p className="text-xs font-semibold tracking-[0.25em] text-blue-100 uppercase">Support</p>
+          <h1 className="mt-2 font-display text-3xl font-bold sm:text-5xl">Contact Us</h1>
+          <p className="mt-3 max-w-2xl text-sm text-blue-100 sm:text-base">
+            We would love to hear from you. Reach out for competition questions, sponsorship, volunteering, or general support.
+          </p>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="mt-8 grid gap-8 lg:grid-cols-2">
           {/* Contact Info */}
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
             <h2 className="font-display text-xl font-bold text-slate-800 mb-5">Get in Touch</h2>

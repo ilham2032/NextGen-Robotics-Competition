@@ -22,6 +22,7 @@ const UserDashboard = () => {
   const [teamName, setTeamName] = useState("")
   const [teamCountry, setTeamCountry] = useState("")
   const [teamCategory, setTeamCategory] = useState("")
+  const [teamDescription, setTeamDescription] = useState("")
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([])
   const [teamError, setTeamError] = useState("")
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null)
@@ -191,6 +192,11 @@ const UserDashboard = () => {
       return
     }
 
+    if (!teamDescription.trim()) {
+      setTeamError("Please provide robot description and technical details.")
+      return
+    }
+
     if (selectedMemberIds.length === 0) {
       setTeamError("Please select at least one member for the team.")
       return
@@ -207,6 +213,7 @@ const UserDashboard = () => {
       name: teamName.trim(),
       school: teamCountry.trim(),
       members: selectedMembers.length,
+      description: teamDescription.trim(),
       categoryName: teamCategory,
       memberIds: selectedMembers.map((member) => member.id),
       memberNames: selectedMembers.map((member) => `${member.name} ${member.surname}`),
@@ -221,6 +228,7 @@ const UserDashboard = () => {
     setTeamName("")
     setTeamCountry("")
     setTeamCategory("")
+    setTeamDescription("")
     setSelectedMemberIds([])
     setTeamError("")
   }
@@ -240,10 +248,11 @@ const UserDashboard = () => {
     const form = new FormData(event.currentTarget)
     const name = String(form.get("teamName") ?? "").trim()
     const categoryName = String(form.get("categoryName") ?? "").trim()
+    const description = String(form.get("description") ?? "").trim()
     const memberIds = form.getAll("memberIds").map((value) => String(value))
 
-    if (!name || !categoryName || memberIds.length === 0) {
-      setTeamError("Team name, category, and at least one member are required.")
+    if (!name || !categoryName || !description || memberIds.length === 0) {
+      setTeamError("Team name, category, description, and participants are required.")
       return
     }
 
@@ -259,6 +268,7 @@ const UserDashboard = () => {
             ...team,
             name,
             categoryName,
+            description,
             memberIds: selectedMembers.map((member) => member.id),
             memberNames: selectedMembers.map((member) => `${member.name} ${member.surname}`),
             members: selectedMembers.length,
@@ -470,6 +480,21 @@ const UserDashboard = () => {
                   />
                 </div>
 
+                <div>
+                  <label htmlFor="teamDescription" className="block text-sm font-medium text-gray-700 mb-2">
+                    Robot Description and Technical Details *
+                  </label>
+                  <textarea
+                    id="teamDescription"
+                    value={teamDescription}
+                    onChange={(event) => setTeamDescription(event.target.value)}
+                    placeholder="Describe your robot design, materials, sensors, controller, and strategy."
+                    rows={4}
+                    className="block w-full px-4 py-3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base"
+                    required
+                  />
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="teamCountry" className="block text-sm font-medium text-gray-700 mb-2">Country *</label>
@@ -509,7 +534,7 @@ const UserDashboard = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Select Team Members *
+                    Participants (Mentor Registered) *
                     <span className="text-sm text-gray-500 ml-2">({selectedMemberIds.length} selected)</span>
                   </label>
                   <div className="border-2 border-gray-200 border-dashed rounded-lg p-4 max-h-48 overflow-y-auto bg-gray-50">
@@ -722,6 +747,14 @@ const UserDashboard = () => {
                             <option key={category.id} value={category.name}>{category.name}</option>
                           ))}
                         </select>
+                        <textarea
+                          name="description"
+                          defaultValue={team.description ?? ""}
+                          rows={3}
+                          placeholder="Robot description and technical details"
+                          className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                          required
+                        />
                         <div className="border border-gray-300 rounded-md p-3 max-h-32 overflow-y-auto">
                           <p className="text-sm font-medium text-gray-700 mb-2">Select Members</p>
                           <div className="space-y-2">
@@ -766,6 +799,12 @@ const UserDashboard = () => {
                             </svg>
                             <span>{team.categoryName ?? "N/A"}</span>
                           </div>
+                          {team.description && (
+                            <div className="mt-2 rounded-md bg-slate-50 p-2">
+                              <p className="text-xs font-semibold text-slate-700">Robot Details</p>
+                              <p className="mt-1 text-xs text-slate-600">{team.description}</p>
+                            </div>
+                          )}
                           {team.memberNames && team.memberNames.length > 0 && (
                             <div className="mt-3">
                               <div className="flex items-center mb-1">

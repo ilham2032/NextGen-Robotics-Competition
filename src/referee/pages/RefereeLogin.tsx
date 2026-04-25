@@ -27,7 +27,7 @@ const RefereeLogin = () => {
 
       setSuccess("Signed in successfully!")
         setTimeout(() => navigate("/referee/dashboard"), 1000)
-    } catch (err) {
+    } catch {
       setError("An error occurred. Please try again.")
     } finally {
       setLoading(false)

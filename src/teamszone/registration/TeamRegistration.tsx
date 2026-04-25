@@ -1,10 +1,8 @@
 import { useState } from "react"
-import { useNavigate } from "react-router"
-import { getCategories, saveTeams, createId } from "../../admin/storage"
-import type { Team, Category } from "../../admin/types"
+import { getCategories, createId } from "../../admin/storage"
+import type { Team } from "../../admin/types"
 
 const TeamRegistration = () => {
-  const navigate = useNavigate()
   const categories = getCategories()
 
   const [loading, setLoading] = useState(false)
@@ -26,31 +24,36 @@ const TeamRegistration = () => {
 
   const handleMemberChange = (index: number, field: string, value: string | number) => {
     switch (field) {
-      case 'name':
+      case 'name': {
         const newNames = [...memberNames]
         newNames[index] = value as string
         setMemberNames(newNames)
         break
-      case 'age':
+      }
+      case 'age': {
         const newAges = [...memberAges]
         newAges[index] = value as number
         setMemberAges(newAges)
         break
-      case 'email':
+      }
+      case 'email': {
         const newEmails = [...memberEmails]
         newEmails[index] = value as string
         setMemberEmails(newEmails)
         break
-      case 'phone':
+      }
+      case 'phone': {
         const newPhones = [...memberPhones]
         newPhones[index] = value as string
         setMemberPhones(newPhones)
         break
-      case 'fin':
+      }
+      case 'fin': {
         const newFINs = [...memberFINs]
         newFINs[index] = value as string
         setMemberFINs(newFINs)
         break
+      }
     }
   }
 
@@ -154,7 +157,7 @@ const TeamRegistration = () => {
       setMemberPhones(["", "", ""])
       setMemberFINs(["", "", ""])
 
-    } catch (err) {
+    } catch {
       setError("An error occurred during registration. Please try again.")
     } finally {
       setLoading(false)

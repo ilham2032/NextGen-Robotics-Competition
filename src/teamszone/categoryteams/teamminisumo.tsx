@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { getCurrentReferee } from '../../referee/auth'
 import { getCategories, getTeams } from '../../admin/storage'
-import type { Team } from '../../admin/types'
 
 const TeamMiniSumo = () => {
   const navigate = useNavigate()

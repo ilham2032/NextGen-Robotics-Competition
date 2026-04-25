@@ -1,10 +1,28 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, NavLink } from 'react-router'
 
+const navItems = [
+  { label: 'Home', path: '/home' },
+  { label: 'About', path: '/about' },
+  { label: 'Standings', path: '/standings' },
+  { label: 'News', path: '/news' },
+  { label: 'Participants', path: '/participants' },
+  { label: 'Regulations', path: '/regulations' },
+  { label: 'Partners', path: '/partners' },
+  { label: 'Awards', path: '/awards' },
+  { label: 'FAQ', path: '/faq' },
+  { label: 'Contact', path: '/contact' },
+]
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const navClassName = ({ isActive }: { isActive: boolean }) =>
+    `font-display rounded-full px-3 py-2 text-sm xl:text-base font-medium tracking-wide transition-all ${
+      isActive
+        ? 'bg-white/18 !text-white ring-1 ring-white/40'
+        : '!text-white hover:bg-white/10'
+    }`
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,73 +35,67 @@ const Navbar = () => {
 
   return (
     <div className={`sticky-navbar ${isScrolled ? 'scrolled' : ''}`}>
-      <nav className='navbar-inner mx-auto mt-3 flex justify-between items-center bg-blue-600 rounded-[14px] py-2 px-2 md:px-4 border border-[#60a5fa] shadow-[0_8px_20px_rgba(37,99,235,0.35),0_0_18px_rgba(96,165,250,0.35)]'>
-            <Link to='/home' className='flex items-center gap-2 pl-1'>
-                <div className='leading-tight rounded-md bg-white/10 px-2 py-1 sm:px-3'>
-                  <p className='font-display text-xs sm:text-sm lg:text-base text-white'>NextGen Robotics</p>
-                  <p className='text-[9px] sm:text-[10px] lg:text-xs text-blue-100 tracking-[0.16em]'>COMPETITION</p>
-                </div>
-            </Link>
-
-            {/* Desktop Menu */}
-            <ul className='hidden lg:flex items-center gap-2 xl:gap-3 mt-1'>
-                <Link className='font-display text-[15px] xl:text-lg font-medium text-white hover:text-blue-200 transition-colors' to='/home'>Home</Link>
-                <Link className='font-display text-[15px] xl:text-lg font-medium text-white hover:text-blue-200 transition-colors' to='/about'>About</Link>
-                <Link className='font-display text-[15px] xl:text-lg font-medium text-white hover:text-blue-200 transition-colors' to='/standings'>Standings</Link>
-                <Link className='font-display text-[15px] xl:text-lg font-medium text-white hover:text-blue-200 transition-colors' to='/news'>News</Link>
-                <Link className='font-display text-[15px] xl:text-lg font-medium text-white hover:text-blue-200 transition-colors' to='/participants'>Participants</Link>
-                <Link className='font-display text-[15px] xl:text-lg font-medium text-white hover:text-blue-200 transition-colors' to='/regulations'>Regulations</Link>
-                <Link className='font-display text-[15px] xl:text-lg font-medium text-white hover:text-blue-200 transition-colors' to='/partners'>Partners</Link>
-                <Link className='font-display text-[15px] xl:text-lg font-medium text-white hover:text-blue-200 transition-colors' to='/awards'>Awards</Link>
-                <Link className='font-display text-[15px] xl:text-lg font-medium text-white hover:text-blue-200 transition-colors' to='/contact'>Contact</Link>
-                <a
-                  className='font-display text-[15px] xl:text-lg font-medium text-white bg-blue-500 hover:bg-blue-700 py-2 px-3 xl:px-4 rounded-2xl transition-colors'
-                  href='/user/auth'
-                  rel='noopener noreferrer'
-                >
-                  Sign UP
-                </a>
-            </ul>
-
-            <button
-              className='lg:hidden text-white text-3xl font-bold focus:outline-none px-2'
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? '✕' : '☰'}
-            </button>
-        </nav>
-
-        {isMenuOpen && (
-          <div className='lg:hidden absolute right-0 top-full mt-2 w-[min(92vw,420px)] bg-blue-600 rounded-[14px] border border-[#60a5fa] shadow-lg z-50'>
-             <Link to='/home' className='flex items-center gap-2 pl-1'>
-                <div className='leading-tight rounded-md bg-white/10 px-2 py-1'>
-                  <p className='font-display text-sm text-white'>NextGen Robotics</p>
-                  <p className='text-[10px] text-blue-100 tracking-[0.16em]'>COMPETITION</p>
-                </div>
-            </Link>
-            <ul className='flex flex-col py-4 px-4 space-y-4'>
-                <Link className='font-display text-[20px] font-medium text-white hover:text-blue-200 transition-colors py-2' to='/home' onClick={() => setIsMenuOpen(false)}>Home</Link>
-                <Link className='font-display text-[20px] font-medium text-white hover:text-blue-200 transition-colors py-2' to='/about' onClick={() => setIsMenuOpen(false)}>About</Link>
-                <Link className='font-display text-[20px] font-medium text-white hover:text-blue-200 transition-colors py-2' to='/standings' onClick={() => setIsMenuOpen(false)}>Standings</Link>
-                <Link className='font-display text-[20px] font-medium text-white hover:text-blue-200 transition-colors py-2' to='/news' onClick={() => setIsMenuOpen(false)}>News</Link>
-                <Link className='font-display text-[20px] font-medium text-white hover:text-blue-200 transition-colors py-2' to='/participants' onClick={() => setIsMenuOpen(false)}>Participants</Link>
-                <Link className='font-display text-[20px] font-medium text-white hover:text-blue-200 transition-colors py-2' to='/regulations' onClick={() => setIsMenuOpen(false)}>Regulations</Link>
-                <Link className='font-display text-[20px] font-medium text-white hover:text-blue-200 transition-colors py-2' to='/partners' onClick={() => setIsMenuOpen(false)}>Partners</Link>
-                <Link className='font-display text-[20px] font-medium text-white hover:text-blue-200 transition-colors py-2' to='/awards' onClick={() => setIsMenuOpen(false)}>Awards</Link>
-                <Link className='font-display text-[20px] font-medium text-white hover:text-blue-200 transition-colors py-2' to='/contact' onClick={() => setIsMenuOpen(false)}>Contact</Link>
-                <a
-                  className='font-display text-[20px] font-medium text-white bg-blue-500 hover:bg-blue-700 py-3 px-6 rounded-2xl transition-colors w-full text-left'
-                  href='/user/auth'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Sign UP
-                </a>
-            </ul>
+      <nav className='navbar-inner mx-auto mt-3 flex justify-between items-center rounded-2xl py-2 px-3 md:px-4 border border-white/20 bg-gradient-to-r from-blue-700/95 via-blue-600/95 to-indigo-700/95 shadow-[0_12px_36px_rgba(15,23,42,0.32)] backdrop-blur-md'>
+        <Link to='/home' className='flex items-center gap-2 pl-1'>
+          <div className='leading-tight rounded-lg bg-white/12 px-2 py-1 sm:px-3'>
+            <p className='font-display text-xs sm:text-sm lg:text-base text-white'>NextGen Robotics</p>
+            <p className='text-[9px] sm:text-[10px] lg:text-xs text-blue-100 tracking-[0.16em]'>COMPETITION</p>
           </div>
-        )}
+        </Link>
+
+        {/* Desktop Menu */}
+        <ul className='hidden lg:flex items-center gap-1 xl:gap-1.5'>
+          {navItems.map((item) => (
+            <NavLink key={item.path} className={navClassName} to={item.path}>
+              {item.label}
+            </NavLink>
+          ))}
+          <a
+            className='font-display ml-2 rounded-full bg-cyan-400 px-4 py-2 text-sm xl:text-base font-semibold text-slate-900 transition-colors hover:bg-cyan-300'
+            href='/user/auth'
+            rel='noopener noreferrer'
+          >
+            Sign Up
+          </a>
+        </ul>
+
+        <button
+          className='lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-white/40'
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label='Toggle menu'
+        >
+          {isMenuOpen ? '✕' : '☰'}
+        </button>
+      </nav>
+
+      {isMenuOpen && (
+        <div className='lg:hidden absolute right-3 top-full mt-2 w-[min(92vw,430px)] rounded-2xl border border-white/20 bg-gradient-to-b from-blue-700/95 to-indigo-700/95 p-4 shadow-xl z-50 backdrop-blur-md'>
+          <ul className='grid grid-cols-2 gap-2'>
+            {navItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                onClick={() => setIsMenuOpen(false)}
+                className={({ isActive }) =>
+                  `font-display rounded-xl px-3 py-2 text-sm font-medium transition ${
+                    isActive ? 'bg-white/20 !text-white' : '!text-white hover:bg-white/10'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </ul>
+          <a
+            className='mt-4 inline-flex w-full items-center justify-center rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-cyan-300'
+            href='/user/auth'
+            rel='noopener noreferrer'
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Sign Up
+          </a>
+        </div>
+      )}
     </div>
   )
 }

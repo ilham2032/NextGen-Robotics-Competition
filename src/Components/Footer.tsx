@@ -16,7 +16,8 @@ const Footer = () => {
             <Link to='/standings' className='px-4 py-2 rounded-full bg-blue-500/20 hover:bg-blue-500/40 text-blue-100 transition'>Standings</Link>
             <Link to='/news' className='px-4 py-2 rounded-full bg-blue-500/20 hover:bg-blue-500/40 text-blue-100 transition'>News</Link>
             <Link to='/regulations' className='px-4 py-2 rounded-full bg-blue-500/20 hover:bg-blue-500/40 text-blue-100 transition'>Regulations</Link>
-            <Link to='/sponsors' className='px-4 py-2 rounded-full bg-blue-500/20 hover:bg-blue-500/40 text-blue-100 transition'>Sponsors</Link>
+            <Link to='/partners' className='px-4 py-2 rounded-full bg-blue-500/20 hover:bg-blue-500/40 text-blue-100 transition'>Partners</Link>
+            <Link to='/faq' className='px-4 py-2 rounded-full bg-blue-500/20 hover:bg-blue-500/40 text-blue-100 transition'>FAQ</Link>
             <Link to='/contact' className='px-4 py-2 rounded-full bg-blue-500/20 hover:bg-blue-500/40 text-blue-100 transition'>Contact</Link>
           </div>
         </div>
@@ -25,7 +26,7 @@ const Footer = () => {
 
         <div className='flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-400'>
           <p className='text-center md:text-left'>&copy; {new Date().getFullYear()} NextGen Robotics Competition. All rights reserved.</p>
-          <p className='text-center md:text-right'>Designed and developed by <strong className='text-cyan-300'>INNOVATIONS TEAM</strong></p>
+          <p className='text-center md:text-right'>Built by <strong className='text-cyan-300'>NextGen Innovations Team</strong></p>
         </div>
       </div>
     </footer>

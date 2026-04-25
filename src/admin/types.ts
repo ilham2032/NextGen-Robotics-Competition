@@ -3,6 +3,7 @@ export type Team = {
   name: string
   school: string
   members: number
+  description?: string
   categoryName?: string
   memberIds?: string[]
   memberNames?: string[]

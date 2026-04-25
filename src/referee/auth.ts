@@ -1,14 +1,9 @@
-import { createId, getRefereeSession, getReferees, saveReferees, setRefereeSession, clearRefereeSession } from "../admin/storage"
+import { getRefereeSession, getReferees, setRefereeSession, clearRefereeSession } from "../admin/storage"
 import type { Referee } from "../admin/types"
 
 const encoder = new TextEncoder()
 
 const toBase64 = (bytes: Uint8Array): string => btoa(String.fromCharCode(...bytes))
-
-const randomSalt = (): string => {
-  const bytes = crypto.getRandomValues(new Uint8Array(16))
-  return toBase64(bytes)
-}
 
 const deriveHash = async (password: string, salt: string): Promise<string> => {
   const keyMaterial = await crypto.subtle.importKey("raw", encoder.encode(password), { name: "PBKDF2" }, false, [
@@ -26,11 +21,6 @@ const deriveHash = async (password: string, salt: string): Promise<string> => {
   )
 
   return toBase64(new Uint8Array(derivedBits))
-}
-
-type SignInInput = {
-  email: string
-  password: string
 }
 
 export const signInReferee = async (email: string, password: string): Promise<{ ok: boolean; message: string }> => {

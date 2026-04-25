@@ -1,20 +1,7 @@
-import React from 'react'
-import { useEffect } from 'react'
-import { Link, useNavigate } from 'react-router'
-import { getCurrentReferee } from '../referee/auth'
+import { Link } from 'react-router'
 import { getCategories, getTeams } from '../admin/storage'
-import type { Category, Team } from '../admin/types'
 
-const Teamszone = () => {  const navigate = useNavigate()
-
-  useEffect(() => {
-    const referee = getCurrentReferee()
-    if (referee) {
-      // If user is a referee, redirect to referee dashboard
-      navigate('/referee/dashboard')
-      return
-    }
-  }, [navigate])
+const Teamszone = () => {
   const categories = getCategories()
   const teams = getTeams()
 
@@ -36,8 +23,8 @@ const Teamszone = () => {  const navigate = useNavigate()
             TEAMS ZONE
           </h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Explore teams competing in different categories of the NextGen Robotics Competition.
-            Discover innovative projects and talented participants from around the world.
+            Referee operations area for reviewing category participation and team statistics.
+            Competition joining and team creation are handled through the mentor portal.
           </p>
         </div>
 
@@ -111,17 +98,17 @@ const Teamszone = () => {  const navigate = useNavigate()
           </div>
         </div>
 
-        {/* Call to Action */}
+        {/* Portal Guidance */}
         <div className="text-center bg-white rounded-xl shadow-sm border border-blue-100 p-8">
-          <h3 className="text-xl font-semibold text-slate-800 mb-3">Ready to Join the Competition?</h3>
+          <h3 className="text-xl font-semibold text-slate-800 mb-3">Team Registration is in Mentor Portal</h3>
           <p className="text-slate-600 mb-6 max-w-md mx-auto">
-            Register your team and showcase your robotics innovations to the world.
+            Participants and mentors should create teams from the mentor account page, not from Teams Zone.
           </p>
           <Link
-            to="/teamszone/register"
+            to="/user/auth"
             className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
           >
-            Register Your Team
+            Open Mentor Portal
             <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
