@@ -40,7 +40,7 @@ const Contact = () => {
                 href="https://docs.google.com/forms/d/e/1FAIpQLSd1sDtuykGlYbrVnl3HDxb6VryI7hzCmgc2W2q6LqPfrJ8IbQ/viewform?usp=publish_editor" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                className="inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold transition hover:bg-blue-700 text-white"
               >
                 Volunteer Registration
               </a>

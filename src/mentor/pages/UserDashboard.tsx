@@ -290,7 +290,7 @@ const UserDashboard = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Mentor Dashboard</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mentor Dashboard</h1>
                 <p className="mt-1 text-sm text-gray-600">Welcome back, {mentor?.name ?? "Mentor"}</p>
                 <p className="mt-2 text-sm text-gray-500">Manage your team members and competition entries</p>
               </div>
@@ -305,7 +305,7 @@ const UserDashboard = () => {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:px-6 sm:py-3"
                 >
                   Sign Out
                 </button>
@@ -327,7 +327,7 @@ const UserDashboard = () => {
                   </div>
                 </div>
                 <div className="ml-3">
-                  <h2 className="text-xl font-semibold text-gray-900">Add New Member</h2>
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Add New Member</h2>
                   <p className="text-sm text-gray-600">Register team members under your mentorship</p>
                 </div>
               </div>
@@ -361,7 +361,7 @@ const UserDashboard = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                   <div>
                     <label htmlFor="memberAge" className="block text-sm font-medium text-gray-700 mb-2">Age *</label>
                     <input
@@ -460,7 +460,7 @@ const UserDashboard = () => {
                   </div>
                 </div>
                 <div className="ml-3">
-                  <h2 className="text-xl font-semibold text-gray-900">Create Team</h2>
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Create Team</h2>
                   <p className="text-sm text-gray-600">Form a team with selected members</p>
                 </div>
               </div>

@@ -4,20 +4,20 @@ const BotsCombat = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-red-700 via-red-600 to-red-700 py-20">
+      <section className="relative overflow-hidden bg-gradient-to-r from-blue-700 via-blue-600 to-blue-700 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 border border-white rounded-full"></div>
           <div className="absolute bottom-10 right-10 w-48 h-48 border border-white rounded-full"></div>
           <div className="absolute top-1/2 left-1/4 w-24 h-24 border border-white rounded-full"></div>
         </div>
         <div className="relative mx-auto max-w-6xl px-6 text-center">
-          <span className="inline-block rounded-full bg-red-500/20 px-4 py-2 text-sm font-semibold text-red-200 mb-4">
+          <span className="inline-block rounded-full bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-200 mb-4 mt-6">
             NEXTGEN ROBOTICS COMPETITION 2026
           </span>
           <h1 className="font-display text-5xl md:text-6xl font-bold text-white mb-4">
             Bots Combat
           </h1>
-          <p className="text-xl text-red-200 max-w-2xl mx-auto">
+          <p className="text-xl text-blue-200 max-w-2xl mx-auto">
             Battle robot competition - Strategy, durability, and combat skill
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
@@ -35,22 +35,22 @@ const BotsCombat = () => {
       <div className="mx-auto max-w-5xl px-6 py-16">
         
         {/* Table of Contents */}
-        <nav className="mb-12 rounded-2xl bg-red-50 p-6 border border-red-100">
-          <h2 className="text-xl font-bold text-red-900 mb-4">Contents</h2>
-          <ol className="space-y-2 text-red-700">
-            <li><a href="#overview" className="hover:text-red-900">1. Overview</a></li>
-            <li><a href="#robot-specs" className="hover:text-red-900">2. Robot Specifications</a></li>
-            <li><a href="#arena" className="hover:text-red-900">3. The Arena</a></li>
-            <li><a href="#match-rules" className="hover:text-red-900">4. Match Rules</a></li>
-            <li><a href="#scoring" className="hover:text-red-900">5. Scoring System</a></li>
-            <li><a href="#penalties" className="hover:text-red-900">6. Penalties & Disqualification</a></li>
-            <li><a href="#safety" className="hover:text-red-900">7. Safety Guidelines</a></li>
+        <nav className="mb-12 rounded-2xl bg-blue-50 p-6 border border-blue-100">
+          <h2 className="text-xl font-bold text-blue-900 mb-4">Contents</h2>
+          <ol className="space-y-2 text-blue-700">
+            <li><a href="#overview" className="hover:text-blue-900">1. Overview</a></li>
+            <li><a href="#robot-specs" className="hover:text-blue-900">2. Robot Specifications</a></li>
+            <li><a href="#arena" className="hover:text-blue-900">3. The Arena</a></li>
+            <li><a href="#match-rules" className="hover:text-blue-900">4. Match Rules</a></li>
+            <li><a href="#scoring" className="hover:text-blue-900">5. Scoring System</a></li>
+            <li><a href="#penalties" className="hover:text-blue-900">6. Penalties & Disqualification</a></li>
+            <li><a href="#safety" className="hover:text-blue-900">7. Safety Guidelines</a></li>
           </ol>
         </nav>
 
         {/* Section 1: Overview */}
         <section id="overview" className="mb-12">
-          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-red-600">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-600">
             1. Overview
           </h2>
           <div className="prose prose-lg max-w-none text-slate-700">
@@ -59,22 +59,22 @@ const BotsCombat = () => {
               with weapons designed to disable or push opponent robots out of the arena. This high-energy 
               competition follows international battle robot standards with strict safety protocols.
             </p>
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 my-6">
-              <p className="font-semibold text-red-900">Competition Format</p>
-              <p className="text-red-800">Single elimination bracket. 3-minute matches with knockout or points.</p>
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 my-6">
+              <p className="font-semibold text-blue-900">Competition Format</p>
+              <p className="text-blue-800">Single elimination bracket. 3-minute matches with knockout or points.</p>
             </div>
           </div>
         </section>
 
         {/* Section 2: Robot Specifications */}
         <section id="robot-specs" className="mb-12">
-          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-red-600">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-600">
             2. Robot Specifications
           </h2>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-red-700 text-white">
+                <tr className="bg-blue-700 text-white">
                   <th className="p-4 text-left font-semibold">Parameter</th>
                   <th className="p-4 text-left font-semibold">Requirement</th>
                 </tr>
@@ -119,7 +119,7 @@ const BotsCombat = () => {
 
         {/* Section 3: The Arena */}
         <section id="arena" className="mb-12">
-          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-red-600">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-600">
             3. The Arena
           </h2>
           <div className="prose prose-lg max-w-none text-slate-700">
@@ -144,7 +144,7 @@ const BotsCombat = () => {
 
         {/* Section 4: Match Rules */}
         <section id="match-rules" className="mb-12">
-          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-red-600">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-600">
             4. Match Rules
           </h2>
           <div className="prose prose-lg max-w-none text-slate-700">
@@ -170,13 +170,13 @@ const BotsCombat = () => {
 
         {/* Section 5: Scoring System */}
         <section id="scoring" className="mb-12">
-          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-red-600">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-600">
             5. Scoring System
           </h2>
           <div className="prose prose-lg max-w-none text-slate-700">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-red-700 text-white">
+                <tr className="bg-blue-700 text-white">
                   <th className="p-4 text-left font-semibold">Result</th>
                   <th className="p-4 text-left font-semibold">Description</th>
                 </tr>
@@ -205,14 +205,14 @@ const BotsCombat = () => {
 
         {/* Section 6: Penalties */}
         <section id="penalties" className="mb-12">
-          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-red-600">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-600">
             6. Penalties & Disqualification
           </h2>
           <div className="prose prose-lg max-w-none text-slate-700">
             <h3 className="text-xl font-semibold text-slate-900 mb-3">6.1 Penalties</h3>
             <table className="w-full border-collapse mb-6">
               <thead>
-                <tr className="bg-red-500 text-white">
+                <tr className="bg-blue-500 text-white">
                   <th className="p-4 text-left font-semibold">Violation</th>
                   <th className="p-4 text-left font-semibold">Penalty</th>
                 </tr>
@@ -250,7 +250,7 @@ const BotsCombat = () => {
 
         {/* Section 7: Safety Guidelines */}
         <section id="safety" className="mb-12">
-          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-red-600">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-600">
             7. Safety Guidelines
           </h2>
           <div className="prose prose-lg max-w-none text-slate-700">
@@ -267,14 +267,14 @@ const BotsCombat = () => {
         </section>
 
         {/* Contact Section */}
-        <section className="rounded-2xl bg-gradient-to-r from-red-600 to-red-800 p-8 text-center">
+        <section className="rounded-2xl bg-gradient-to-r from-blue-600 to-blue-800 p-8 text-center">
           <h3 className="text-2xl font-bold text-white mb-4">Questions about Bots Combat?</h3>
-          <p className="text-red-100 mb-6">
+          <p className="text-blue-100 mb-6">
             Contact our technical team for clarifications on regulations
           </p>
           <Link
             to="/contact"
-            className="inline-block rounded-lg bg-white px-8 py-3 font-semibold text-red-600 hover:bg-red-50 transition"
+            className="inline-block rounded-lg bg-white px-8 py-3 font-semibold text-blue-600 hover:bg-blue-50 transition"
           >
             Contact Us
           </Link>

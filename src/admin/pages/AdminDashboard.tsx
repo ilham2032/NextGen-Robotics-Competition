@@ -137,26 +137,26 @@ const AdminDashboard = () => {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-sm tracking-widest text-blue-100 uppercase">NextGen Robotics Control Panel</p>
-              <h1 className="mt-1 font-display text-4xl font-bold">Admin Dashboard</h1>
+              <h1 className="mt-1 font-display text-3xl sm:text-4xl font-bold">Admin Dashboard</h1>
               <p className="mt-2 text-sm text-blue-100">Manage teams, participants, categories, and referee accounts from one secure place.</p>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={refreshDashboardData}
-                className="rounded-xl border border-white/50 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="rounded-xl border border-white/50 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 sm:px-6 sm:py-3"
               >
                 Refresh Data
               </button>
               <button
                 onClick={handleLogout}
-                className="rounded-xl border border-white/50 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="rounded-xl border border-white/50 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 sm:px-6 sm:py-3"
               >
                 Log Out
               </button>
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
             <div className="rounded-xl border border-white/40 bg-white/10 px-4 py-3">
               <p className="text-xs tracking-wide text-blue-100 uppercase">Total Teams</p>
               <p className="mt-1 text-2xl font-bold text-white">{stats.totalTeams}</p>
@@ -188,9 +188,9 @@ const AdminDashboard = () => {
           </div>
         </header>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-2">
+        <div className="mt-8 grid gap-8 xl:grid-cols-2">
           <div className="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-3xl font-semibold text-slate-900">Team Management</h2>
+            <h2 className="font-display text-2xl sm:text-3xl font-semibold text-slate-900">Team Management</h2>
             <p className="mt-1 text-sm text-slate-600">Create, review, and remove teams.</p>
 
             <form className="mt-5 space-y-3" onSubmit={handleAddTeam}>
@@ -256,7 +256,7 @@ const AdminDashboard = () => {
           </div>
 
           <div className="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-3xl font-semibold text-slate-900">Participant Registry</h2>
+            <h2 className="font-display text-2xl sm:text-3xl font-semibold text-slate-900">Participant Registry</h2>
             <p className="mt-1 text-sm text-slate-600">
               All participants registered by mentors are listed here automatically.
             </p>
@@ -280,13 +280,13 @@ const AdminDashboard = () => {
           </div>
 
           <div className="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-3xl font-semibold text-slate-900">Referee Accounts</h2>
+            <h2 className="font-display text-2xl sm:text-3xl font-semibold text-slate-900">Referee Accounts</h2>
             <p className="mt-1 text-sm text-slate-600">
               Create and maintain referee, judge, and organizer access for Teams Zone operations.
             </p>
 
             <form className="mt-5 space-y-3" onSubmit={handleAddReferee}>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input
                   type="text"
                   value={refereeName}

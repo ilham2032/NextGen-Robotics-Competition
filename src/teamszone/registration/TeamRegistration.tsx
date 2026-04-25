@@ -180,7 +180,7 @@ const TeamRegistration = () => {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Team Information */}
           <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-6">
-            <h2 className="text-2xl font-semibold text-blue-900 mb-6">Team Information</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold text-blue-900 mb-6">Team Information</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -227,7 +227,7 @@ const TeamRegistration = () => {
           {/* Team Members */}
           <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-blue-900">Team Members ({members})</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold text-blue-900">Team Members ({members})</h2>
               {members < 10 && (
                 <button
                   type="button"
@@ -243,7 +243,7 @@ const TeamRegistration = () => {
               {Array.from({ length: members }, (_, index) => (
                 <div key={index} className="border border-blue-100 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-medium text-blue-900">Member {index + 1}</h3>
+                    <h3 className="text-base sm:text-lg font-medium text-blue-900">Member {index + 1}</h3>
                     {members > 1 && (
                       <button
                         type="button"
@@ -255,7 +255,7 @@ const TeamRegistration = () => {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-blue-900 mb-2">Full Name *</label>
                       <input

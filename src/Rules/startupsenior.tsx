@@ -3,17 +3,17 @@ import { Link } from "react-router"
 const StartupSenior = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <section className="relative overflow-hidden bg-gradient-to-r from-indigo-800 via-violet-800 to-indigo-900 py-20">
+      <section className="relative overflow-hidden bg-gradient-to-r from-blue-800 via-blue-800 to-blue-900 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 h-32 w-32 rounded-full border border-white"></div>
           <div className="absolute bottom-10 right-10 h-48 w-48 rounded-full border border-white"></div>
         </div>
         <div className="relative mx-auto max-w-6xl px-6 text-center">
-          <span className="mb-4 inline-block rounded-full bg-indigo-500/20 px-4 py-2 text-sm font-semibold text-indigo-100">
+          <span className="mb-4 inline-block rounded-full bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-100 mb-4 mt-6">
             NEXTGEN ROBOTICS COMPETITION 2026
           </span>
           <h1 className="font-display mb-4 text-5xl font-bold text-white md:text-6xl">Start Up Senior</h1>
-          <p className="mx-auto max-w-2xl text-xl text-indigo-100">
+          <p className="mx-auto max-w-2xl text-xl text-blue-100">
             Advanced innovation category for high-impact robotics ventures and scalable technical solutions.
           </p>
           <div className="mt-8">
@@ -28,9 +28,9 @@ const StartupSenior = () => {
       </section>
 
       <div className="mx-auto max-w-5xl px-6 py-16">
-        <nav className="mb-12 rounded-2xl border border-indigo-100 bg-indigo-50 p-6">
-          <h2 className="mb-4 text-xl font-bold text-indigo-900">Contents</h2>
-          <ol className="space-y-2 text-indigo-700">
+        <nav className="mb-12 rounded-2xl border border-blue-100 bg-blue-50 p-6">
+          <h2 className="mb-4 text-xl font-bold text-blue-900">Contents</h2>
+          <ol className="space-y-2 text-blue-700">
             <li>1. Overview</li>
             <li>2. Team and Project Requirements</li>
             <li>3. Submission Package</li>
@@ -42,7 +42,7 @@ const StartupSenior = () => {
         </nav>
 
         <section className="mb-10">
-          <h2 className="font-display mb-4 border-b-2 border-indigo-500 pb-2 text-3xl font-bold text-slate-900">1. Overview</h2>
+          <h2 className="font-display mb-4 border-b-2 border-blue-500 pb-2 text-3xl font-bold text-slate-900">1. Overview</h2>
           <p className="text-slate-700">
             Start Up Senior is designed for experienced teams presenting robotics products with clear technical depth,
             implementation readiness, and measurable business or social impact.
@@ -50,7 +50,7 @@ const StartupSenior = () => {
         </section>
 
         <section className="mb-10">
-          <h2 className="font-display mb-4 border-b-2 border-indigo-500 pb-2 text-3xl font-bold text-slate-900">
+          <h2 className="font-display mb-4 border-b-2 border-blue-500 pb-2 text-3xl font-bold text-slate-900">
             2. Team and Project Requirements
           </h2>
           <ul className="list-disc space-y-2 pl-6 text-slate-700">
@@ -62,7 +62,7 @@ const StartupSenior = () => {
         </section>
 
         <section className="mb-10">
-          <h2 className="font-display mb-4 border-b-2 border-indigo-500 pb-2 text-3xl font-bold text-slate-900">
+          <h2 className="font-display mb-4 border-b-2 border-blue-500 pb-2 text-3xl font-bold text-slate-900">
             3. Submission Package
           </h2>
           <ul className="list-disc space-y-2 pl-6 text-slate-700">
@@ -75,7 +75,7 @@ const StartupSenior = () => {
         </section>
 
         <section className="mb-10">
-          <h2 className="font-display mb-4 border-b-2 border-indigo-500 pb-2 text-3xl font-bold text-slate-900">4. Pitch and Demo Rules</h2>
+          <h2 className="font-display mb-4 border-b-2 border-blue-500 pb-2 text-3xl font-bold text-slate-900">4. Pitch and Demo Rules</h2>
           <ul className="list-disc space-y-2 pl-6 text-slate-700">
             <li>Pitch duration: 7 minutes + 5 minutes Q&A.</li>
             <li>Live demo is recommended where feasible.</li>
@@ -85,11 +85,11 @@ const StartupSenior = () => {
         </section>
 
         <section className="mb-10">
-          <h2 className="font-display mb-4 border-b-2 border-indigo-500 pb-2 text-3xl font-bold text-slate-900">5. Judging and Ranking</h2>
+          <h2 className="font-display mb-4 border-b-2 border-blue-500 pb-2 text-3xl font-bold text-slate-900">5. Judging and Ranking</h2>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-indigo-600 text-white">
+                <tr className="bg-blue-600 text-white">
                   <th className="p-4 text-left">Criteria</th>
                   <th className="p-4 text-left">Weight</th>
                 </tr>
@@ -121,7 +121,7 @@ const StartupSenior = () => {
         </section>
 
         <section className="mb-10">
-          <h2 className="font-display mb-4 border-b-2 border-indigo-500 pb-2 text-3xl font-bold text-slate-900">6. Intellectual Integrity</h2>
+          <h2 className="font-display mb-4 border-b-2 border-blue-500 pb-2 text-3xl font-bold text-slate-900">6. Intellectual Integrity</h2>
           <ul className="list-disc space-y-2 pl-6 text-slate-700">
             <li>All claims must be supported by prototype evidence or validated data.</li>
             <li>Proper attribution required for external frameworks and prior work.</li>
@@ -130,7 +130,7 @@ const StartupSenior = () => {
         </section>
 
         <section className="mb-12">
-          <h2 className="font-display mb-4 border-b-2 border-indigo-500 pb-2 text-3xl font-bold text-slate-900">7. Operational Safety</h2>
+          <h2 className="font-display mb-4 border-b-2 border-blue-500 pb-2 text-3xl font-bold text-slate-900">7. Operational Safety</h2>
           <ul className="list-disc space-y-2 pl-6 text-slate-700">
             <li>All demos must be safe for indoor exhibition spaces.</li>
             <li>High-power modules must include protection and emergency stop.</li>

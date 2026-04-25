@@ -16,7 +16,7 @@ const legoline = () => {
           <h1 className="font-display text-5xl md:text-6xl font-bold text-white mb-4">
             LEGO Line Follower
           </h1>
-          <p className="text-xl text-yellow-100 max-w-2xl mx-auto">
+          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
             Autonomous LEGO robot line tracking - Navigate the track accurately and efficiently
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
