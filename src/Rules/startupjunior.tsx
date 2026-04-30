@@ -9,7 +9,7 @@ const StartupJunior = () => {
           <div className="absolute bottom-10 right-10 h-48 w-48 rounded-full border border-white"></div>
         </div>
         <div className="relative mx-auto max-w-6xl px-6 text-center">
-          <span className="mb-4 inline-block rounded-full bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-100">
+          <span className="mb-4 inline-block rounded-full bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-100 mb-4 mt-6">
             NEXTGEN ROBOTICS COMPETITION 2026
           </span>
           <h1 className="font-display mb-4 text-5xl font-bold text-white md:text-6xl">Start Up Junior</h1>

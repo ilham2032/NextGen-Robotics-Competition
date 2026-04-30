@@ -2,8 +2,10 @@ import { useEffect, useState } from "react"
 import { Link } from "react-router"
 import { getCategories } from "../admin/storage"
 import type { Category } from "../admin/types"
+import { useTranslation } from 'react-i18next'
 
 const Regulations = () => {
+  const { t } = useTranslation()
   const [categories, setCategories] = useState<Category[]>([])
 
   useEffect(() => {
@@ -14,10 +16,10 @@ const Regulations = () => {
     <section className="min-h-screen bg-slate-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
       <div className="mx-auto max-w-5xl">
         <div className="rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 p-6 text-white shadow-lg sm:p-8">
-          <p className="text-xs font-semibold tracking-[0.25em] text-blue-100 uppercase">Competition Guide</p>
-          <h1 className="mt-2 font-display text-4xl font-bold sm:text-5xl">Regulations</h1>
+          <p className="text-xs font-semibold tracking-[0.25em] text-blue-100 uppercase">{t('Competition Guide')}</p>
+          <h1 className="mt-2 font-display text-4xl font-bold sm:text-5xl">{t('Regulations')}</h1>
           <p className="mt-3 max-w-2xl text-sm text-blue-100 sm:text-base">
-            Review each category requirements, official details, and downloadable regulation files.
+            {t('Review each category requirements, official details, and downloadable regulation files.')}
           </p>
         </div>
 

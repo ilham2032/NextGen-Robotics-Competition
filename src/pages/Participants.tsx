@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
+import { useTranslation } from 'react-i18next';
 import { getCategories, getTeams } from "../admin/storage"
 import type { Category, Team } from "../admin/types"
 import { byCountry } from "country-code-lookup"
@@ -33,6 +34,7 @@ const getCountryFlag = (countryName: string): string => {
 }
 
 const Participants = () => {
+  const { t } = useTranslation();
   const [teams, setTeams] = useState<Team[]>([])
   const [categories, setCategories] = useState<Category[]>([])
 
@@ -55,10 +57,10 @@ const Participants = () => {
     <section className="min-h-screen bg-slate-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
       <div className="mx-auto max-w-5xl">
         <div className="rounded-3xl border border-blue-100 bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 p-6 text-white shadow-lg sm:p-8">
-          <p className="text-xs font-semibold tracking-[0.25em] text-blue-100 uppercase">Competition Overview</p>
-          <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">Participants</h1>
+          <p className="text-xs font-semibold tracking-[0.25em] text-blue-100 uppercase">{t('Competition Overview')}</p>
+          <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">{t('Participants')}</h1>
           <p className="mt-3 max-w-2xl text-sm text-blue-100 sm:text-base">
-            Explore registered teams by category and see the growing international robotics community joining NextGen.
+            {t('Explore registered teams by category and see the growing international robotics community joining NextGen.')}
           </p>
         </div>
         
@@ -66,15 +68,15 @@ const Participants = () => {
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="rounded-xl border border-blue-200 bg-white p-4 text-center shadow-sm">
             <p className="text-2xl font-bold text-blue-700">{stats.totalTeams}</p>
-            <p className="text-sm text-blue-600 font-semibold">Total Teams</p>
+            <p className="text-sm text-blue-600 font-semibold">{t('Total Teams')}</p>
           </div>
           <div className="rounded-xl border border-blue-200 bg-white p-4 text-center shadow-sm">
             <p className="text-2xl font-bold text-blue-700">{stats.totalParticipants}</p>
-            <p className="text-sm text-blue-600 font-semibold">Participants</p>
+            <p className="text-sm text-blue-600 font-semibold">{t('Participants')}</p>
           </div>
           <div className="rounded-xl border border-blue-200 bg-white p-4 text-center shadow-sm">
             <p className="text-2xl font-bold text-blue-700">{stats.totalCountries}</p>
-            <p className="text-sm text-blue-600 font-semibold">Countries</p>
+            <p className="text-sm text-blue-600 font-semibold">{t('Countries')}</p>
           </div>
         </div>
 
@@ -93,7 +95,7 @@ const Participants = () => {
                   const flagEmoji = getCountryFlag(team.school || "")
                   return (
                   <article key={team.id} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-                    <h3 className="text-xl font-semibold text-blue-900 sm:text-2xl">{team.name}</h3>
+                    <h3 className="text-xl font-semibold text-blue-900 sm:text-2xl"> Team name: {team.name}</h3>
                     <div className="mt-2 flex items-center gap-2">
                       <span className="text-slate-700">Country:</span>
                       {flagEmoji && <span className="text-lg">{flagEmoji}</span>}

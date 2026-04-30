@@ -1,41 +1,37 @@
 import { useState } from "react"
 import { Link } from "react-router"
-
-const faqItems = [
-  {
-    question: "Who can join the NextGen Robotics Competition?",
-    answer:
-      "Students and young innovators can participate through school teams, clubs, or independent groups based on the category requirements.",
-  },
-  {
-    question: "How do we register a team?",
-    answer:
-      "Go to Teams Zone and use the registration form. Fill in team details, member information, and select the competition category.",
-  },
-  {
-    question: "Can we participate in multiple categories?",
-    answer:
-      "Yes. A team can register in multiple categories, but each category should have a clear submission and meet all technical rules.",
-  },
-  {
-    question: "Where can we find rules and technical requirements?",
-    answer:
-      "All regulations are available on the Regulations page, including category-specific details, restrictions, and judging criteria.",
-  },
-  {
-    question: "How are winners selected?",
-    answer:
-      "Winners are selected by a judging panel and referees based on category scoring systems, technical performance, and innovation quality.",
-  },
-  {
-    question: "How can sponsors or volunteers contact the team?",
-    answer:
-      "Use the Contact page to reach organizers. You can also apply as a volunteer using the registration link provided there.",
-  },
-]
+import { useTranslation } from 'react-i18next'
 
 const FAQ = () => {
+  const { t } = useTranslation()
   const [openIndex, setOpenIndex] = useState<number>(0)
+
+  const faqItems = [
+    {
+      question: t("Who can join the NextGen Robotics Competition?"),
+      answer: t("Students and young innovators can participate through school teams, clubs, or independent groups based on the category requirements."),
+    },
+    {
+      question: t("How do we register a team?"),
+      answer: t("Go to Teams Zone and use the registration form. Fill in team details, member information, and select the competition category."),
+    },
+    {
+      question: t("Can we participate in multiple categories?"),
+      answer: t("Yes. A team can register in multiple categories, but each category should have a clear submission and meet all technical rules."),
+    },
+    {
+      question: t("Where can we find rules and technical requirements?"),
+      answer: t("All regulations are available on the Regulations page, including category-specific details, restrictions, and judging criteria."),
+    },
+    {
+      question: t("How are winners selected?"),
+      answer: t("Winners are selected by a judging panel and referees based on category scoring systems, technical performance, and innovation quality."),
+    },
+    {
+      question: t("How can sponsors or volunteers contact the team?"),
+      answer: t("Use the Contact page to reach organizers. You can also apply as a volunteer using the registration link provided there."),
+    },
+  ]
 
   const toggleItem = (index: number) => {
     setOpenIndex((current) => (current === index ? -1 : index))

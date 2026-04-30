@@ -125,7 +125,7 @@ const Footer = () => {
             </div>
             <div className='flex items-center gap-2 text-sm text-slate-400'>
               <span>Powered by</span>
-              <span className='text-cyan-300 font-semibold'>NextGen Innovations</span>
+              <span className='text-cyan-300 font-semibold'>INNOVATIONS TEAM</span>
             </div>
           </div>
         </div>

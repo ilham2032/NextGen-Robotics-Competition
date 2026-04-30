@@ -1,5 +1,6 @@
 import {Routes, Route, Navigate} from 'react-router'
 import { useLocation } from 'react-router'
+import { useEffect } from 'react'
 import Navbar from './Components/Navbar'
 import Home from './pages/Home'
 import About from './pages/About'
@@ -41,10 +42,16 @@ import TeamLegoLine from './teamszone/categoryteams/teamlegoline'
 import TeamDrone from './teamszone/categoryteams/teamdrone'
 import TeamStartupJr from './teamszone/categoryteams/teamstartupjr'
 import TeamStartupSenior from './teamszone/categoryteams/teamstartupsenior'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import TermsOfService from './pages/TermsOfService'
 
 const App = () => {
   const location = useLocation()
   const isPortalRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/user') || location.pathname.startsWith('/referee')
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [location.pathname])
 
   return (
     <div className='min-h-screen bg-slate-50 text-slate-900'>
@@ -93,6 +100,8 @@ const App = () => {
           <Route path='/teamszone/drone' element={<ProtectedRefereeRoute><TeamDrone/></ProtectedRefereeRoute>}/>
           <Route path='/teamszone/start-up-junior' element={<ProtectedRefereeRoute><TeamStartupJr/></ProtectedRefereeRoute>}/>
           <Route path='/teamszone/start-up-senior' element={<ProtectedRefereeRoute><TeamStartupSenior/></ProtectedRefereeRoute>}/>
+          <Route path='/privacy' element={<PrivacyPolicy/>}/>
+          <Route path='/terms' element={<TermsOfService/>}/>
         </Routes>
       </main>
       {!isPortalRoute && <Footer/>}

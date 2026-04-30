@@ -11,7 +11,7 @@ const LegoSumo3kg = () => {
           <div className="absolute top-1/2 left-1/4 w-24 h-24 border border-white rounded-full"></div>
         </div>
         <div className="relative mx-auto max-w-6xl px-6 text-center">
-          <span className="inline-block rounded-full bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-100 mb-4">
+          <span className="inline-block rounded-full bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-100 mb-4 mt-6">
             NEXTGEN ROBOTICS COMPETITION 2026
           </span>
           <h1 className="font-display text-5xl md:text-6xl font-bold text-white mb-4">
