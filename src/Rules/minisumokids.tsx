@@ -34,11 +34,11 @@ const minisumokids = () => {
       <div className="max-w-4xl mx-auto px-6 py-12">
         <header className="text-center mb-16 pt-10">
           <h1 className="text-4xl font-bold text-slate-900 mb-4">Mini Sumo Kids Regulations</h1>
-          <p className="text-lg text-slate-600">Adapted from All Japan Robot Sumo Tournament standards</p>
+          <p className="text-lg text-slate-600">Junior robot sumo competition standards for autonomous and RC-controlled robots</p>
         </header>
 
         <section className='mb-12'>
-          <h2 className='text-4xl font-bold text-slate-900 mb-6'>Glossary</h2>
+          <h2 className='text-3xl font-bold text-slate-900 mb-6'>GLOSSARY OF TERMS</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>Battle:</p>

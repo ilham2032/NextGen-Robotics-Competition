@@ -85,13 +85,10 @@ const About = () => {
           </article>
         </section>
 
-        <div className='mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row'>
+        <div className='mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row text-white'>
           <Link to='/contact' className='inline-flex items-center justify-center rounded-full bg-slate-900 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800'>
             {t('Contact the team')}
           </Link>
-          <a href='mailto:nextgenazer@gmail.com' className='inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-8 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50'>
-            {t('Email us')}
-          </a>
         </div>
       </div>
     </main>

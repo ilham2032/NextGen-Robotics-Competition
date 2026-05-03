@@ -14,6 +14,7 @@ import Participants from './pages/Participants'
 import FAQ from './pages/FAQ'
 import Minisumo from './Rules/minisumo'
 import Minisumokids from './Rules/minisumokids'
+import Megasumo from './Rules/megasumo'
 import AdminPage from './admin/adminPage'
 import AdminLogin from './admin/pages/AdminLogin'
 import ProtectedAdminRoute from './admin/ProtectedAdminRoute'
@@ -78,6 +79,7 @@ const App = () => {
           <Route path='/referee/dashboard' element={<ProtectedRefereeRoute><RefereeDashboard/></ProtectedRefereeRoute>}/>
           <Route path='/regulations/mini-sumo' element={<Minisumo/>}/>
           <Route path='/regulations/mini-sumo-kids' element={<Minisumokids/>}/>
+          <Route path='/regulations/mega-sumo' element={<Megasumo/>}/>
           <Route path='/regulations/lego-line' element={<Legoline/>}/>
           <Route path='/regulations/line-follower' element={<LineFollower/>}/>
           <Route path='/regulations/drone-race' element={<Drone/>}/>

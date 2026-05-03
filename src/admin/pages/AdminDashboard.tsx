@@ -1,5 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from "react"
-import { createId, getTeams, saveTeams } from "../storage"
+import { createId, getTeams, saveTeams, getSettings, saveSettings } from "../storage"
 import type { Team } from "../types"
 import type { EventSettings, LeaderboardRow, MatchSlot, ScoringRule, TeamRecord, TeamStatus } from "./adminDashboardTypes"
 import LeaderboardPage from "./LeaderboardPage"
@@ -34,7 +34,7 @@ const defaultScoringRules: ScoringRule[] = [
 const defaultSettings: EventSettings = {
   eventName: "NextGen Robotics Championship",
   eventStatus: "Upcoming",
-  eventDate: "2025-08-16",
+  eventDate: "2026-07-23",
   venue: "Innovation Expo Center",
   matchDuration: 6,
   logoUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80",
@@ -146,7 +146,10 @@ const AdminDashboard = () => {
     return saved.length > 0 ? saved.map(createTeamRecord) : defaultTeams
   })
   const [matches, setMatches] = useState<MatchSlot[]>(defaultMatches)
-  const [settings, setSettings] = useState<EventSettings>(defaultSettings)
+  const [settings, setSettings] = useState<EventSettings>(() => {
+    const saved = getSettings()
+    return saved ?? defaultSettings
+  })
   const [activePage, setActivePage] = useState<PageId>("overview")
   const [sortBy, setSortBy] = useState<"score" | "wins" | "points" | "tieBreaker">("score")
   const [toastMessage, setToastMessage] = useState("")
@@ -338,6 +341,7 @@ const AdminDashboard = () => {
 
   const handleUpdateSettings = (nextSettings: EventSettings) => {
     setSettings(nextSettings)
+    saveSettings(nextSettings)
     notify("Settings updated")
   }
 

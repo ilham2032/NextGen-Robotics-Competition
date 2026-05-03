@@ -1,4 +1,5 @@
 import type { Category, Member, Mentor, Team, Referee, MatchResult, CompetitionResult } from "./types"
+import type { EventSettings } from "./pages/adminDashboardTypes"
 
 const TEAM_STORAGE_KEY = "nextgen_admin_teams"
 const CATEGORY_STORAGE_KEY = "nextgen_admin_categories"
@@ -9,6 +10,7 @@ const REFEREE_STORAGE_KEY = "nextgen_referees"
 const REFEREE_SESSION_KEY = "nextgen_referee_session"
 const MATCH_RESULTS_KEY = "nextgen_match_results"
 const COMPETITION_RESULTS_KEY = "nextgen_competition_results"
+const SETTINGS_STORAGE_KEY = "nextgen_admin_settings"
 
 const defaultTeams: Team[] = []
 
@@ -71,9 +73,9 @@ const defaultCategories: Category[] = [
   },
   {
     id: "category-9",
-    name: "Start Up Junior",
-    description: "Junior startup and innovation pitching challenge.",
-    pdfName: "start-up-junior.pdf",
+    name: "Mega Sumo",
+    description: "3kg Sumo robot ",
+    pdfName: "mega-sumo.pdf",
     pdfDataUrl: "",
   },
   {
@@ -167,4 +169,18 @@ export const getCompetitionResults = (): CompetitionResult[] => parseStoredList<
 
 export const saveCompetitionResults = (results: CompetitionResult[]): void => {
   localStorage.setItem(COMPETITION_RESULTS_KEY, JSON.stringify(results))
+}
+
+export const getSettings = (): EventSettings | null => {
+  const stored = localStorage.getItem(SETTINGS_STORAGE_KEY)
+  if (!stored) return null
+  try {
+    return JSON.parse(stored)
+  } catch {
+    return null
+  }
+}
+
+export const saveSettings = (settings: EventSettings): void => {
+  localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings))
 }

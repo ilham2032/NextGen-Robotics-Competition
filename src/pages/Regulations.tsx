@@ -28,6 +28,7 @@ const Regulations = () => {
             const routeMap: Record<string, string> = {
               "Mini Sumo": "/regulations/mini-sumo",
               "Mini Sumo Kids": "/regulations/mini-sumo-kids",
+              "Mega Sumo": "/regulations/mega-sumo",
               "Lego Line": "/regulations/lego-line",
               "Line Follower": "/regulations/line-follower",
               "Drone": "/regulations/drone-race",
