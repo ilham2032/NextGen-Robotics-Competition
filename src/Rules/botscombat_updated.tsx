@@ -1,10 +1,9 @@
-import { Link } from "react-router"
+import { Link } from "react-router-dom"
 
 const BotsCombat = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-red-900 via-red-800 to-red-900 py-20">
+            <section className="relative overflow-hidden bg-gradient-to-r from-red-900 via-red-800 to-red-900 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 border border-white rounded-full"></div>
           <div className="absolute bottom-10 right-10 w-48 h-48 border border-white rounded-full"></div>
@@ -38,7 +37,7 @@ const BotsCombat = () => {
           <p className="text-lg text-slate-600">Remote-controlled battle robot competition standards</p>
         </header>
 
-        {{/* Section 1: Overview */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">1. OVERVIEW</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -53,7 +52,7 @@ const BotsCombat = () => {
           </div>
         </section>
 
-        {{/* Section 2: Robot Specifications */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">2. ROBOT SPECIFICATIONS</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -76,7 +75,7 @@ const BotsCombat = () => {
           </div>
         </section>
 
-        {{/* Section 3: The Arena */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">3. THE ARENA</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -95,7 +94,7 @@ const BotsCombat = () => {
           </div>
         </section>
 
-        {{/* Section 4: Match Rules */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">4. MATCH RULES</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -110,7 +109,7 @@ const BotsCombat = () => {
           </div>
         </section>
 
-        {{/* Section 5: Scoring System */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">5. SCORING SYSTEM</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -121,7 +120,7 @@ const BotsCombat = () => {
           </div>
         </section>
 
-        {{/* Section 6: Penalties & Disqualification */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">6. PENALTIES AND DISQUALIFICATION</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -136,7 +135,7 @@ const BotsCombat = () => {
           </div>
         </section>
 
-        {{/* Section 7: Safety Guidelines */}
+       
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">7. SAFETY GUIDELINES</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">

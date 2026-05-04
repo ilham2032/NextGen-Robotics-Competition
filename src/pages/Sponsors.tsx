@@ -1,4 +1,4 @@
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import YourVisaAssistance from '../assets/619395084_17896020795383433_1687352418807126550_n-removebg-preview.png'
 import { useTranslation } from 'react-i18next'
 import KapitalBank from '../assets/Kapital_Bank_logo_2025.png'

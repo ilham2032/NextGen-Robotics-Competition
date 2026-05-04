@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink } from 'react-router'
+import { Link, NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 const Navbar = () => {
@@ -77,13 +77,12 @@ const Navbar = () => {
               </button>
             </div>
           </div>
-          <a
+          <Link
             className='font-display ml-2 rounded-full bg-cyan-400 px-4 py-2 text-sm xl:text-base font-semibold text-slate-900 transition-colors hover:bg-cyan-300'
-            href='/user/auth'
-            rel='noopener noreferrer'
+            to='/user/auth'
           >
             {t('Sign Up')}
-          </a>
+          </Link>
         </ul>
 
         <button
@@ -136,14 +135,13 @@ const Navbar = () => {
               AZ
             </button>
           </div>
-          <a
+          <Link
             className='mt-4 inline-flex w-full items-center justify-center rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-cyan-300'
-            href='/user/auth'
-            rel='noopener noreferrer'
+            to='/user/auth'
             onClick={() => setIsMenuOpen(false)}
           >
             {t('Sign Up')}
-          </a>
+          </Link>
         </div>
       )}
     </div>

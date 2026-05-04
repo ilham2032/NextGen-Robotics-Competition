@@ -1,4 +1,4 @@
-import { Link } from "react-router"
+import { Link } from "react-router-dom"
 
 const legoline = () => {
   return (
@@ -161,7 +161,7 @@ const legoline = () => {
           </div>
         </section>
 
-        {{/* Section 8: Safety & Fair Play */}
+   
         <section className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>8. SAFETY AND FAIR PLAY</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>

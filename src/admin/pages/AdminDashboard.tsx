@@ -1,11 +1,12 @@
 ﻿import { useEffect, useMemo, useState } from "react"
-import { createId, getTeams, saveTeams, getSettings, saveSettings } from "../storage"
-import type { Team } from "../types"
+import { createId, getMembers, getMentors, getTeams, getSettings, saveTeams, saveSettings } from "../storage"
+import type { Member, Mentor, Team } from "../types"
 import type { EventSettings, LeaderboardRow, MatchSlot, ScoringRule, TeamRecord, TeamStatus } from "./adminDashboardTypes"
-import LeaderboardPage from "./LeaderboardPage"
+import CreateTeamPage from "./CreateTeamPage"
 import MatchesPage from "./MatchesPage"
-import SettingsPage from "./SettingsPage"
+import ProfilePage from "./ProfilePage"
 import TeamsPage from "./TeamsPage"
+import UsersPage from "./UsersPage"
 
 const defaultScoringRules: ScoringRule[] = [
   {
@@ -120,11 +121,11 @@ const defaultMatches: MatchSlot[] = [
 ]
 
 const navItems = [
-  { id: "overview", title: "Overview" },
+  { id: "users", title: "Users" },
+  { id: "create-team", title: "Create Team" },
   { id: "teams", title: "Teams" },
-  { id: "matches", title: "Matches" },
-  { id: "leaderboard", title: "Leaderboard" },
-  { id: "settings", title: "Settings" },
+  { id: "schedule", title: "Schedule" },
+  { id: "profile", title: "Profile" },
 ] as const
 
 type PageId = (typeof navItems)[number]["id"]
@@ -150,7 +151,16 @@ const AdminDashboard = () => {
     const saved = getSettings()
     return saved ?? defaultSettings
   })
-  const [activePage, setActivePage] = useState<PageId>("overview")
+  const [mentors] = useState<Mentor[]>(() => getMentors())
+  const [members] = useState<Member[]>(() => getMembers())
+  const [profile, setProfile] = useState({
+    name: "NextGen Admin",
+    email: "admin@nextgen-robocomp.com",
+    role: "Admin",
+    organization: "NextGen Robotics",
+    phone: "+994 50 123 45 67",
+  })
+  const [activePage, setActivePage] = useState<PageId>("users")
   const [sortBy, setSortBy] = useState<"score" | "wins" | "points" | "tieBreaker">("score")
   const [toastMessage, setToastMessage] = useState("")
   const [darkMode, setDarkMode] = useState(false)
@@ -395,7 +405,11 @@ const AdminDashboard = () => {
                 key={item.id}
                 type="button"
                 onClick={() => setActivePage(item.id)}
-                className={`rounded-2xl px-4 py-3 text-sm font-semibold transition ${activePage === item.id ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-400/30" : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"}`}
+                className={`rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                  activePage === item.id
+                    ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-400/30"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                }`}
               >
                 {item.title}
               </button>
@@ -405,72 +419,21 @@ const AdminDashboard = () => {
 
         <div className="mt-8 grid gap-8 xl:grid-cols-[1.4fr_420px]">
           <main className="space-y-8">
-            {activePage === "overview" && (
-              <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-                <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                  <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">Live event summary</h2>
-                  <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-2">
-                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800">
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Scheduled teams</p>
-                      <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">{teams.length}</p>
-                    </div>
-                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800">
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Live match</p>
-                      <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">{currentMatch ? currentMatch.id : "None"}</p>
-                    </div>
-                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800">
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Venue</p>
-                      <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">{settings.venue}</p>
-                    </div>
-                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800">
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Score rule count</p>
-                      <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">{settings.scoringRules.length}</p>
-                    </div>
-                  </div>
-                </div>
+            {activePage === "users" && <UsersPage mentors={mentors} members={members} />}
 
-                <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                  <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">Quick actions</h2>
-                  <div className="mt-6 space-y-4">
-                    <button
-                      type="button"
-                      onClick={handleGenerateSchedule}
-                      className="w-full rounded-3xl bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-400/30 transition hover:bg-cyan-300"
-                    >
-                      Auto-generate match schedule
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleExportScheduleCsv}
-                      className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-                    >
-                      Export schedule CSV
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleExportLeaderboard}
-                      className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-                    >
-                      Export leaderboard report
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+            {activePage === "create-team" && <CreateTeamPage onAddTeam={handleAddTeam} />}
 
             {activePage === "teams" && (
               <TeamsPage
                 teams={teams}
                 matches={matches}
-                onAddTeam={handleAddTeam}
-                onUpdateTeam={handleUpdateTeam}
                 onDeleteTeam={handleDeleteTeam}
                 onToggleCheckIn={handleToggleCheckIn}
                 onAssignMatch={handleAssignMatch}
               />
             )}
 
-            {activePage === "matches" && (
+            {activePage === "schedule" && (
               <MatchesPage
                 matches={matches}
                 teams={teams}
@@ -483,18 +446,7 @@ const AdminDashboard = () => {
               />
             )}
 
-            {activePage === "leaderboard" && (
-              <LeaderboardPage leaderboard={leaderboard} sortBy={sortBy} onSort={(field) => setSortBy(field)} />
-            )}
-
-            {activePage === "settings" && (
-              <SettingsPage
-                settings={settings}
-                darkMode={darkMode}
-                onToggleDarkMode={() => setDarkMode((current) => !current)}
-                onUpdateSettings={handleUpdateSettings}
-              />
-            )}
+            {activePage === "profile" && <ProfilePage profile={profile} onUpdateProfile={setProfile} />}
           </main>
 
           <aside className="space-y-6">

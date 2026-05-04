@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { Navigate } from "react-router"
+import { Navigate } from "react-router-dom"
 import { isRefereeAuthenticated } from "./auth"
 
 type ProtectedRefereeRouteProps = {

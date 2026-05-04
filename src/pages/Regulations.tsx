@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Link } from "react-router"
+import { Link } from "react-router-dom"
 import { getCategories } from "../admin/storage"
 import type { Category } from "../admin/types"
 import { useTranslation } from 'react-i18next'
@@ -11,6 +11,86 @@ const Regulations = () => {
   useEffect(() => {
     setCategories(getCategories())
   }, [])
+
+  const categoryStyles: Record<string, { card: string; title: string; description: string; button: string; buttonAlt: string }> = {
+    "Mini Sumo": {
+      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800",
+      title: "text-2xl font-semibold text-white",
+      description: "mt-2 text-sm text-blue-100",
+      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+    },
+    "Mini Sumo Kids": {
+      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-sky-700 via-sky-600 to-sky-800",
+      title: "text-2xl font-semibold text-white",
+      description: "mt-2 text-sm text-sky-100",
+      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+    },
+    "Line Follower": {
+      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-cyan-700 via-cyan-600 to-sky-700",
+      title: "text-2xl font-semibold text-white",
+      description: "mt-2 text-sm text-cyan-100",
+      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+    },
+    "Lego Line": {
+      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-amber-700 via-amber-600 to-orange-700",
+      title: "text-2xl font-semibold text-white",
+      description: "mt-2 text-sm text-amber-100",
+      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+    },
+    "Drone": {
+      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-sky-800 via-sky-700 to-indigo-800",
+      title: "text-2xl font-semibold text-white",
+      description: "mt-2 text-sm text-sky-100",
+      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+    },
+    "1kg Lego Sumo": {
+      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-violet-700 via-indigo-600 to-violet-800",
+      title: "text-2xl font-semibold text-white",
+      description: "mt-2 text-sm text-violet-100",
+      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+    },
+    "3kg Lego Sumo": {
+      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-blue-800 via-indigo-700 to-purple-800",
+      title: "text-2xl font-semibold text-white",
+      description: "mt-2 text-sm text-blue-100",
+      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+    },
+    "Combat Robot": {
+      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-red-800 via-red-700 to-rose-800",
+      title: "text-2xl font-semibold text-white",
+      description: "mt-2 text-sm text-rose-100",
+      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+    },
+    "Mega Sumo": {
+      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-indigo-900 via-blue-800 to-violet-900",
+      title: "text-2xl font-semibold text-white",
+      description: "mt-2 text-sm text-blue-100",
+      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+    },
+    "Start Up Junior": {
+      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-blue-800 via-blue-700 to-slate-900",
+      title: "text-2xl font-semibold text-white",
+      description: "mt-2 text-sm text-blue-100",
+      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+    },
+    "Start Up Senior": {
+      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-slate-800 via-blue-800 to-indigo-900",
+      title: "text-2xl font-semibold text-white",
+      description: "mt-2 text-sm text-slate-100",
+      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+    },
+  }
 
   return (
     <section className="min-h-screen bg-slate-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
@@ -41,32 +121,23 @@ const Regulations = () => {
 
             const categoryPath =
               routeMap[category.name] ?? `/regulations/${category.name.toLowerCase().replace(/\s+/g, "-")}`
+            const style = categoryStyles[category.name] ?? categoryStyles["Mini Sumo"]
 
             return (
-              <article
-                key={category.id}
-                className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm"
-              >
-                <h2 className="text-2xl font-semibold text-blue-900">{category.name}</h2>
-                <p className="mt-2 text-sm text-slate-600">{category.description}</p>
+              <article key={category.id} className={style.card}>
+                <h2 className={style.title}>{category.name}</h2>
+                <p className={style.description}>{category.description}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <Link
-                    to={categoryPath}
-                    className="rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
-                  >
+                  <Link to={categoryPath} className={style.button}>
                     View
                   </Link>
 
                   {category.pdfDataUrl ? (
-                    <a
-                      href={category.pdfDataUrl}
-                      download={category.pdfName}
-                      className="rounded-lg border border-blue-300 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100"
-                    >
+                    <a href={category.pdfDataUrl} download={category.pdfName} className={style.buttonAlt}>
                       Download PDF
                     </a>
                   ) : (
-                    <span className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-500">No PDF</span>
+                    <span className="rounded-lg border border-white/20 px-3 py-2 text-sm text-white/80">No PDF</span>
                   )}
                 </div>
               </article>

@@ -28,6 +28,8 @@ const defaultCategories: Category[] = [
     description: "Beginner robotics rules for young participants.",
     pdfName: "mini-sumo-kids.pdf",
     pdfDataUrl: "",
+    ageMin: 8,
+    ageMax: 12,
   },
   {
     id: "category-3",

@@ -1,12 +1,12 @@
-import { useMemo, useState } from "react"
-import { useNavigate } from "react-router"
-import { createId, getCategories, getMembers, getTeams, saveMembers, saveTeams } from "../../admin/storage"
-import type { Category, Member, Team } from "../../admin/types"
+import { useEffect, useMemo, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { createId, getCategories, getMembers, getMentors, getTeams, saveMembers, saveMentors, saveTeams } from "../../admin/storage"
+import type { Category, Member, Mentor, Team } from "../../admin/types"
 import { getCurrentMentor, signOutMentor } from "../auth"
 
 const UserDashboard = () => {
   const navigate = useNavigate()
-  const mentor = getCurrentMentor()
+  const [mentor, setMentor] = useState<Mentor | null>(() => getCurrentMentor())
   const [allMembers, setAllMembers] = useState<Member[]>(() => getMembers())
   const [allTeams, setAllTeams] = useState<Team[]>(() => getTeams())
   const [categories] = useState<Category[]>(() => getCategories())
@@ -27,6 +27,12 @@ const UserDashboard = () => {
   const [teamError, setTeamError] = useState("")
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null)
   const [editingTeamId, setEditingTeamId] = useState<string | null>(null)
+  const [profileName, setProfileName] = useState(mentor?.name ?? "")
+  const [profileSurname, setProfileSurname] = useState(mentor?.surname ?? "")
+  const [profileEmail, setProfileEmail] = useState(mentor?.email ?? "")
+  const [profileError, setProfileError] = useState("")
+  const [profileMessage, setProfileMessage] = useState("")
+  const [activeTab, setActiveTab] = useState<"users" | "create-team" | "teams" | "schedule" | "profile">("users")
   const countries = [
     "Azerbaijan",
     "Turkey",
@@ -40,6 +46,14 @@ const UserDashboard = () => {
     "United Kingdom",
     "United States",
     "Other",
+  ]
+
+  const navigationTabs = [
+    { id: "users", label: "Users" },
+    { id: "create-team", label: "Create Team" },
+    { id: "teams", label: "Teams" },
+    { id: "schedule", label: "Schedule" },
+    { id: "profile", label: "Profile" },
   ]
 
   const mentorMembers = useMemo(
@@ -57,6 +71,45 @@ const UserDashboard = () => {
     navigate("/user/auth")
   }
 
+  useEffect(() => {
+    setProfileName(mentor?.name ?? "")
+    setProfileSurname(mentor?.surname ?? "")
+    setProfileEmail(mentor?.email ?? "")
+  }, [mentor])
+
+  const updateMentorProfile = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!mentor) {
+      setProfileError("Unable to update profile. Mentor session not found.")
+      return
+    }
+
+    const normalizedEmail = profileEmail.trim().toLowerCase()
+    if (!profileName.trim() || !profileSurname.trim() || !normalizedEmail) {
+      setProfileError("Please fill in all profile fields.")
+      return
+    }
+
+    const mentors = getMentors()
+    if (mentors.some((item) => item.id !== mentor.id && item.email === normalizedEmail)) {
+      setProfileError("This email is already used by another account.")
+      return
+    }
+
+    const updatedMentor: Mentor = {
+      ...mentor,
+      name: profileName.trim(),
+      surname: profileSurname.trim(),
+      email: normalizedEmail,
+    }
+
+    const nextMentors = mentors.map((item) => (item.id === mentor.id ? updatedMentor : item))
+    saveMentors(nextMentors)
+    setMentor(updatedMentor)
+    setProfileError("")
+    setProfileMessage("Profile updated successfully.")
+  }
+
   const normalizeAndSyncTeams = (teams: Team[], members: Member[]): Team[] =>
     teams.map((team) => {
       const resolvedMembers = members.filter((member) => team.memberIds?.includes(member.id))
@@ -67,6 +120,48 @@ const UserDashboard = () => {
         members: resolvedMembers.length,
       }
     })
+
+  const findCategoryByName = (categoryName: string) => categories.find((category) => category.name === categoryName)
+
+  const getCategoryAgeHint = (categoryName: string) => {
+    const category = findCategoryByName(categoryName)
+    if (!category) {
+      return ""
+    }
+    if (category.ageMin !== undefined && category.ageMax !== undefined) {
+      return `Age ${category.ageMin}-${category.ageMax}`
+    }
+    if (category.ageMin !== undefined) {
+      return `Age ${category.ageMin}+`
+    }
+    if (category.ageMax !== undefined) {
+      return `Up to ${category.ageMax} years`
+    }
+    return ""
+  }
+
+  const validateCategoryAgeRules = (selectedMembers: Member[], categoryName: string) => {
+    const category = findCategoryByName(categoryName)
+    if (!category) {
+      return null
+    }
+
+    if (category.ageMin !== undefined) {
+      const underage = selectedMembers.filter((member) => member.age < category.ageMin)
+      if (underage.length > 0) {
+        return `All selected members must be at least ${category.ageMin} years old for ${category.name}.`
+      }
+    }
+
+    if (category.ageMax !== undefined) {
+      const overage = selectedMembers.filter((member) => member.age > category.ageMax)
+      if (overage.length > 0) {
+        return `All selected members must be ${category.ageMax} or younger for ${category.name}.`
+      }
+    }
+
+    return null
+  }
 
   const addMember = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -208,6 +303,12 @@ const UserDashboard = () => {
       return
     }
 
+    const categoryValidationError = validateCategoryAgeRules(selectedMembers, teamCategory)
+    if (categoryValidationError) {
+      setTeamError(categoryValidationError)
+      return
+    }
+
     const newTeam: Team = {
       id: createId("team"),
       name: teamName.trim(),
@@ -262,6 +363,12 @@ const UserDashboard = () => {
       return
     }
 
+    const categoryValidationError = validateCategoryAgeRules(selectedMembers, categoryName)
+    if (categoryValidationError) {
+      setTeamError(categoryValidationError)
+      return
+    }
+
     const nextTeams = allTeams.map((team) =>
       team.id === teamId
         ? {
@@ -283,41 +390,93 @@ const UserDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-950/5 text-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mentor Dashboard</h1>
-                <p className="mt-1 text-sm text-gray-600">Welcome back, {mentor?.name ?? "Mentor"}</p>
-                <p className="mt-2 text-sm text-gray-500">Manage your team members and competition entries</p>
+        {/* Hero */}
+        <div className="mb-10 rounded-[2rem] bg-gradient-to-r from-slate-950 via-indigo-950 to-sky-700 p-8 text-white shadow-2xl shadow-slate-950/20 ring-1 ring-white/10 backdrop-blur-sm">
+          <div className="flex flex-col gap-8 xl:flex-row xl:items-center xl:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-xs uppercase tracking-[0.35em] text-cyan-200/80">Mentor dashboard</p>
+              <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Welcome back, {mentor?.name ?? "Mentor"}</h1>
+              <p className="mt-4 text-sm leading-7 text-slate-200/90">
+                Manage your mentor program, register teams, and review progress from a polished center of command built for NextGen competition success.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-[22px] bg-white/10 border border-white/15 p-5 shadow-lg shadow-slate-950/20 backdrop-blur-sm">
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Team Members</p>
+                <p className="mt-4 text-3xl font-semibold text-white">{mentorMembers.length}</p>
+                <p className="mt-2 text-sm text-slate-300">Your active mentees</p>
               </div>
-              <div className="mt-4 sm:mt-0 flex items-center space-x-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-indigo-600">{mentorMembers.length}</div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wide">Members</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{mentorTeams.length}</div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wide">Teams</div>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:px-6 sm:py-3"
-                >
-                  Sign Out
-                </button>
+              <div className="rounded-[22px] bg-white/10 border border-white/15 p-5 shadow-lg shadow-slate-950/20 backdrop-blur-sm">
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Registered Teams</p>
+                <p className="mt-4 text-3xl font-semibold text-white">{mentorTeams.length}</p>
+                <p className="mt-2 text-sm text-slate-300">Teams ready for competition</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Add Member Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200">
+        <div className="mt-8 lg:grid lg:grid-cols-[280px_1fr] lg:gap-8">
+          <aside className="space-y-6">
+            <div className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-[0_32px_80px_rgba(15,23,42,0.12)]">
+              <div className="mb-6">
+                <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Mentor toolkit</p>
+                <h2 className="mt-3 text-xl font-semibold text-slate-900">Dashboard navigation</h2>
+                <p className="mt-2 text-sm text-slate-600">Quickly move between users, teams, schedule, and profile settings.</p>
+              </div>
+              <div className="space-y-3">
+                {navigationTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                    className={`flex w-full items-center justify-between rounded-3xl px-4 py-3 text-left text-sm font-semibold transition ${
+                      activeTab === tab.id
+                        ? "bg-slate-900 text-white shadow-lg shadow-slate-900/10"
+                        : "bg-slate-50 text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    {tab.label}
+                    <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition ${
+                      activeTab === tab.id ? "bg-cyan-300 text-slate-950" : "bg-slate-200 text-slate-500"
+                    }`}>
+                      {tab.id === "users" ? "U" : tab.id === "create-team" ? "+" : tab.id === "teams" ? "T" : tab.id === "schedule" ? "S" : "P"}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-[0_32px_80px_rgba(15,23,42,0.12)]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Live overview</p>
+                  <h3 className="mt-2 text-base font-semibold text-slate-900">Performance at a glance</h3>
+                </div>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Current</span>
+              </div>
+              <div className="mt-5 grid gap-4">
+                <div className="rounded-3xl bg-slate-50 p-4">
+                  <p className="text-sm text-slate-500">Total members</p>
+                  <p className="mt-2 text-3xl font-semibold text-slate-900">{mentorMembers.length}</p>
+                </div>
+                <div className="rounded-3xl bg-slate-50 p-4">
+                  <p className="text-sm text-slate-500">Active teams</p>
+                  <p className="mt-2 text-3xl font-semibold text-slate-900">{mentorTeams.length}</p>
+                </div>
+                <div className="rounded-3xl bg-slate-50 p-4">
+                  <p className="text-sm text-slate-500">Selected category</p>
+                  <p className="mt-2 text-3xl font-semibold text-slate-900">{teamCategory || "None"}</p>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <div className="space-y-6">
+            {/* Add Member Section */}
+          <div className={`rounded-[28px] border border-slate-200 bg-white shadow-lg shadow-slate-900/5 overflow-hidden ${activeTab !== "users" ? "hidden" : ""}`}>
+            <div className="bg-slate-50 px-6 py-5 border-b border-slate-200">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
@@ -449,8 +608,8 @@ const UserDashboard = () => {
           </div>
 
           {/* Create Team Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200">
+          <div className={`rounded-[28px] border border-slate-200 bg-white shadow-lg shadow-slate-900/5 overflow-hidden ${activeTab !== "create-team" ? "hidden" : ""}`}>
+            <div className="bg-slate-50 px-6 py-5 border-b border-slate-200">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -529,6 +688,9 @@ const UserDashboard = () => {
                         </option>
                       ))}
                     </select>
+                    {teamCategory && (
+                      <p className="mt-2 text-sm text-gray-500">{getCategoryAgeHint(teamCategory)}</p>
+                    )}
                   </div>
                 </div>
 
@@ -598,7 +760,7 @@ const UserDashboard = () => {
         </div>
 
         {/* Members List */}
-        <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className={`mt-8 bg-white rounded-lg shadow-sm border border-gray-200 ${activeTab !== "users" ? "hidden" : ""}`}>
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
@@ -610,8 +772,8 @@ const UserDashboard = () => {
                   </div>
                 </div>
                 <div className="ml-3">
-                  <h2 className="text-xl font-semibold text-gray-900">Team Members</h2>
-                  <p className="text-sm text-gray-600">Manage your registered team members</p>
+                  <h2 className="text-xl font-semibold text-gray-900">Users</h2>
+                  <p className="text-sm text-gray-600">Manage your registered users</p>
                 </div>
               </div>
               <div className="text-sm text-gray-500">
@@ -699,7 +861,7 @@ const UserDashboard = () => {
         </div>
 
         {/* Teams List */}
-        <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className={`mt-8 bg-white rounded-lg shadow-sm border border-gray-200 ${activeTab !== "teams" ? "hidden" : ""}`}>
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
@@ -839,8 +1001,128 @@ const UserDashboard = () => {
             )}
           </div>
         </div>
+
+        <div className={`mt-8 bg-white rounded-lg shadow-sm border border-gray-200 ${activeTab !== "schedule" ? "hidden" : ""}`}>
+          <div className="px-6 py-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Event Schedule</h2>
+                <p className="text-sm text-gray-600">Upcoming registration deadlines and competition milestones.</p>
+              </div>
+              <span className="inline-flex rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">Live</span>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+              <p className="text-sm text-slate-500">Registration deadline</p>
+              <p className="mt-2 text-lg font-semibold text-slate-900">May 25, 2026</p>
+              <p className="mt-2 text-sm text-slate-600">Complete your team submissions before the final deadline.</p>
+            </div>
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+              <p className="text-sm text-slate-500">Category review</p>
+              <p className="mt-2 text-lg font-semibold text-slate-900">{teamCategory || "Select a category first"}</p>
+              <p className="mt-2 text-sm text-slate-600">Use eligible members to match category rules and maximize your lineup.</p>
+            </div>
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+              <p className="text-sm text-slate-500">Mentor checkpoints</p>
+              <p className="mt-2 text-lg font-semibold text-slate-900">{mentorTeams.length} team{mentorTeams.length !== 1 ? 's' : ''} registered</p>
+              <p className="mt-2 text-sm text-slate-600">Track your active teams and confirm that each team has the right members.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className={`mt-8 bg-white rounded-lg shadow-sm border border-gray-200 ${activeTab !== "profile" ? "hidden" : ""}`}>
+          <div className="px-6 py-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Mentor Profile</h2>
+                <p className="text-sm text-gray-600">Review your account and update your mentor details.</p>
+              </div>
+              <button onClick={handleLogout} className="rounded-2xl bg-red-100 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-200">
+                Sign Out
+              </button>
+            </div>
+          </div>
+          <div className="p-6 space-y-6">
+            <form className="grid gap-6 md:grid-cols-2" onSubmit={updateMentorProfile}>
+              <div className="rounded-3xl bg-slate-50 p-5">
+                <label htmlFor="profileName" className="block text-sm font-medium text-slate-600 mb-2">First Name</label>
+                <input
+                  id="profileName"
+                  type="text"
+                  value={profileName}
+                  onChange={(event) => setProfileName(event.target.value)}
+                  className="block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+
+              <div className="rounded-3xl bg-slate-50 p-5">
+                <label htmlFor="profileSurname" className="block text-sm font-medium text-slate-600 mb-2">Last Name</label>
+                <input
+                  id="profileSurname"
+                  type="text"
+                  value={profileSurname}
+                  onChange={(event) => setProfileSurname(event.target.value)}
+                  className="block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+
+              <div className="rounded-3xl bg-slate-50 p-5 md:col-span-2">
+                <label htmlFor="profileEmail" className="block text-sm font-medium text-slate-600 mb-2">Email Address</label>
+                <input
+                  id="profileEmail"
+                  type="email"
+                  value={profileEmail}
+                  onChange={(event) => setProfileEmail(event.target.value)}
+                  className="block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                {profileError ? (
+                  <div className="rounded-2xl bg-red-50 border border-red-200 p-4 text-sm text-red-700">{profileError}</div>
+                ) : profileMessage ? (
+                  <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 text-sm text-emerald-700">{profileMessage}</div>
+                ) : null}
+              </div>
+
+              <div className="md:col-span-2 flex justify-end">
+                <button
+                  type="submit"
+                  className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+                >
+                  Save Profile
+                </button>
+              </div>
+            </form>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="rounded-3xl bg-slate-50 p-5">
+                <p className="text-sm text-slate-500">Current Name</p>
+                <p className="mt-2 text-lg font-semibold text-slate-900">{mentor?.name} {mentor?.surname}</p>
+              </div>
+              <div className="rounded-3xl bg-slate-50 p-5">
+                <p className="text-sm text-slate-500">Current Email</p>
+                <p className="mt-2 text-lg font-semibold text-slate-900">{mentor?.email}</p>
+              </div>
+              <div className="rounded-3xl bg-slate-50 p-5">
+                <p className="text-sm text-slate-500">Category focus</p>
+                <p className="mt-2 text-lg font-semibold text-slate-900">{teamCategory || "Not selected"}</p>
+              </div>
+              <div className="rounded-3xl bg-slate-50 p-5">
+                <p className="text-sm text-slate-500">Teams managed</p>
+                <p className="mt-2 text-lg font-semibold text-slate-900">{mentorTeams.length}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
+</div>
   )
 }
 

@@ -1,9 +1,9 @@
-import { Link } from "react-router"
+import { Link } from "react-router-dom"
 
 const LegoSumo = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      {/* Hero Section */}
+      
       <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 border border-white rounded-full"></div>
@@ -31,14 +31,14 @@ const LegoSumo = () => {
         </div>
       </section>
 
-      {/* Content */}
+     
       <div className="mx-auto max-w-4xl px-6 py-12">
         <header className="text-center mb-16 pt-10">
           <h1 className="text-4xl font-bold text-slate-900 mb-4">LEGO Sumo (Standard) Regulations</h1>
           <p className="text-lg text-slate-600">International LEGO robot sumo competition standards</p>
         </header>
 
-        {/* Section 1: Overview */}
+     
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">1. OVERVIEW</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -53,7 +53,7 @@ const LegoSumo = () => {
           </div>
         </section>
 
-        {{/* Section 2: Robot Specifications */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">2. ROBOT SPECIFICATIONS</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -80,7 +80,7 @@ const LegoSumo = () => {
           </div>
         </section>
 
-        {{/* Section 3: The Dohyo (Ring) */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">3. THE DOHYO (RING)</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -99,7 +99,7 @@ const LegoSumo = () => {
           </div>
         </section>
 
-        {{/* Section 4: Match Rules */}
+     
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">4. MATCH RULES</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -114,7 +114,7 @@ const LegoSumo = () => {
           </div>
         </section>
 
-        {{/* Section 5: Scoring System */}
+       
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">5. SCORING SYSTEM</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -125,7 +125,7 @@ const LegoSumo = () => {
           </div>
         </section>
 
-        {{/* Section 6: Penalties & Disqualification */}
+       
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">6. PENALTIES AND DISQUALIFICATION</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -140,7 +140,7 @@ const LegoSumo = () => {
           </div>
         </section>
 
-        {{/* Section 7: Safety Guidelines */}
+       
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">7. SAFETY GUIDELINES</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -161,7 +161,7 @@ const LegoSumo = () => {
           </p>
         </div>
 
-        {/* Contact Section */}
+       
         <section className="rounded-2xl bg-gradient-to-r from-blue-500 to-blue-700 p-8 text-center mt-12">
           <h3 className="text-2xl font-bold text-white mb-4">Questions about LEGO Sumo?</h3>
           <p className="text-blue-100 mb-6">

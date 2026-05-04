@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router-dom"
 import { signOutReferee, getCurrentReferee } from "../auth"
 import { createId, getCategories, getTeams, getMatchResults, saveMatchResults, getCompetitionResults, saveCompetitionResults } from "../../admin/storage"
 import type { Category, Team, MatchResult, CompetitionResult } from "../../admin/types"

@@ -1,5 +1,5 @@
-import {Routes, Route, Navigate} from 'react-router'
-import { useLocation } from 'react-router'
+import {Routes, Route, Navigate} from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import Navbar from './Components/Navbar'
 import Home from './pages/Home'

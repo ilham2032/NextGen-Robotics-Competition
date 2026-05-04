@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router-dom'
 import { getCurrentReferee } from '../../referee/auth'
 import { getCategories, getTeams } from '../../admin/storage'
 

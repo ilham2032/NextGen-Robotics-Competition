@@ -1,4 +1,4 @@
-import { Link } from "react-router"
+import { Link } from "react-router-dom"
 
 const LineFollower = () => {
   return (
@@ -53,7 +53,7 @@ const LineFollower = () => {
           </div>
         </section>
 
-        {{/* Section 2: Robot Specifications */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">2. ROBOT SPECIFICATIONS</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -133,7 +133,7 @@ const LineFollower = () => {
           </div>
         </section>
 
-        {{/* Section 6: Penalties & Disqualification */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">6. PENALTIES AND DISQUALIFICATION</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -148,7 +148,7 @@ const LineFollower = () => {
           </div>
         </section>
 
-        {{/* Section 7: Safety Guidelines */}
+      
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">7. SAFETY GUIDELINES</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">

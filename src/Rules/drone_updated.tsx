@@ -1,9 +1,9 @@
-import { Link } from "react-router"
+import { Link } from "react-router-dom"
 
 const Drone = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      {/* Hero Section */}
+     
       <section className="relative overflow-hidden bg-gradient-to-r from-sky-900 via-sky-800 to-sky-900 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 border border-white rounded-full"></div>
@@ -38,7 +38,7 @@ const Drone = () => {
           <p className="text-lg text-slate-600">FPV drone racing competition standards for autonomous and piloted flight</p>
         </header>
 
-        {{/* Section 1: Overview */}
+       
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">1. OVERVIEW</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -53,7 +53,7 @@ const Drone = () => {
           </div>
         </section>
 
-        {{/* Section 2: Drone Specifications */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">2. DRONE SPECIFICATIONS</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -72,7 +72,6 @@ const Drone = () => {
           </div>
         </section>
 
-        {{/* Section 3: Race Course */}
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">3. RACE COURSE</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -91,7 +90,7 @@ const Drone = () => {
           </div>
         </section>
 
-        {{/* Section 4: Race Rules */}
+       
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">4. RACE RULES</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -106,7 +105,7 @@ const Drone = () => {
           </div>
         </section>
 
-        {{/* Section 5: Scoring System */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">5. SCORING SYSTEM</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -121,7 +120,7 @@ const Drone = () => {
           </div>
         </section>
 
-        {{/* Section 6: Penalties & Disqualification */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">6. PENALTIES AND DISQUALIFICATION</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">
@@ -136,7 +135,7 @@ const Drone = () => {
           </div>
         </section>
 
-        {{/* Section 7: Safety Guidelines */}
+        
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">7. SAFETY GUIDELINES</h2>
           <div className="space-y-4 text-slate-700 leading-relaxed">

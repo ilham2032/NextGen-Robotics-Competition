@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { Navigate } from "react-router"
+import { Navigate } from "react-router-dom"
 import { isAdminAuthenticated } from "./auth"
 
 type ProtectedAdminRouteProps = {
