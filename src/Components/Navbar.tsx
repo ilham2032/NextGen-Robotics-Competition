@@ -102,7 +102,7 @@ const Navbar = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsMenuOpen(false)}
-                className={({ isActive }) =>
+                className={({ isActive }: { isActive: boolean }) =>
                   `font-display rounded-xl px-3 py-2 text-sm font-medium transition ${
                     isActive ? 'bg-white/20 !text-white' : '!text-white hover:bg-white/10'
                   }`

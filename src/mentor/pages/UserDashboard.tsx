@@ -146,17 +146,20 @@ const UserDashboard = () => {
       return null
     }
 
-    if (category.ageMin !== undefined) {
-      const underage = selectedMembers.filter((member) => member.age < category.ageMin)
+    const minAge = category.ageMin
+    const maxAge = category.ageMax
+
+    if (minAge !== undefined) {
+      const underage = selectedMembers.filter((member) => member.age < minAge)
       if (underage.length > 0) {
-        return `All selected members must be at least ${category.ageMin} years old for ${category.name}.`
+        return `All selected members must be at least ${minAge} years old for ${category.name}.`
       }
     }
 
-    if (category.ageMax !== undefined) {
-      const overage = selectedMembers.filter((member) => member.age > category.ageMax)
+    if (maxAge !== undefined) {
+      const overage = selectedMembers.filter((member) => member.age > maxAge)
       if (overage.length > 0) {
-        return `All selected members must be ${category.ageMax} or younger for ${category.name}.`
+        return `All selected members must be ${maxAge} or younger for ${category.name}.`
       }
     }
 
@@ -1122,7 +1125,6 @@ const UserDashboard = () => {
       </div>
     </div>
   </div>
-</div>
   )
 }
 

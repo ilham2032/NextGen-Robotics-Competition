@@ -12,83 +12,86 @@ const Regulations = () => {
     setCategories(getCategories())
   }, [])
 
+  const primaryButton = "rounded-lg px-3 py-2 text-sm font-semibold text-white bg-blue-700 shadow-lg shadow-blue-700/30 transition hover:bg-blue-600"
+  const altButton = "rounded-lg border border-blue-700 bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-900"
+
   const categoryStyles: Record<string, { card: string; title: string; description: string; button: string; buttonAlt: string }> = {
     "Mini Sumo": {
-      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800",
-      title: "text-2xl font-semibold text-white",
-      description: "mt-2 text-sm text-blue-100",
-      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
-      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200/70 bg-white",
+      title: "text-2xl font-semibold text-slate-950",
+      description: "mt-2 text-sm text-slate-600",
+      button: primaryButton,
+      buttonAlt: altButton,
     },
     "Mini Sumo Kids": {
-      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-sky-700 via-sky-600 to-sky-800",
-      title: "text-2xl font-semibold text-white",
-      description: "mt-2 text-sm text-sky-100",
-      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
-      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
+      title: "text-2xl font-semibold text-slate-900",
+      description: "mt-2 text-sm text-slate-600",
+      button: primaryButton,
+      buttonAlt: altButton,
     },
     "Line Follower": {
-      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-cyan-700 via-cyan-600 to-sky-700",
-      title: "text-2xl font-semibold text-white",
-      description: "mt-2 text-sm text-cyan-100",
-      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
-      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
+      title: "text-2xl font-semibold text-slate-900",
+      description: "mt-2 text-sm text-slate-600",
+      button: primaryButton,
+      buttonAlt: altButton,
     },
     "Lego Line": {
-      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-amber-700 via-amber-600 to-orange-700",
-      title: "text-2xl font-semibold text-white",
-      description: "mt-2 text-sm text-amber-100",
-      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
-      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
+      title: "text-2xl font-semibold text-slate-900",
+      description: "mt-2 text-sm text-slate-600",
+      button: primaryButton,
+      buttonAlt: altButton,
     },
     "Drone": {
-      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-sky-800 via-sky-700 to-indigo-800",
-      title: "text-2xl font-semibold text-white",
-      description: "mt-2 text-sm text-sky-100",
-      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
-      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
+      title: "text-2xl font-semibold text-slate-900",
+      description: "mt-2 text-sm text-slate-600",
+      button: primaryButton,
+      buttonAlt: altButton,
     },
     "1kg Lego Sumo": {
-      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-violet-700 via-indigo-600 to-violet-800",
-      title: "text-2xl font-semibold text-white",
-      description: "mt-2 text-sm text-violet-100",
-      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
-      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
+      title: "text-2xl font-semibold text-slate-900",
+      description: "mt-2 text-sm text-slate-600",
+      button: primaryButton,
+      buttonAlt: altButton,
     },
     "3kg Lego Sumo": {
-      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-blue-800 via-indigo-700 to-purple-800",
-      title: "text-2xl font-semibold text-white",
-      description: "mt-2 text-sm text-blue-100",
-      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
-      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
+      title: "text-2xl font-semibold text-slate-900",
+      description: "mt-2 text-sm text-slate-600",
+      button: primaryButton,
+      buttonAlt: altButton,
     },
     "Combat Robot": {
-      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-red-800 via-red-700 to-rose-800",
-      title: "text-2xl font-semibold text-white",
-      description: "mt-2 text-sm text-rose-100",
-      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
-      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
+      title: "text-2xl font-semibold text-slate-900",
+      description: "mt-2 text-sm text-slate-600",
+      button: primaryButton,
+      buttonAlt: altButton,
     },
     "Mega Sumo": {
-      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-indigo-900 via-blue-800 to-violet-900",
-      title: "text-2xl font-semibold text-white",
-      description: "mt-2 text-sm text-blue-100",
-      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
-      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
+      title: "text-2xl font-semibold text-slate-900",
+      description: "mt-2 text-sm text-slate-600",
+      button: primaryButton,
+      buttonAlt: altButton,
     },
     "Start Up Junior": {
-      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-blue-800 via-blue-700 to-slate-900",
-      title: "text-2xl font-semibold text-white",
-      description: "mt-2 text-sm text-blue-100",
-      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
-      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
+      title: "text-2xl font-semibold text-slate-900",
+      description: "mt-2 text-sm text-slate-600",
+      button: primaryButton,
+      buttonAlt: altButton,
     },
     "Start Up Senior": {
-      card: "rounded-2xl p-5 shadow-sm bg-gradient-to-br from-slate-800 via-blue-800 to-indigo-900",
-      title: "text-2xl font-semibold text-white",
-      description: "mt-2 text-sm text-slate-100",
-      button: "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
-      buttonAlt: "rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20",
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
+      title: "text-2xl font-semibold text-slate-900",
+      description: "mt-2 text-sm text-slate-600",
+      button: primaryButton,
+      buttonAlt: altButton,
     },
   }
 
@@ -137,7 +140,9 @@ const Regulations = () => {
                       Download PDF
                     </a>
                   ) : (
-                    <span className="rounded-lg border border-white/20 px-3 py-2 text-sm text-white/80">No PDF</span>
+                    <span className="rounded-lg border border-blue-700 bg-slate-950 px-3 py-2 text-sm font-semibold text-white">
+                      No PDF
+                    </span>
                   )}
                 </div>
               </article>

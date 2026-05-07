@@ -3,7 +3,6 @@ import type { TeamRecord, MatchSlot } from './adminDashboardTypes'
 type TeamsPageProps = {
   teams: TeamRecord[]
   matches: MatchSlot[]
-  onUpdateTeam: (updatedTeam: TeamRecord) => void
   onDeleteTeam: (teamId: string) => void
   onToggleCheckIn: (teamId: string) => void
   onAssignMatch: (teamId: string, matchId: string) => void

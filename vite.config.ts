@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
-export default defineConfig({
-  base: '/NextGen-Robotics-Competition/',
+export default defineConfig(({ mode }) => ({
+  base: mode === 'development' ? '/' : '/NextGen-Robotics-Competition/',
   plugins: [react(), tailwindcss()]
-})
+}))

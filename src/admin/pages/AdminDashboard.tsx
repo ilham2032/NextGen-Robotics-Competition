@@ -1,12 +1,14 @@
 ﻿import { useEffect, useMemo, useState } from "react"
-import { createId, getMembers, getMentors, getTeams, getSettings, saveTeams, saveSettings } from "../storage"
+import { createId, getMembers, getMentors, getTeams, getSettings, saveTeams } from "../storage"
 import type { Member, Mentor, Team } from "../types"
-import type { EventSettings, LeaderboardRow, MatchSlot, ScoringRule, TeamRecord, TeamStatus } from "./adminDashboardTypes"
-import CreateTeamPage from "./CreateTeamPage"
+import type { EventSettings, MatchSlot, ScoringRule, TeamRecord, TeamStatus } from "./adminDashboardTypes"
+import AdminNav from "../components/AdminNav"
 import MatchesPage from "./MatchesPage"
 import ProfilePage from "./ProfilePage"
 import TeamsPage from "./TeamsPage"
 import UsersPage from "./UsersPage"
+import CategoryPage from "./CategoryPage"
+import AboutEventPage from "./AboutEventPage"
 
 const defaultScoringRules: ScoringRule[] = [
   {
@@ -121,11 +123,13 @@ const defaultMatches: MatchSlot[] = [
 ]
 
 const navItems = [
+  { id: "dashboard", title: "Dashboard" },
   { id: "users", title: "Users" },
-  { id: "create-team", title: "Create Team" },
   { id: "teams", title: "Teams" },
+  { id: "category", title: "Category" },
   { id: "schedule", title: "Schedule" },
   { id: "profile", title: "Profile" },
+  { id: "about-event", title: "About Event" },
 ] as const
 
 type PageId = (typeof navItems)[number]["id"]
@@ -147,7 +151,7 @@ const AdminDashboard = () => {
     return saved.length > 0 ? saved.map(createTeamRecord) : defaultTeams
   })
   const [matches, setMatches] = useState<MatchSlot[]>(defaultMatches)
-  const [settings, setSettings] = useState<EventSettings>(() => {
+  const [settings] = useState<EventSettings>(() => {
     const saved = getSettings()
     return saved ?? defaultSettings
   })
@@ -160,10 +164,8 @@ const AdminDashboard = () => {
     organization: "NextGen Robotics",
     phone: "+994 50 123 45 67",
   })
-  const [activePage, setActivePage] = useState<PageId>("users")
-  const [sortBy, setSortBy] = useState<"score" | "wins" | "points" | "tieBreaker">("score")
+  const [activePage, setActivePage] = useState<PageId>("dashboard")
   const [toastMessage, setToastMessage] = useState("")
-  const [darkMode, setDarkMode] = useState(false)
   const [currentRole, setCurrentRole] = useState<"Admin" | "Judge" | "Volunteer">("Admin")
   const [matchTimeLeft, setMatchTimeLeft] = useState(settings.matchDuration * 60)
   const [matchTimerRunning, setMatchTimerRunning] = useState(false)
@@ -214,36 +216,12 @@ const AdminDashboard = () => {
     return { checkedIn, late, absent, countries }
   }, [teams])
 
-  const leaderboard = useMemo(() => {
-    const rows: LeaderboardRow[] = teams.map((team) => ({
-      teamId: team.id,
-      teamName: team.name,
-      score: team.score,
-      wins: team.wins,
-      points: team.score + team.bonuses + team.penalties,
-      tieBreaker: team.wins * 10 + team.score,
-    }))
-
-    return rows.sort((a, b) => {
-      if (b[sortBy] !== a[sortBy]) return b[sortBy] - a[sortBy]
-      return b.tieBreaker - a.tieBreaker
-    })
-  }, [teams, sortBy])
-
   const saveTeamState = (nextTeams: TeamRecord[]) => {
     setTeams(nextTeams)
     saveTeams(nextTeams)
   }
 
-  const handleAddTeam = (team: TeamRecord) => {
-    saveTeamState([team, ...teams])
-    notify(`Added ${team.name}`)
-  }
 
-  const handleUpdateTeam = (updatedTeam: TeamRecord) => {
-    saveTeamState(teams.map((team) => (team.id === updatedTeam.id ? updatedTeam : team)))
-    notify(`Updated ${updatedTeam.name}`)
-  }
 
   const handleDeleteTeam = (teamId: string) => {
     saveTeamState(teams.filter((team) => team.id !== teamId))
@@ -349,186 +327,150 @@ const AdminDashboard = () => {
     notify("Schedule exported")
   }
 
-  const handleUpdateSettings = (nextSettings: EventSettings) => {
-    setSettings(nextSettings)
-    saveSettings(nextSettings)
-    notify("Settings updated")
-  }
-
-  const handleExportLeaderboard = () => {
-    const report = leaderboard
-      .map((entry, index) => `${index + 1}. ${entry.teamName} — ${entry.score} pts`)
-      .join("\n")
-    const blob = new Blob([`Leaderboard report:\n\n${report}`], { type: "text/plain;charset=utf-8" })
-    const link = document.createElement("a")
-    link.href = URL.createObjectURL(blob)
-    link.download = "robotics_leaderboard_report.txt"
-    link.click()
-    notify("Leaderboard exported")
-  }
-
   const displayMinutes = Math.floor(matchTimeLeft / 60)
   const displaySeconds = String(matchTimeLeft % 60).padStart(2, "0")
 
   return (
-    <section className={`${darkMode ? "dark bg-slate-950" : "bg-slate-50"} min-h-screen px-4 pb-16 pt-14 lg:px-8`}>
-      <div className="mx-auto max-w-7xl">
-        <div className="rounded-3xl border border-slate-200 bg-white px-6 py-7 shadow-sm transition dark:border-slate-700 dark:bg-slate-900 sm:px-8">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-cyan-600 dark:text-cyan-400">NextGen Robotics Admin</p>
-              <h1 className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">Event Operations Dashboard</h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-                Manage teams, schedule matches, track live scoring and configure event settings for a modern competition experience.
-              </p>
+    <>
+      <AdminNav activePage={activePage} onNavigate={(pageId) => setActivePage(pageId as PageId)} />
+
+      <section className="bg-slate-50 min-h-screen px-4 pb-16 pt-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          {/* Dashboard Overview Page */}
+          {activePage === "dashboard" && (
+            <div className="space-y-8">
+              <div className="rounded-3xl border border-slate-200 bg-white px-8 py-12 shadow-sm">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-xs font-semibold tracking-[0.25em] text-blue-600 uppercase">Welcome back</p>
+                    <h1 className="mt-2 text-4xl font-bold text-slate-900">Admin Dashboard</h1>
+                    <p className="mt-3 max-w-2xl text-slate-600">
+                      Manage teams, schedule matches, track live scoring and configure event settings for a modern competition experience.
+                    </p>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Total Teams</p>
+                      <p className="mt-2 text-3xl font-bold text-blue-700">{teams.length}</p>
+                    </div>
+                    <div className="rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-blue-50 p-6">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Checked In</p>
+                      <p className="mt-2 text-3xl font-bold text-cyan-700">{stats.checkedIn}</p>
+                    </div>
+                    <div className="rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-purple-50 p-6">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Pending Matches</p>
+                      <p className="mt-2 text-3xl font-bold text-indigo-700">{matches.filter((m) => m.status === "Pending").length}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Current Role</p>
+                    <p className="mt-2 text-lg font-bold text-slate-900">{currentRole}</p>
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Event Status</p>
+                    <p className="mt-2 text-lg font-bold text-slate-900">{settings.eventStatus}</p>
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Event Date</p>
+                    <p className="mt-2 text-lg font-bold text-slate-900">{new Date(settings.eventDate).toLocaleDateString()}</p>
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Match Duration</p>
+                    <p className="mt-2 text-lg font-bold text-slate-900">{settings.matchDuration} min</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+                  <h3 className="text-xl font-bold text-slate-900">📊 Live Match Timer</h3>
+                  <div className="mt-6 text-center">
+                    <p className="text-5xl font-bold text-blue-700">{displayMinutes}:{displaySeconds}</p>
+                    <p className="mt-2 text-sm text-slate-600">
+                      {currentMatch ? `${currentMatch.teamA} vs ${currentMatch.teamB}` : "No active match"}
+                    </p>
+                  </div>
+                  <div className="mt-6 flex gap-3">
+                    <button
+                      onClick={() => setMatchTimerRunning(true)}
+                      className="flex-1 rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white transition hover:bg-blue-600"
+                    >
+                      ▶ Start
+                    </button>
+                    <button
+                      onClick={() => setMatchTimerRunning(false)}
+                      className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-900 transition hover:bg-slate-50"
+                    >
+                      ⏸ Pause
+                    </button>
+                  </div>
+                </div>
+
+                <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+                  <h3 className="text-xl font-bold text-slate-900">⚙️ Admin Settings</h3>
+                  <div className="mt-6 space-y-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700">Current Role</label>
+                      <select
+                        value={currentRole}
+                        onChange={(e) => setCurrentRole(e.target.value as "Admin" | "Judge" | "Volunteer")}
+                        className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-900 outline-none"
+                      >
+                        <option>Admin</option>
+                        <option>Judge</option>
+                        <option>Volunteer</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+          )}
 
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-center dark:border-slate-700 dark:bg-slate-800">
-                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Current role</p>
-                <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">{currentRole}</p>
-              </div>
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-center dark:border-slate-700 dark:bg-slate-800">
-                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Checks in</p>
-                <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">{stats.checkedIn}</p>
-              </div>
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-center dark:border-slate-700 dark:bg-slate-800">
-                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Pending matches</p>
-                <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">{matches.filter((match) => match.status === "Pending").length}</p>
-              </div>
-            </div>
+          {activePage === "users" && <UsersPage mentors={mentors} members={members} />}
+
+          {activePage === "teams" && (
+            <TeamsPage
+              teams={teams}
+              matches={matches}
+              onDeleteTeam={handleDeleteTeam}
+              onToggleCheckIn={handleToggleCheckIn}
+              onAssignMatch={handleAssignMatch}
+            />
+          )}
+
+          {activePage === "category" && <CategoryPage onNotify={notify} />}
+
+          {activePage === "schedule" && (
+            <MatchesPage
+              matches={matches}
+              teams={teams}
+              scoringRules={settings.scoringRules}
+              matchDuration={settings.matchDuration}
+              onUpdateMatch={handleUpdateMatch}
+              onAddMatch={(match) => setMatches((current) => [match, ...current])}
+              onGenerateSchedule={handleGenerateSchedule}
+              onExportCsv={handleExportScheduleCsv}
+            />
+          )}
+
+          {activePage === "profile" && <ProfilePage profile={profile} onUpdateProfile={setProfile} />}
+
+          {activePage === "about-event" && <AboutEventPage onNotify={notify} />}
+        </div>
+
+        {toastMessage ? (
+          <div className="fixed bottom-5 right-5 z-50 rounded-3xl bg-blue-700 px-6 py-4 text-white shadow-xl shadow-blue-700/30 font-semibold">
+            {toastMessage}
           </div>
-
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setActivePage(item.id)}
-                className={`rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-                  activePage === item.id
-                    ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-400/30"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                }`}
-              >
-                {item.title}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-8 grid gap-8 xl:grid-cols-[1.4fr_420px]">
-          <main className="space-y-8">
-            {activePage === "users" && <UsersPage mentors={mentors} members={members} />}
-
-            {activePage === "create-team" && <CreateTeamPage onAddTeam={handleAddTeam} />}
-
-            {activePage === "teams" && (
-              <TeamsPage
-                teams={teams}
-                matches={matches}
-                onDeleteTeam={handleDeleteTeam}
-                onToggleCheckIn={handleToggleCheckIn}
-                onAssignMatch={handleAssignMatch}
-              />
-            )}
-
-            {activePage === "schedule" && (
-              <MatchesPage
-                matches={matches}
-                teams={teams}
-                scoringRules={settings.scoringRules}
-                matchDuration={settings.matchDuration}
-                onUpdateMatch={handleUpdateMatch}
-                onAddMatch={(match) => setMatches((current) => [match, ...current])}
-                onGenerateSchedule={handleGenerateSchedule}
-                onExportCsv={handleExportScheduleCsv}
-              />
-            )}
-
-            {activePage === "profile" && <ProfilePage profile={profile} onUpdateProfile={setProfile} />}
-          </main>
-
-          <aside className="space-y-6">
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">Live match timer</p>
-                  <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{displayMinutes}:{displaySeconds}</p>
-                </div>
-                <div className="rounded-3xl bg-slate-100 px-3 py-2 text-xs font-semibold uppercase text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                  {currentMatch?.status ?? "Idle"}
-                </div>
-              </div>
-
-              <p className="mt-4 text-sm text-slate-600 dark:text-slate-300">
-                Current match: {currentMatch ? `${currentMatch.teamA} vs ${currentMatch.teamB}` : "No active match selected."}
-              </p>
-
-              <div className="mt-5 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={() => setMatchTimerRunning(true)}
-                  className="rounded-2xl bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-400/30 transition hover:bg-cyan-300"
-                >
-                  Start timer
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMatchTimerRunning(false)}
-                  className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-                >
-                  Pause timer
-                </button>
-              </div>
-            </section>
-
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Event controls</h2>
-              <div className="mt-4 space-y-3">
-                <div className="rounded-3xl bg-slate-50 p-4 dark:bg-slate-800">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Event day</p>
-                  <p className="mt-1 text-base font-semibold text-slate-900 dark:text-white">{settings.eventDate}</p>
-                </div>
-                <div className="rounded-3xl bg-slate-50 p-4 dark:bg-slate-800">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Venue</p>
-                  <p className="mt-1 text-base font-semibold text-slate-900 dark:text-white">{settings.venue}</p>
-                </div>
-                <div className="rounded-3xl bg-slate-50 p-4 dark:bg-slate-800">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Match length</p>
-                  <p className="mt-1 text-base font-semibold text-slate-900 dark:text-white">{settings.matchDuration} minutes</p>
-                </div>
-              </div>
-            </section>
-
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">Role selector</p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">{currentRole}</p>
-                </div>
-                <select
-                  value={currentRole}
-                  onChange={(event) => setCurrentRole(event.target.value as "Admin" | "Judge" | "Volunteer")}
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                >
-                  <option>Admin</option>
-                  <option>Judge</option>
-                  <option>Volunteer</option>
-                </select>
-              </div>
-              <p className="mt-4 text-sm text-slate-600 dark:text-slate-300">Role mode updates interface behavior to help with event preparation and access scope simulations.</p>
-            </section>
-          </aside>
-        </div>
-      </div>
-
-      {toastMessage ? (
-        <div className="fixed bottom-5 right-5 z-50 rounded-3xl bg-cyan-400 px-5 py-3 text-sm text-slate-950 shadow-xl shadow-cyan-400/30">
-          {toastMessage}
-        </div>
-      ) : null}
-    </section>
+        ) : null}
+      </section>
+    </>
   )
 }
 
