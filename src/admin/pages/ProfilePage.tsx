@@ -3,23 +3,27 @@ import { useState } from "react"
 type ProfilePageProps = {
   profile: {
     name: string
+    surname: string
     email: string
     role: string
     organization: string
     phone: string
+    age: number
   }
-  onUpdateProfile: (profile: { name: string; email: string; role: string; organization: string; phone: string }) => void
+  onUpdateProfile: (profile: { name: string; surname: string; email: string; role: string; organization: string; phone: string; age: number }) => void
 }
 
 const ProfilePage = ({ profile, onUpdateProfile }: ProfilePageProps) => {
   const [name, setName] = useState(profile.name)
+  const [surname, setSurname] = useState(profile.surname || "")
   const [email, setEmail] = useState(profile.email)
   const [role, setRole] = useState(profile.role)
   const [organization, setOrganization] = useState(profile.organization)
   const [phone, setPhone] = useState(profile.phone)
+  const [age, setAge] = useState(profile.age || 0)
 
   const handleSave = () => {
-    onUpdateProfile({ name, email, role, organization, phone })
+    onUpdateProfile({ name, surname, email, role, organization, phone, age })
   }
 
   return (
@@ -43,11 +47,24 @@ const ProfilePage = ({ profile, onUpdateProfile }: ProfilePageProps) => {
                     onChange={(event) => setName(event.target.value)}
                     className="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 outline-none"
                   />
+                  <label className="block text-sm font-medium text-slate-700">Surname</label>
+                  <input
+                    value={surname}
+                    onChange={(event) => setSurname(event.target.value)}
+                    className="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 outline-none"
+                  />
                   <label className="block text-sm font-medium text-slate-700">Email address</label>
                   <input
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
+                    className="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 outline-none"
+                  />
+                  <label className="block text-sm font-medium text-slate-700">Age</label>
+                  <input
+                    type="number"
+                    value={age}
+                    onChange={(event) => setAge(parseInt(event.target.value))}
                     className="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 outline-none"
                   />
                   <label className="block text-sm font-medium text-slate-700">Phone number</label>

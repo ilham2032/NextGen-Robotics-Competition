@@ -1,32 +1,32 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+
 
 type NavItem = {
   id: string
   title: string
   icon: string
+  link: string
 }
 
 interface AdminNavProps {
   activePage: string
-  onNavigate: (pageId: string) => void
 }
 
-const AdminNav = ({ activePage, onNavigate }: AdminNavProps) => {
+const AdminNav = ({ activePage }: AdminNavProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
 
   const navItems: NavItem[] = [
-    { id: 'dashboard', title: 'Dashboard', icon: '📊' },
-    { id: 'users', title: 'Members', icon: '👥' },
-    { id: 'teams', title: 'Teams', icon: '🤖' },
-    { id: 'category', title: 'Categories', icon: '📂' },
-    { id: 'schedule', title: 'Schedule', icon: '📅' },
-    { id: 'profile', title: 'Profile', icon: '⚙️' },
-    { id: 'about-event', title: 'Event Info', icon: 'ℹ️' },
+    { id: 'dashboard', title: 'Dashboard', icon: '📊', link: 'admin/dashboard' },
+    { id: 'users', title: 'Members', icon: '👥', link: 'admin/users' },
+    { id: 'teams', title: 'Teams', icon: '🤖', link: 'admin/teams' },
+    { id: 'category', title: 'Categories', icon: '📂', link: 'admin/category' },
+    { id: 'schedule', title: 'Schedule', icon: '📅', link: 'admin/schedule' },
+    { id: 'profile', title: 'Profile', icon: '⚙️', link: 'admin/profile' },
+    { id: 'about-event', title: 'Event Info', icon: 'ℹ️', link: 'admin/about-event' },
   ]
 
   return (
-    <div className="flex">
-      {/* Sidebar Navigation */}
       <aside className={`sticky top-0 h-screen bg-gradient-to-b from-blue-700 via-blue-600 to-indigo-700 border-r border-white/10 shadow-lg transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
         <div className="flex flex-col h-full">
           {/* Logo Area */}
@@ -55,10 +55,10 @@ const AdminNav = ({ activePage, onNavigate }: AdminNavProps) => {
           {/* Navigation Items */}
           <nav className="flex-1 overflow-y-auto px-3 py-6 space-y-2">
             {navItems.map((item) => (
-              <button
+              <Link
+                to={`/${item.link || item.id}`}
                 key={item.id}
-                onClick={() => onNavigate(item.id)}
-                className={`w-full flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold transition-all ${
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold transition-all ${
                   activePage === item.id
                     ? 'bg-white text-blue-700 shadow-lg'
                     : 'text-white hover:bg-white/15'
@@ -67,7 +67,7 @@ const AdminNav = ({ activePage, onNavigate }: AdminNavProps) => {
               >
                 <span className="text-lg flex-shrink-0">{item.icon}</span>
                 {!isCollapsed && <span>{item.title}</span>}
-              </button>
+              </Link>
             ))}
           </nav>
 
@@ -78,10 +78,6 @@ const AdminNav = ({ activePage, onNavigate }: AdminNavProps) => {
           </div>
         </div>
       </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto" />
-    </div>
   )
 }
 

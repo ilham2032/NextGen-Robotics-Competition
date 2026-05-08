@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react"
 import { getSettings, saveSettings } from "../../admin/storage"
 import type { EventSettings } from "./adminDashboardTypes"
+import type { TeamRecord } from "./adminDashboardTypes"
+import type { Member, Mentor } from "../types"
 
 interface AboutEventProps {
   onNotify?: (message: string) => void
+  teams: TeamRecord[]
+  mentors: Mentor[]
+  members: Member[]
 }
 
-const AboutEventPage = ({ onNotify }: AboutEventProps) => {
+const AboutEventPage = ({ onNotify, teams, mentors, members }: AboutEventProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const [settings, setSettings] = useState<EventSettings | null>(null)
   const [formData, setFormData] = useState({
@@ -32,6 +37,11 @@ const AboutEventPage = ({ onNotify }: AboutEventProps) => {
       })
     }
   }, [])
+
+  const totalParticipants = members.length
+  const totalTeams = teams.length
+  const totalMentors = mentors.length
+  const totalCategories = new Set(teams.map((team) => team.categoryName).filter(Boolean)).size
 
   const handleSave = () => {
     if (!formData.eventName || !formData.venue) {
@@ -95,6 +105,25 @@ const AboutEventPage = ({ onNotify }: AboutEventProps) => {
             />
           </div>
         )}
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-4">
+        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+          <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Teams</p>
+          <p className="mt-2 text-3xl font-bold text-slate-900">{totalTeams}</p>
+        </div>
+        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+          <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Participants</p>
+          <p className="mt-2 text-3xl font-bold text-slate-900">{totalParticipants}</p>
+        </div>
+        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+          <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Mentors</p>
+          <p className="mt-2 text-3xl font-bold text-slate-900">{totalMentors}</p>
+        </div>
+        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+          <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Categories</p>
+          <p className="mt-2 text-3xl font-bold text-slate-900">{totalCategories}</p>
+        </div>
       </div>
 
       {/* Edit Form */}

@@ -46,6 +46,7 @@ import TeamStartupSenior from './teamszone/categoryteams/teamstartupsenior'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfService from './pages/TermsOfService'
 
+
 const App = () => {
   const location = useLocation()
   const isPortalRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/user') || location.pathname.startsWith('/referee')
@@ -72,7 +73,7 @@ const App = () => {
           <Route path='/awards' element={<Awards/>}/>
           <Route path='/' element={<Home/>}/>
           <Route path='/admin/login' element={<AdminLogin/>}/>
-          <Route path='/admin' element={<ProtectedAdminRoute><AdminPage/></ProtectedAdminRoute>}/>
+          <Route path='/admin/*' element={<ProtectedAdminRoute><AdminPage/></ProtectedAdminRoute>}/>
           <Route path='/user/auth' element={<UserAuth/>}/>
           <Route path='/user/dashboard' element={<ProtectedMentorRoute><UserDashboard/></ProtectedMentorRoute>}/>
           <Route path='/referee/login' element={<RefereeLogin/>}/>

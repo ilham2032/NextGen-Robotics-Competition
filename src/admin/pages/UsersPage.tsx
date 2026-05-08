@@ -1,3 +1,4 @@
+import { useState } from "react"
 import type { Member, Mentor } from "../types"
 
 type UsersPageProps = {
@@ -6,6 +7,32 @@ type UsersPageProps = {
 }
 
 const UsersPage = ({ mentors, members }: UsersPageProps) => {
+  const [editingMentor, setEditingMentor] = useState<string | null>(null)
+  const [editingMember, setEditingMember] = useState<string | null>(null)
+  const [mentorForm, setMentorForm] = useState({ name: "", surname: "", email: "", age: 0 })
+  const [memberForm, setMemberForm] = useState({ name: "", surname: "", email: "", age: 0 })
+
+  const handleEditMentor = (mentor: Mentor) => {
+    setEditingMentor(mentor.id)
+    setMentorForm({ name: mentor.name, surname: mentor.surname, email: mentor.email, age: mentor.age })
+  }
+
+  const handleSaveMentor = () => {
+    // In a real app, this would update the mentor in storage/database
+    console.log("Saving mentor:", mentorForm)
+    setEditingMentor(null)
+  }
+
+  const handleEditMember = (member: Member) => {
+    setEditingMember(member.id)
+    setMemberForm({ name: member.name, surname: member.surname, email: member.email, age: member.age })
+  }
+
+  const handleSaveMember = () => {
+    // In a real app, this would update the member in storage/database
+    console.log("Saving member:", memberForm)
+    setEditingMember(null)
+  }
   return (
     <div className="space-y-8">
       <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-xl shadow-slate-200/20">
@@ -51,16 +78,83 @@ const UsersPage = ({ mentors, members }: UsersPageProps) => {
             <div className="mt-6 space-y-4">
               {mentors.map((mentor) => (
                 <div key={mentor.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-lg font-semibold text-slate-900">{mentor.name} {mentor.surname}</p>
-                      <p className="text-sm text-slate-500">{mentor.email}</p>
+                  {editingMentor === mentor.id ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700">Name</label>
+                          <input
+                            type="text"
+                            value={mentorForm.name}
+                            onChange={(e) => setMentorForm({ ...mentorForm, name: e.target.value })}
+                            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700">Surname</label>
+                          <input
+                            type="text"
+                            value={mentorForm.surname}
+                            onChange={(e) => setMentorForm({ ...mentorForm, surname: e.target.value })}
+                            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700">Email</label>
+                          <input
+                            type="email"
+                            value={mentorForm.email}
+                            onChange={(e) => setMentorForm({ ...mentorForm, email: e.target.value })}
+                            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700">Age</label>
+                          <input
+                            type="number"
+                            value={mentorForm.age}
+                            onChange={(e) => setMentorForm({ ...mentorForm, age: parseInt(e.target.value) })}
+                            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleSaveMentor}
+                          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditingMentor(null)}
+                          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
-                    <div className="space-y-1 text-sm text-slate-600">
-                      <p>Age: {mentor.age}</p>
-                      <p>Mentor ID: {mentor.id}</p>
+                  ) : (
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-lg font-semibold text-slate-900">{mentor.name} {mentor.surname}</p>
+                        <p className="text-sm text-slate-500">{mentor.email}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="space-y-1 text-sm text-slate-600">
+                          <p>Age: {mentor.age}</p>
+                          <p>Mentor ID: {mentor.id}</p>
+                        </div>
+                        <button
+                          onClick={() => handleEditMentor(mentor)}
+                          className="rounded-lg bg-blue-100 px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-200"
+                        >
+                          Edit
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -74,8 +168,77 @@ const UsersPage = ({ mentors, members }: UsersPageProps) => {
             <div className="mt-6 grid gap-4">
               {members.slice(0, 4).map((member) => (
                 <div key={member.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="font-semibold text-slate-900">{member.name} {member.surname}</p>
-                  <p className="text-sm text-slate-500">Age {member.age} • {member.email}</p>
+                  {editingMember === member.id ? (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700">Name</label>
+                          <input
+                            type="text"
+                            value={memberForm.name}
+                            onChange={(e) => setMemberForm({ ...memberForm, name: e.target.value })}
+                            className="mt-1 w-full rounded border border-slate-300 px-2 py-1 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700">Surname</label>
+                          <input
+                            type="text"
+                            value={memberForm.surname}
+                            onChange={(e) => setMemberForm({ ...memberForm, surname: e.target.value })}
+                            className="mt-1 w-full rounded border border-slate-300 px-2 py-1 text-sm"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700">Email</label>
+                          <input
+                            type="email"
+                            value={memberForm.email}
+                            onChange={(e) => setMemberForm({ ...memberForm, email: e.target.value })}
+                            className="mt-1 w-full rounded border border-slate-300 px-2 py-1 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700">Age</label>
+                          <input
+                            type="number"
+                            value={memberForm.age}
+                            onChange={(e) => setMemberForm({ ...memberForm, age: parseInt(e.target.value) })}
+                            className="mt-1 w-full rounded border border-slate-300 px-2 py-1 text-sm"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleSaveMember}
+                          className="rounded bg-blue-600 px-3 py-1 text-xs font-semibold text-white hover:bg-blue-700"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditingMember(null)}
+                          className="rounded border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-slate-900">{member.name} {member.surname}</p>
+                        <p className="text-sm text-slate-500">Age {member.age} • {member.email}</p>
+                      </div>
+                      <button
+                        onClick={() => handleEditMember(member)}
+                        className="rounded-lg bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700 hover:bg-blue-200"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
               {members.length === 0 && <p className="text-sm text-slate-500">No member records available yet.</p>}

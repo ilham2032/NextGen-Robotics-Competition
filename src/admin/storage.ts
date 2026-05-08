@@ -14,80 +14,7 @@ const SETTINGS_STORAGE_KEY = "nextgen_admin_settings"
 
 const defaultTeams: Team[] = []
 
-const defaultCategories: Category[] = [
-  {
-    id: "category-1",
-    name: "Mini Sumo",
-    description: "500g autonomous robot battle regulations.",
-    pdfName: "mini-sumo.pdf",
-    pdfDataUrl: "",
-  },
-  {
-    id: "category-2",
-    name: "Mini Sumo Kids",
-    description: "Beginner robotics rules for young participants.",
-    pdfName: "mini-sumo-kids.pdf",
-    pdfDataUrl: "",
-    ageMin: 8,
-    ageMax: 12,
-  },
-  {
-    id: "category-3",
-    name: "Line Follower",
-    description: "Autonomous line tracking challenge regulations.",
-    pdfName: "line-follower.pdf",
-    pdfDataUrl: "",
-  },
-  {
-    id: "category-4",
-    name: "Lego Line",
-    description: "LEGO-based line follower competition rules.",
-    pdfName: "lego-line.pdf",
-    pdfDataUrl: "",
-  },
-  {
-    id: "category-5",
-    name: "Combat Robot",
-    description: "Robot combat arena safety and battle regulations.",
-    pdfName: "combat-robot.pdf",
-    pdfDataUrl: "",
-  },
-  {
-    id: "category-6",
-    name: "1kg Lego Sumo",
-    description: "LEGO sumo category with 1kg robot limit.",
-    pdfName: "1kg-lego-sumo.pdf",
-    pdfDataUrl: "",
-  },
-  {
-    id: "category-7",
-    name: "3kg Lego Sumo",
-    description: "Advanced LEGO sumo category with 3kg robot limit.",
-    pdfName: "3kg-lego-sumo.pdf",
-    pdfDataUrl: "",
-  },
-  {
-    id: "category-8",
-    name: "Drone",
-    description: "UAV flight and mission challenge regulations.",
-    pdfName: "drone.pdf",
-    pdfDataUrl: "",
-  },
-  {
-    id: "category-9",
-    name: "Mega Sumo",
-    description: "3kg Sumo robot ",
-    pdfName: "mega-sumo.pdf",
-    pdfDataUrl: "",
-  },
-  {
-    id: "category-10",
-    name: "Start Up Senior",
-    description: "Senior startup and innovation pitching challenge.",
-    pdfName: "start-up-senior.pdf",
-    pdfDataUrl: "",
-  },
-]
+const defaultCategories: Category[] = []
 
 const parseStoredList = <T,>(raw: string | null): T[] | null => {
   if (!raw) {
@@ -185,4 +112,16 @@ export const getSettings = (): EventSettings | null => {
 
 export const saveSettings = (settings: EventSettings): void => {
   localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings))
+}
+
+export const clearAllData = (): void => {
+  // Clear all user/member related data
+  localStorage.removeItem(TEAM_STORAGE_KEY)
+  localStorage.removeItem(MENTOR_STORAGE_KEY)
+  localStorage.removeItem(MEMBER_STORAGE_KEY)
+  localStorage.removeItem(REFEREE_STORAGE_KEY)
+  localStorage.removeItem(MENTOR_SESSION_KEY)
+  localStorage.removeItem(REFEREE_SESSION_KEY)
+  localStorage.removeItem(MATCH_RESULTS_KEY)
+  localStorage.removeItem(COMPETITION_RESULTS_KEY)
 }

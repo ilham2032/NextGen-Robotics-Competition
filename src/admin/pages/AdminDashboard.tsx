@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from "react"
-import { createId, getMembers, getMentors, getTeams, getSettings, saveTeams } from "../storage"
+import { useLocation } from "react-router-dom"
+import { createId, getMembers, getMentors, getTeams, getSettings, saveTeams, saveSettings, clearAllData } from "../storage"
 import type { Member, Mentor, Team } from "../types"
 import type { EventSettings, MatchSlot, ScoringRule, TeamRecord, TeamStatus } from "./adminDashboardTypes"
 import AdminNav from "../components/AdminNav"
@@ -10,29 +11,7 @@ import UsersPage from "./UsersPage"
 import CategoryPage from "./CategoryPage"
 import AboutEventPage from "./AboutEventPage"
 
-const defaultScoringRules: ScoringRule[] = [
-  {
-    id: "rule-1",
-    title: "Base match score",
-    description: "Points awarded for each match win.",
-    value: 10,
-    type: "Base",
-  },
-  {
-    id: "rule-2",
-    title: "Precision bonus",
-    description: "Awarded for technical execution and stability.",
-    value: 3,
-    type: "Bonus",
-  },
-  {
-    id: "rule-3",
-    title: "Penalty deduction",
-    description: "Points deducted for rule infractions.",
-    value: -2,
-    type: "Penalty",
-  },
-]
+const defaultScoringRules: ScoringRule[] = []
 
 const defaultSettings: EventSettings = {
   eventName: "NextGen Robotics Championship",
@@ -44,83 +23,9 @@ const defaultSettings: EventSettings = {
   scoringRules: defaultScoringRules,
 }
 
-const defaultTeams: TeamRecord[] = [
-  {
-    id: "team-1",
-    name: "Vector Velocity",
-    school: "Starlight Technical Academy",
-    members: 4,
-    description: "Autonomous line-following prototype",
-    categoryName: "Line Follower",
-    memberNames: ["Alya", "Rian", "Mira", "Kaito"],
-    status: "checked-in",
-    robotType: "Line Follower",
-    membersList: ["Alya", "Rian", "Mira", "Kaito"],
-    score: 92,
-    wins: 4,
-    penalties: 2,
-    bonuses: 8,
-  },
-  {
-    id: "team-2",
-    name: "Quantum Circuit",
-    school: "Nexus Institute",
-    members: 3,
-    description: "Fast response mini-sumo",
-    categoryName: "Mini Sumo",
-    memberNames: ["Lina", "Evan", "Theo"],
-    status: "checked-in",
-    robotType: "Sumo",
-    membersList: ["Lina", "Evan", "Theo"],
-    score: 85,
-    wins: 3,
-    penalties: 1,
-    bonuses: 10,
-  },
-  {
-    id: "team-3",
-    name: "AeroStrikers",
-    school: "Pinnacle Academy",
-    members: 5,
-    description: "High-precision drone navigation",
-    categoryName: "Drone",
-    memberNames: ["Sofia", "Noel", "Jade", "Mason", "Rhea"],
-    status: "late",
-    robotType: "Drone",
-    membersList: ["Sofia", "Noel", "Jade", "Mason", "Rhea"],
-    score: 78,
-    wins: 2,
-    penalties: 0,
-    bonuses: 6,
-  },
-]
+const defaultTeams: TeamRecord[] = []
 
-const defaultMatches: MatchSlot[] = [
-  {
-    id: "match-1",
-    round: "Qualification",
-    time: "09:00",
-    arena: "Arena 1",
-    teamA: "Vector Velocity",
-    teamB: "Quantum Circuit",
-    status: "Pending",
-    scoreA: 0,
-    scoreB: 0,
-    notes: "Opening qualification match",
-  },
-  {
-    id: "match-2",
-    round: "Qualification",
-    time: "09:20",
-    arena: "Arena 2",
-    teamA: "AeroStrikers",
-    teamB: "TBD",
-    status: "Pending",
-    scoreA: 0,
-    scoreB: 0,
-    notes: "Drone elimination round",
-  },
-]
+const defaultMatches: MatchSlot[] = []
 
 const navItems = [
   { id: "dashboard", title: "Dashboard" },
@@ -151,19 +56,22 @@ const AdminDashboard = () => {
     return saved.length > 0 ? saved.map(createTeamRecord) : defaultTeams
   })
   const [matches, setMatches] = useState<MatchSlot[]>(defaultMatches)
-  const [settings] = useState<EventSettings>(() => {
+  const [settings, setSettings] = useState<EventSettings>(() => {
     const saved = getSettings()
     return saved ?? defaultSettings
   })
-  const [mentors] = useState<Mentor[]>(() => getMentors())
-  const [members] = useState<Member[]>(() => getMembers())
+  const [mentors, setMentors] = useState<Mentor[]>(() => getMentors())
+  const [members, setMembers] = useState<Member[]>(() => getMembers())
   const [profile, setProfile] = useState({
     name: "NextGen Admin",
+    surname: "User",
     email: "admin@nextgen-robocomp.com",
     role: "Admin",
     organization: "NextGen Robotics",
     phone: "+994 50 123 45 67",
+    age: 30,
   })
+  const location = useLocation()
   const [activePage, setActivePage] = useState<PageId>("dashboard")
   const [toastMessage, setToastMessage] = useState("")
   const [currentRole, setCurrentRole] = useState<"Admin" | "Judge" | "Volunteer">("Admin")
@@ -176,6 +84,15 @@ const AdminDashboard = () => {
     setToastMessage(message)
     window.setTimeout(() => setToastMessage(""), 2600)
   }
+
+  useEffect(() => {
+    const pathSegment = location.pathname.split("/")[2] as PageId | undefined
+    if (pathSegment && navItems.some((item) => item.id === pathSegment)) {
+      setActivePage(pathSegment)
+    } else {
+      setActivePage("dashboard")
+    }
+  }, [location.pathname])
 
   useEffect(() => {
     if (!matchTimerRunning || !currentMatch) {
@@ -310,6 +227,13 @@ const AdminDashboard = () => {
     notify("Match updated")
   }
 
+  const handleUpdateEventDate = (newDate: string) => {
+    const updatedSettings = { ...settings, eventDate: newDate }
+    setSettings(updatedSettings)
+    saveSettings(updatedSettings)
+    notify("Event date updated")
+  }
+
   const handleExportScheduleCsv = () => {
     if (matches.length === 0) {
       notify("No matches to export.")
@@ -327,14 +251,25 @@ const AdminDashboard = () => {
     notify("Schedule exported")
   }
 
+  const handleClearAllData = () => {
+    if (window.confirm("Are you sure you want to delete ALL teams, mentors, and users? This action cannot be undone.")) {
+      clearAllData()
+      setTeams([])
+      setMentors([])
+      setMembers([])
+      setMatches([])
+      notify("All data has been cleared")
+    }
+  }
+
   const displayMinutes = Math.floor(matchTimeLeft / 60)
   const displaySeconds = String(matchTimeLeft % 60).padStart(2, "0")
 
   return (
-    <>
-      <AdminNav activePage={activePage} onNavigate={(pageId) => setActivePage(pageId as PageId)} />
+    <div className="flex min-h-screen bg-slate-50">
+      <AdminNav activePage={activePage} />
 
-      <section className="bg-slate-50 min-h-screen px-4 pb-16 pt-6 lg:px-8">
+      <section className="flex-1 min-h-screen px-4 pb-16 pt-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           {/* Dashboard Overview Page */}
           {activePage === "dashboard" && (
@@ -429,6 +364,20 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Data Management */}
+              <div className="rounded-3xl border border-red-200 bg-red-50 p-6">
+                <h3 className="text-lg font-bold text-red-900">🗑️ Data Management</h3>
+                <p className="mt-2 text-sm text-red-700">Clear all stored data (teams, mentors, users, matches)</p>
+                <div className="mt-4">
+                  <button
+                    onClick={handleClearAllData}
+                    className="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
+                  >
+                    Clear All Data
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -456,12 +405,14 @@ const AdminDashboard = () => {
               onAddMatch={(match) => setMatches((current) => [match, ...current])}
               onGenerateSchedule={handleGenerateSchedule}
               onExportCsv={handleExportScheduleCsv}
+              eventDate={settings.eventDate}
+              onUpdateEventDate={handleUpdateEventDate}
             />
           )}
 
           {activePage === "profile" && <ProfilePage profile={profile} onUpdateProfile={setProfile} />}
 
-          {activePage === "about-event" && <AboutEventPage onNotify={notify} />}
+          {activePage === "about-event" && <AboutEventPage onNotify={notify} teams={teams} mentors={mentors} members={members} />}
         </div>
 
         {toastMessage ? (
@@ -470,7 +421,7 @@ const AdminDashboard = () => {
           </div>
         ) : null}
       </section>
-    </>
+    </div>
   )
 }
 

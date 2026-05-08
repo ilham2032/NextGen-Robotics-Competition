@@ -39,8 +39,16 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
     setIsAdding(false)
   }
 
-  const handleEdit = (category: Category) => {
-    setEditingId(category.id)
+  const handleEdit = (categoryId: string) => {
+    setIsAdding(false)
+    setEditingId(categoryId)
+
+    const category = categories.find((cat) => cat.id === categoryId)
+    if (!category) {
+      onNotify?.("Category not found")
+      return
+    }
+
     setFormData({
       name: category.name,
       description: category.description,
@@ -86,6 +94,25 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
     setFormData({ name: "", description: "", pdfName: "", pdfDataUrl: "" })
   }
 
+  useEffect(() => {
+    if (editingId) {
+      const formSection = document.getElementById("category-form")
+      formSection?.scrollIntoView({ behavior: "smooth", block: "center" })
+    }
+  }, [editingId])
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string
+        setFormData({ ...formData, pdfName: file.name, pdfDataUrl: dataUrl })
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="rounded-3xl border border-slate-200 bg-white px-6 py-7 shadow-sm sm:px-8">
@@ -107,7 +134,7 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
 
         {/* Add/Edit Form */}
         {(isAdding || editingId) && (
-          <div className="mt-6 space-y-4 rounded-2xl border-2 border-blue-200 bg-blue-50 p-6">
+          <div id="category-form" className="mt-6 space-y-4 rounded-2xl border-2 border-blue-200 bg-blue-50 p-6">
             <h3 className="font-semibold text-slate-900">
               {editingId ? "Edit Category" : "Add New Category"}
             </h3>
@@ -148,15 +175,25 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700">PDF URL/Data</label>
+                  <label className="block text-sm font-semibold text-slate-700">Select PDF File</label>
                   <input
-                    type="text"
-                    value={formData.pdfDataUrl}
-                    onChange={(e) => setFormData({ ...formData, pdfDataUrl: e.target.value })}
-                    placeholder="PDF link or data URL"
-                    className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileSelect}
+                    className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none file:mr-4 file:rounded file:border-0 file:bg-blue-50 file:px-3 file:py-1 file:text-blue-700 file:hover:bg-blue-100"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700">PDF URL/Data (or leave blank if using file upload)</label>
+                <input
+                  type="text"
+                  value={formData.pdfDataUrl}
+                  onChange={(e) => setFormData({ ...formData, pdfDataUrl: e.target.value })}
+                  placeholder="PDF link or data URL"
+                  className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
               </div>
             </div>
 
@@ -220,7 +257,7 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
 
                 <div className="flex gap-2 ml-4">
                   <button
-                    onClick={() => handleEdit(category)}
+                    onClick={() => handleEdit(category.id)}
                     className="rounded-lg bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-200"
                   >
                     ✎ Edit
