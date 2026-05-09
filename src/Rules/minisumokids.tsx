@@ -31,14 +31,34 @@ const minisumokids = () => {
         </div>
       </section>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <header className="text-center mb-16 pt-10">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">Mini Sumo Kids Regulations</h1>
-          <p className="text-lg text-slate-600">Junior robot sumo competition standards for autonomous and RC-controlled robots</p>
-        </header>
+      {/* Content */}
+      <div className="mx-auto max-w-5xl px-6 py-16">
+        
+        {/* Table of Contents */}
+        <nav className="mb-12 rounded-2xl bg-blue-50 p-6 border border-blue-100">
+          <h2 className="text-xl font-bold text-blue-900 mb-4">Contents</h2>
+          <ol className="space-y-2 text-blue-700">
+            <li><a href="#glossary" className="hover:text-blue-900">1. Glossary of Terms</a></li>
+            <li><a href="#general-provisions" className="hover:text-blue-900">2. General Provisions</a></li>
+            <li><a href="#match-definition" className="hover:text-blue-900">3. Match Definition</a></li>
+            <li><a href="#dohyo-specs" className="hover:text-blue-900">4. Dohyo Specifications</a></li>
+            <li><a href="#robot-specs" className="hover:text-blue-900">5. Robot Specifications</a></li>
+            <li><a href="#movement-conditions" className="hover:text-blue-900">6. Movement Conditions</a></li>
+            <li><a href="#prohibited-matters" className="hover:text-blue-900">7. Prohibited Matters</a></li>
+            <li><a href="#battle-rules" className="hover:text-blue-900">8. Battle Rules</a></li>
+            <li><a href="#match-execution" className="hover:text-blue-900">9. Match Execution</a></li>
+            <li><a href="#yuko-points" className="hover:text-blue-900">10. Yuko Point, Shinitai and Yusei</a></li>
+            <li><a href="#penalties" className="hover:text-blue-900">11. Hansoku and Keikoku</a></li>
+            <li><a href="#disqualification" className="hover:text-blue-900">12. Hansoku-make, Shikkaku</a></li>
+            <li><a href="#appendix" className="hover:text-blue-900">13. Appendix: Notes and Cases</a></li>
+          </ol>
+        </nav>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>GLOSSARY OF TERMS</h2>
+        {/* Section 1: Glossary of Terms */}
+        <section id="glossary" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            1. Glossary of Terms
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>Battle:</p>
@@ -119,8 +139,11 @@ const minisumokids = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-4xl font-bold text-slate-900 mb-6'>Chapter I: General Provisions</h2>
+        {/* Section 2: General Provisions */}
+        <section id="general-provisions" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            2. General Provisions
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>Objective</p>
@@ -129,8 +152,11 @@ const minisumokids = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-4xl font-bold text-slate-900 mb-6'>Chapter II: Match Definition</h2>
+        {/* Section 3: Match Definition */}
+        <section id="match-definition" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            3. Match Definition
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>Definition</p>
@@ -139,8 +165,11 @@ const minisumokids = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-4xl font-bold text-slate-900 mb-6'>Chapter III: Dohyo Specifications</h2>
+        {/* Section 4: Dohyo Specifications */}
+        <section id="dohyo-specs" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            4. Dohyo Specifications
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>Dohyo Specifications</p>
@@ -165,8 +194,11 @@ const minisumokids = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-4xl font-bold text-slate-900 mb-6'>Chapter IV: Robot Specifications</h2>
+        {/* Section 5: Robot Specifications */}
+        <section id="robot-specs" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            5. Robot Specifications
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>Robot Measures</p>
@@ -203,8 +235,11 @@ const minisumokids = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-4xl font-bold text-slate-900 mb-6'>Chapter V: Movement Conditions</h2>
+        {/* Section 6: Movement Conditions */}
+        <section id="movement-conditions" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            6. Movement Conditions
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>Autonomous Movement</p>
@@ -217,8 +252,11 @@ const minisumokids = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-4xl font-bold text-slate-900 mb-6'>Chapter VI: Prohibited Matters</h2>
+        {/* Section 7: Prohibited Matters */}
+        <section id="prohibited-matters" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            7. Prohibited Matters
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <p>No disturbing wave generators, lasers, flash, infrared.</p>
             <p>No components scratching Dohyo surface.</p>
@@ -229,8 +267,11 @@ const minisumokids = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-4xl font-bold text-slate-900 mb-6'>Chapter VII: Battle Rules</h2>
+        {/* Section 8: Battle Rules */}
+        <section id="battle-rules" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            8. Battle Rules
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <p>Battle time: 3 matches within 3 minutes. Winner gets 2 Yuko points.</p>
             <p>If tie, decided by Yusei. Extension if needed.</p>
@@ -238,8 +279,11 @@ const minisumokids = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-4xl font-bold text-slate-900 mb-6'>Chapter VIII: Match Execution</h2>
+        {/* Section 9: Match Execution */}
+        <section id="match-execution" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            9. Match Execution
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>Safety Measures</p>
@@ -260,8 +304,11 @@ const minisumokids = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-4xl font-bold text-slate-900 mb-6'>Chapter IX: Yuko Point, Shinitai and Yusei</h2>
+        {/* Section 10: Yuko Point, Shinitai and Yusei */}
+        <section id="yuko-points" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            10. Yuko Point, Shinitai and Yusei
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>Yuko Point</p>
@@ -278,8 +325,11 @@ const minisumokids = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-4xl font-bold text-slate-900 mb-6'>Chapter X: Hansoku and Keikoku</h2>
+        {/* Section 11: Hansoku and Keikoku */}
+        <section id="penalties" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            11. Hansoku and Keikoku
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>Keikoku</p>
@@ -292,8 +342,11 @@ const minisumokids = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-4xl font-bold text-slate-900 mb-6'>Chapter XI: Hansoku-make, Shikkaku</h2>
+        {/* Section 12: Hansoku-make, Shikkaku */}
+        <section id="disqualification" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            12. Hansoku-make, Shikkaku
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>Hansoku-make</p>
@@ -306,8 +359,11 @@ const minisumokids = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-4xl font-bold text-slate-900 mb-6'>Appendix: Notes and Cases</h2>
+        {/* Section 13: Appendix: Notes and Cases */}
+        <section id="appendix" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            13. Appendix: Notes and Cases
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <p>Adapted notes for Mini Sumo: Similar to Mega Sumo but scaled for 500g robots and 77cm arena.</p>
             <p>Inspection box: 105x105mm for 10cm robots.</p>

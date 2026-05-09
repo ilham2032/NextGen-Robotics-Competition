@@ -84,7 +84,7 @@ const Participants = () => {
           const categoryTeams = teams.filter((team) => team.categoryName?.trim() === category.name)
           return (
           <div key={category.id} className="mt-8">
-            <h2 className="font-display text-2xl font-semibold text-blue-800 sm:text-3xl">{category.name}</h2>
+            <h2 className="font-display text-2xl font-semibold text-blue-800 sm:text-3xl">{category.name} ({categoryTeams.length} teams)</h2>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               {categoryTeams.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">
@@ -95,7 +95,7 @@ const Participants = () => {
                   const flagEmoji = getCountryFlag(team.school || "")
                   return (
                   <article key={team.id} className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-                    <h3 className="text-xl font-semibold text-blue-900 sm:text-2xl"> Team name: {team.name}</h3>
+                    <h3 className="text-xl font-semibold text-blue-900 sm:text-2xl">{team.name}</h3>
                     <div className="mt-2 flex items-center gap-2">
                       <span className="text-slate-700">Country:</span>
                       {flagEmoji && <span className="text-lg">{flagEmoji}</span>}

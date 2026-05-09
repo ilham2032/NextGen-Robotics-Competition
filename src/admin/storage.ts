@@ -14,7 +14,85 @@ const SETTINGS_STORAGE_KEY = "nextgen_admin_settings"
 
 const defaultTeams: Team[] = []
 
-const defaultCategories: Category[] = []
+const defaultCategories: Category[] = [
+  {
+    id: "cat-1",
+    name: "Mini Sumo",
+    description: "Robots battle in a circular arena to push each other out.",
+    pdfName: "",
+    pdfDataUrl: "",
+  },
+  {
+    id: "cat-2", 
+    name: "Mini Sumo Kids",
+    description: "Mini Sumo competition designed for younger participants.",
+    pdfName: "",
+    pdfDataUrl: "",
+  },
+  {
+    id: "cat-3",
+    name: "Mega Sumo",
+    description: "Larger robots compete in sumo wrestling matches.",
+    pdfName: "",
+    pdfDataUrl: "",
+  },
+  {
+    id: "cat-4",
+    name: "Lego Line",
+    description: "Robots follow a line course using LEGO components.",
+    pdfName: "",
+    pdfDataUrl: "",
+  },
+  {
+    id: "cat-5",
+    name: "Line Follower",
+    description: "Autonomous robots navigate complex line courses.",
+    pdfName: "",
+    pdfDataUrl: "",
+  },
+  {
+    id: "cat-6",
+    name: "Drone",
+    description: "Drone racing and navigation challenges.",
+    pdfName: "",
+    pdfDataUrl: "",
+  },
+  {
+    id: "cat-7",
+    name: "1kg Lego Sumo",
+    description: "1kg LEGO robots compete in sumo battles.",
+    pdfName: "",
+    pdfDataUrl: "",
+  },
+  {
+    id: "cat-8",
+    name: "3kg Lego Sumo",
+    description: "3kg LEGO robots compete in sumo battles.",
+    pdfName: "",
+    pdfDataUrl: "",
+  },
+  {
+    id: "cat-9",
+    name: "Combat Robot",
+    description: "Combat robots battle in the arena.",
+    pdfName: "",
+    pdfDataUrl: "",
+  },
+  {
+    id: "cat-10",
+    name: "Start Up Junior",
+    description: "Junior startup robotics competition.",
+    pdfName: "",
+    pdfDataUrl: "",
+  },
+  {
+    id: "cat-11",
+    name: "Start Up Senior",
+    description: "Senior startup robotics competition.",
+    pdfName: "",
+    pdfDataUrl: "",
+  },
+]
 
 const parseStoredList = <T,>(raw: string | null): T[] | null => {
   if (!raw) {
@@ -40,7 +118,12 @@ export const saveTeams = (teams: Team[]): void => {
 
 export const getCategories = (): Category[] => {
   const stored = parseStoredList<Category>(localStorage.getItem(CATEGORY_STORAGE_KEY))
-  return stored && stored.length > 0 ? stored : defaultCategories
+  if (stored && stored.length > 0) {
+    return stored
+  }
+  // Save defaults to localStorage if nothing is stored
+  localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(defaultCategories))
+  return defaultCategories
 }
 
 export const saveCategories = (categories: Category[]): void => {

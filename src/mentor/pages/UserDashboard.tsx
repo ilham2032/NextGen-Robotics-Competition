@@ -396,7 +396,7 @@ const UserDashboard = () => {
     <div className="min-h-screen bg-slate-950/5 text-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Hero */}
-        <div className="mb-10 rounded-[2rem] bg-gradient-to-r from-slate-950 via-indigo-950 to-sky-700 p-8 text-white shadow-2xl shadow-slate-950/20 ring-1 ring-white/10 backdrop-blur-sm">
+        <div className={`mb-10 rounded-[2rem] bg-gradient-to-r from-slate-950 via-indigo-950 to-sky-700 p-8 text-white shadow-2xl shadow-slate-950/20 ring-1 ring-white/10 backdrop-blur-sm ${activeTab === "teams" ? "hidden" : ""}`}>
           <div className="flex flex-col gap-8 xl:flex-row xl:items-center xl:justify-between">
             <div className="max-w-3xl">
               <p className="text-xs uppercase tracking-[0.35em] text-cyan-200/80">Mentor dashboard</p>
@@ -421,7 +421,7 @@ const UserDashboard = () => {
         </div>
 
         <div className="mt-8 lg:grid lg:grid-cols-[280px_1fr] lg:gap-8">
-          <aside className="space-y-6">
+          <aside className={`space-y-6 ${activeTab === "teams" ? "hidden" : ""}`}>
             <div className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-[0_32px_80px_rgba(15,23,42,0.12)]">
               <div className="mb-6">
                 <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Mentor toolkit</p>

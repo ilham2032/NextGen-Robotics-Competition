@@ -30,28 +30,54 @@ const legoline = () => {
         </div>
       </section>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <div>
-          <h3 className='text-3xl font-bold text-slate-900 mb-6'>1. Overview</h3>
+      {/* Content */}
+      <div className="mx-auto max-w-5xl px-6 py-16">
+        
+        {/* Table of Contents */}
+        <nav className="mb-12 rounded-2xl bg-blue-50 p-6 border border-blue-100">
+          <h2 className="text-xl font-bold text-blue-900 mb-4">Contents</h2>
+          <ol className="space-y-2 text-blue-700">
+            <li><a href="#overview" className="hover:text-blue-900">1. Overview</a></li>
+            <li><a href="#team-requirements" className="hover:text-blue-900">2. Team Requirements</a></li>
+            <li><a href="#robot-specs" className="hover:text-blue-900">3. Robot Specifications</a></li>
+            <li><a href="#playing-field" className="hover:text-blue-900">4. Playing Field</a></li>
+            <li><a href="#game-rules" className="hover:text-blue-900">5. Game Rules</a></li>
+            <li><a href="#scoring" className="hover:text-blue-900">6. Scoring System</a></li>
+            <li><a href="#penalties" className="hover:text-blue-900">7. Penalties</a></li>
+            <li><a href="#safety-fairplay" className="hover:text-blue-900">8. Safety & Fair Play</a></li>
+          </ol>
+        </nav>
+        
+        {/* Section 1: Overview */}
+        <section id="overview" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            1. Overview
+          </h2>
           <p className="text-lg text-slate-700 leading-relaxed mb-8">
             The LEGO Line Category requires teams to design and program an autonomous LEGO robot
             capable of following a line track accurately and efficiently. This category is perfect for 
             teams using LEGO Spike Prime, Mindstorms, or classic LEGO robotics kits.
           </p>
-        </div>
+        </section>
 
-        <div>
-          <h3 className='text-3xl font-bold text-slate-900 mb-6'>2. Team Requirements</h3>
+        {/* Section 2: Team Requirements */}
+        <section id="team-requirements" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            2. Team Requirements
+          </h2>
           <ul className="list-disc pl-6 space-y-3 text-slate-700 text-lg">
             <li>Teams must consist of 1–4 members</li>
             <li>Each team must register before the deadline</li>
             <li>Only one robot per team is allowed</li>
             <li>All team members must be present during competition</li>
           </ul>
-        </div>
+        </section>
 
-        <div className="mt-10">
-          <h3 className='text-3xl font-bold text-slate-900 mb-6'>3. Robot Specifications</h3>
+        {/* Section 3: Robot Specifications */}
+        <section id="robot-specs" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            3. Robot Specifications
+          </h2>
           <ul className="list-disc pl-6 space-y-3 text-slate-700 text-lg">
             <li>Must be built mainly using LEGO components (SPIKE, Mindstorms, etc.)</li>
             <li>Maximum size: 25cm x 25cm x 25cm at start position</li>
@@ -60,20 +86,26 @@ const legoline = () => {
             <li>Sensors such as color, ultrasonic, gyro are permitted</li>
             <li>Maximum 4 motors allowed</li>
           </ul>
-        </div>
+        </section>
 
-        <div className="mt-10">
-          <h3 className='text-3xl font-bold text-slate-900 mb-6'>4. Playing Field</h3>
+        {/* Section 4: Playing Field */}
+        <section id="playing-field" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            4. Playing Field
+          </h2>
           <ul className="list-disc pl-6 space-y-3 text-slate-700 text-lg">
             <li>Black line (2–3 cm width) on white surface</li>
             <li>May include curves, turns, intersections, gaps, and checkpoints</li>
             <li>Exact track will be revealed on competition day</li>
             <li>Start and finish zones clearly marked</li>
           </ul>
-        </div>
+        </section>
 
-        <div className="mt-10">
-          <h3 className='text-3xl font-bold text-slate-900 mb-6'>5. Game Rules</h3>
+        {/* Section 5: Game Rules */}
+        <section id="game-rules" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            5. Game Rules
+          </h2>
           <ul className="list-disc pl-6 space-y-3 text-slate-700 text-lg">
             <li>Robot must start from the designated start area</li>
             <li>No human control during the run</li>
@@ -81,37 +113,46 @@ const legoline = () => {
             <li>If robot leaves the line, time penalty is applied</li>
             <li>Manual intervention is not allowed during run</li>
           </ul>
-        </div>
+        </section>
 
-        <div className="mt-10">
-          <h3 className='text-3xl font-bold text-slate-900 mb-6'>6. Scoring System</h3>
+        {/* Section 6: Scoring System */}
+        <section id="scoring" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            6. Scoring System
+          </h2>
           <ul className="list-disc pl-6 space-y-3 text-slate-700 text-lg">
             <li>Based on completion time (fastest time wins)</li>
             <li>Accuracy of line following</li>
             <li>Penalties for violations added to final time</li>
             <li>Best of 3 attempts counts toward ranking</li>
           </ul>
-        </div>
+        </section>
 
-        <div className="mt-10">
-          <h3 className='text-3xl font-bold text-slate-900 mb-6'>7. Penalties</h3>
+        {/* Section 7: Penalties */}
+        <section id="penalties" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            7. Penalties
+          </h2>
           <ul className="list-disc pl-6 space-y-3 text-slate-700 text-lg">
             <li>Leaving track = +5 seconds to final time</li>
             <li>Manual interference = attempt disqualified</li>
             <li>Incomplete run = partial scoring based on checkpoints</li>
             <li>Starting before signal = +3 seconds penalty</li>
           </ul>
-        </div>
+        </section>
 
-        <div className="mt-10">
-          <h3 className='text-3xl font-bold text-slate-900 mb-6'>8. Safety & Fair Play</h3>
+        {/* Section 8: Safety & Fair Play */}
+        <section id="safety-fairplay" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            8. Safety & Fair Play
+          </h2>
           <ul className="list-disc pl-6 space-y-3 text-slate-700 text-lg">
             <li>No damage to field or equipment allowed</li>
             <li>Follow judge instructions at all times</li>
             <li>Cheating results in immediate disqualification</li>
             <li>All robots must pass safety inspection before competition</li>
           </ul>
-        </div>
+        </section>
 
         {/* Contact Section */}
         <section className="rounded-2xl bg-gradient-to-r from-yellow-500 to-yellow-700 p-8 text-center mt-12">

@@ -31,15 +31,37 @@ const megasumo = () => {
         </div>
       </section>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <header className="text-center mb-16 pt-10">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">Mega Sumo Regulations</h1>
-          <p className="text-lg text-slate-600">Competition-grade standards for advanced autonomous robotics</p>
-        </header>
+      {/* Content */}
+      <div className="mx-auto max-w-5xl px-6 py-16">
+        
+        {/* Table of Contents */}
+        <nav className="mb-12 rounded-2xl bg-blue-50 p-6 border border-blue-100">
+          <h2 className="text-xl font-bold text-blue-900 mb-4">Contents</h2>
+          <ol className="space-y-2 text-blue-700">
+            <li><a href="#general-principles" className="hover:text-blue-900">1. General Principles</a></li>
+            <li><a href="#robot-specs" className="hover:text-blue-900">2. Robot Specifications</a></li>
+            <li><a href="#materials-construction" className="hover:text-blue-900">3. Materials and Construction</a></li>
+            <li><a href="#power-electronics" className="hover:text-blue-900">4. Power and Electronics</a></li>
+            <li><a href="#sensors-ai" className="hover:text-blue-900">5. Sensors and AI</a></li>
+            <li><a href="#dohyo-specs" className="hover:text-blue-900">6. Dohyo Specifications</a></li>
+            <li><a href="#match-rules" className="hover:text-blue-900">7. Match Rules</a></li>
+            <li><a href="#victory-conditions" className="hover:text-blue-900">8. Victory Conditions</a></li>
+            <li><a href="#scoring-criteria" className="hover:text-blue-900">9. Scoring Criteria</a></li>
+            <li><a href="#prohibited-weapons" className="hover:text-blue-900">10. Prohibited Weapons and Actions</a></li>
+            <li><a href="#safety-inspection" className="hover:text-blue-900">11. Safety and Inspection</a></li>
+            <li><a href="#penalties" className="hover:text-blue-900">12. Penalties</a></li>
+            <li><a href="#edge-cases" className="hover:text-blue-900">13. Edge Case Rules</a></li>
+            <li><a href="#team-responsibilities" className="hover:text-blue-900">14. Team Responsibilities</a></li>
+            <li><a href="#referee-authority" className="hover:text-blue-900">15. Referee Authority</a></li>
+            <li><a href="#regulatory-standards" className="hover:text-blue-900">16. Regulatory Document Standards</a></li>
+          </ol>
+        </nav>
 
         {/* Section 1: General Principles */}
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>1. GENERAL PRINCIPLES</h2>
+        <section id="general-principles" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            1. General Principles
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>1.1 Competition Objectives</p>

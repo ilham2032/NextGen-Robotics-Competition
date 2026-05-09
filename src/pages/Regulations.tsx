@@ -17,8 +17,8 @@ const Regulations = () => {
 
   const categoryStyles: Record<string, { card: string; title: string; description: string; button: string; buttonAlt: string }> = {
     "Mini Sumo": {
-      card: "rounded-2xl p-5 shadow-sm border border-slate-200/70 bg-white",
-      title: "text-2xl font-semibold text-slate-950",
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
+      title: "text-2xl font-semibold text-slate-900",
       description: "mt-2 text-sm text-slate-600",
       button: primaryButton,
       buttonAlt: altButton,
@@ -115,9 +115,9 @@ const Regulations = () => {
               "Lego Line": "/regulations/lego-line",
               "Line Follower": "/regulations/line-follower",
               "Drone": "/regulations/drone-race",
-              "1kg Lego Sumo": "/regulations/1kg-lego-sumo",
-              "3kg Lego Sumo": "/regulations/3kg-lego-sumo",
-              "Combat Robot": "/regulations/combat-robot",
+              "1kg Lego Sumo": "/regulations/lego-sumo",
+              "3kg Lego Sumo": "/regulations/lego-sumo-3kg",
+              "Combat Robot": "/regulations/bots-combat",
               "Start Up Junior": "/regulations/start-up-junior",
               "Start Up Senior": "/regulations/start-up-senior",
             }

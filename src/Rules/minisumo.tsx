@@ -31,14 +31,34 @@ const minisumo = () => {
         </div>
       </section>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <header className="text-center mb-16 pt-10">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">Mini Sumo Regulations</h1>
-          <p className="text-lg text-slate-600">Competition-grade standards for small-scale sumo robotics</p>
-        </header>
+      {/* Content */}
+      <div className="mx-auto max-w-5xl px-6 py-16">
+        
+        {/* Table of Contents */}
+        <nav className="mb-12 rounded-2xl bg-blue-50 p-6 border border-blue-100">
+          <h2 className="text-xl font-bold text-blue-900 mb-4">Contents</h2>
+          <ol className="space-y-2 text-blue-700">
+            <li><a href="#glossary" className="hover:text-blue-900">1. Glossary</a></li>
+            <li><a href="#general-provisions" className="hover:text-blue-900">2. General Provisions</a></li>
+            <li><a href="#match-definition" className="hover:text-blue-900">3. Match Definition</a></li>
+            <li><a href="#dohyo-specs" className="hover:text-blue-900">4. Dohyo Specifications</a></li>
+            <li><a href="#robot-specs" className="hover:text-blue-900">5. Robot Specifications</a></li>
+            <li><a href="#movement-conditions" className="hover:text-blue-900">6. Movement Conditions</a></li>
+            <li><a href="#prohibited-matters" className="hover:text-blue-900">7. Prohibited Matters & Weapons</a></li>
+            <li><a href="#match-rules" className="hover:text-blue-900">8. Match Rules</a></li>
+            <li><a href="#match-execution" className="hover:text-blue-900">9. Match Execution</a></li>
+            <li><a href="#victory-conditions" className="hover:text-blue-900">10. Victory Conditions</a></li>
+            <li><a href="#penalties" className="hover:text-blue-900">11. Penalties & Warnings</a></li>
+            <li><a href="#disqualification" className="hover:text-blue-900">12. Disqualification</a></li>
+            <li><a href="#inspection-safety" className="hover:text-blue-900">13. Inspection & Safety</a></li>
+          </ol>
+        </nav>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>GLOSSARY</h2>
+        {/* Section 1: Glossary */}
+        <section id="glossary" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            1. Glossary
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>Battle:</p>
@@ -119,8 +139,11 @@ const minisumo = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>1. GENERAL PROVISIONS</h2>
+        {/* Section 2: General Provisions */}
+        <section id="general-provisions" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            2. General Provisions
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>1.1 Objective</p>
@@ -133,8 +156,11 @@ const minisumo = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>2. MATCH DEFINITION</h2>
+        {/* Section 3: Match Definition */}
+        <section id="match-definition" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            3. Match Definition
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>2.1 Match Format</p>
@@ -143,8 +169,11 @@ const minisumo = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>3. DOHYO SPECIFICATIONS</h2>
+        {/* Section 4: Dohyo Specifications */}
+        <section id="dohyo-specs" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            4. Dohyo Specifications
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>3.1 Arena Composition</p>
@@ -169,8 +198,11 @@ const minisumo = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>4. ROBOT SPECIFICATIONS</h2>
+        {/* Section 5: Robot Specifications */}
+        <section id="robot-specs" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            5. Robot Specifications
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>4.1 Dimensions</p>
@@ -199,8 +231,11 @@ const minisumo = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>5. MOVEMENT CONDITIONS</h2>
+        {/* Section 6: Movement Conditions */}
+        <section id="movement-conditions" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            6. Movement Conditions
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>5.1 Autonomous Robots</p>
@@ -213,8 +248,11 @@ const minisumo = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>6. PROHIBITED MATTERS AND WEAPONS</h2>
+        {/* Section 7: Prohibited Matters & Weapons */}
+        <section id="prohibited-matters" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            7. Prohibited Matters & Weapons
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>6.1 Disruptive Devices</p>
@@ -235,8 +273,11 @@ const minisumo = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>7. MATCH RULES</h2>
+        {/* Section 8: Match Rules */}
+        <section id="match-rules" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            8. Match Rules
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>7.1 Battle Format</p>
@@ -253,8 +294,11 @@ const minisumo = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>8. MATCH EXECUTION</h2>
+        {/* Section 9: Match Execution */}
+        <section id="match-execution" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            9. Match Execution
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>8.1 Safety Requirements</p>
@@ -275,8 +319,11 @@ const minisumo = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>9. VICTORY CONDITIONS</h2>
+        {/* Section 10: Victory Conditions */}
+        <section id="victory-conditions" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            10. Victory Conditions
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>9.1 Yuko Point</p>
@@ -293,8 +340,11 @@ const minisumo = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>10. PENALTIES AND WARNINGS</h2>
+        {/* Section 11: Penalties & Warnings */}
+        <section id="penalties" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            11. Penalties & Warnings
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>10.1 Keikoku (Warning)</p>
@@ -307,8 +357,11 @@ const minisumo = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>11. DISQUALIFICATION</h2>
+        {/* Section 12: Disqualification */}
+        <section id="disqualification" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            12. Disqualification
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>11.1 Hansoku-Make (Battle Loss)</p>
@@ -321,8 +374,11 @@ const minisumo = () => {
           </div>
         </section>
 
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>12. INSPECTION AND SAFETY</h2>
+        {/* Section 13: Inspection & Safety */}
+        <section id="inspection-safety" className="mb-12">
+          <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
+            13. Inspection & Safety
+          </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>12.1 Pre-Match Inspection</p>
