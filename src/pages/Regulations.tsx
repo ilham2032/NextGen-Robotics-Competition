@@ -136,7 +136,7 @@ const Regulations = () => {
                   </Link>
 
                   {category.pdfDataUrl ? (
-                    <a href={category.pdfDataUrl} download={category.pdfName} className={style.buttonAlt}>
+                    <a href={category.pdfDataUrl} download={category.pdfName} className='rounded-lg border border-blue-700 bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-900 '>
                       Download PDF
                     </a>
                   ) : (

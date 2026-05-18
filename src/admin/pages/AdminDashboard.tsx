@@ -95,6 +95,12 @@ const AdminDashboard = () => {
   }, [location.pathname])
 
   useEffect(() => {
+    if (activePage === "users") {
+      setMentors(getMentors())
+    }
+  }, [activePage])
+
+  useEffect(() => {
     if (!matchTimerRunning || !currentMatch) {
       return
     }
@@ -381,7 +387,9 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {activePage === "users" && <UsersPage mentors={mentors} members={members} />}
+          {activePage === "users" && (
+            <UsersPage mentors={mentors} members={members} onMentorsChange={setMentors} />
+          )}
 
           {activePage === "teams" && (
             <TeamsPage

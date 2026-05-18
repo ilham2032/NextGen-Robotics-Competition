@@ -1,25 +1,69 @@
 import { useState } from "react"
+import { saveMentors } from "../storage"
 import type { Member, Mentor } from "../types"
+import { exportMentorsExcel, exportMentorsPdf } from "../utils/mentorExport"
 
 type UsersPageProps = {
   mentors: Mentor[]
   members: Member[]
+  onMentorsChange: (mentors: Mentor[]) => void
 }
 
-const UsersPage = ({ mentors, members }: UsersPageProps) => {
+const formatRegisteredAt = (value: string): string => {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+
+  return date.toLocaleString()
+}
+
+const UsersPage = ({ mentors, members, onMentorsChange }: UsersPageProps) => {
   const [editingMentor, setEditingMentor] = useState<string | null>(null)
   const [editingMember, setEditingMember] = useState<string | null>(null)
-  const [mentorForm, setMentorForm] = useState({ name: "", surname: "", email: "", age: 0 })
+  const [mentorForm, setMentorForm] = useState({
+    name: "",
+    surname: "",
+    fin: "",
+    email: "",
+    dateOfBirth: "",
+    country: "",
+  })
   const [memberForm, setMemberForm] = useState({ name: "", surname: "", email: "", age: 0 })
 
   const handleEditMentor = (mentor: Mentor) => {
     setEditingMentor(mentor.id)
-    setMentorForm({ name: mentor.name, surname: mentor.surname, email: mentor.email, age: mentor.age })
+    setMentorForm({
+      name: mentor.name,
+      surname: mentor.surname,
+      fin: mentor.fin ?? "",
+      email: mentor.email,
+      dateOfBirth: mentor.dateOfBirth ?? "",
+      country: mentor.country ?? "",
+    })
   }
 
   const handleSaveMentor = () => {
-    // In a real app, this would update the mentor in storage/database
-    console.log("Saving mentor:", mentorForm)
+    if (!editingMentor) {
+      return
+    }
+
+    const nextMentors = mentors.map((mentor) =>
+      mentor.id === editingMentor
+        ? {
+            ...mentor,
+            name: mentorForm.name.trim(),
+            surname: mentorForm.surname.trim(),
+            fin: mentorForm.fin.trim().toUpperCase(),
+            email: mentorForm.email.trim().toLowerCase(),
+            dateOfBirth: mentorForm.dateOfBirth.trim(),
+            country: mentorForm.country,
+          }
+        : mentor,
+    )
+
+    saveMentors(nextMentors)
+    onMentorsChange(nextMentors)
     setEditingMentor(null)
   }
 
@@ -29,10 +73,10 @@ const UsersPage = ({ mentors, members }: UsersPageProps) => {
   }
 
   const handleSaveMember = () => {
-    // In a real app, this would update the member in storage/database
     console.log("Saving member:", memberForm)
     setEditingMember(null)
   }
+
   return (
     <div className="space-y-8">
       <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-xl shadow-slate-200/20">
@@ -45,7 +89,7 @@ const UsersPage = ({ mentors, members }: UsersPageProps) => {
         <div className="p-8">
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-6">
-              <p className="text-sm font-medium text-slate-500">Mentor accounts</p>
+              <p className="text-sm font-medium text-slate-500">Mentor registrations</p>
               <p className="mt-3 text-3xl font-semibold text-slate-900">{mentors.length}</p>
             </div>
             <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-6">
@@ -53,8 +97,10 @@ const UsersPage = ({ mentors, members }: UsersPageProps) => {
               <p className="mt-3 text-3xl font-semibold text-slate-900">{members.length}</p>
             </div>
             <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-6">
-              <p className="text-sm font-medium text-slate-500">Active groups</p>
-              <p className="mt-3 text-3xl font-semibold text-slate-900">{Math.max(mentors.length, 1)}</p>
+              <p className="text-sm font-medium text-slate-500">Countries represented</p>
+              <p className="mt-3 text-3xl font-semibold text-slate-900">
+                {new Set(mentors.map((mentor) => mentor.country).filter(Boolean)).size}
+              </p>
             </div>
           </div>
         </div>
@@ -62,17 +108,33 @@ const UsersPage = ({ mentors, members }: UsersPageProps) => {
 
       <div className="grid gap-6 xl:grid-cols-[0.9fr_0.7fr]">
         <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h2 className="text-2xl font-semibold text-slate-900">Mentor directory</h2>
-              <p className="mt-2 text-sm text-slate-600">Review mentor accounts that have registered on the platform.</p>
+              <h2 className="text-2xl font-semibold text-slate-900">Mentor registrations</h2>
+              <p className="mt-2 text-sm text-slate-600">Mentors who signed up through the registration form appear here.</p>
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => exportMentorsPdf(mentors)}
+                className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+              >
+                PDF
+              </button>
+              <button
+                type="button"
+                onClick={() => exportMentorsExcel(mentors)}
+                className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
+              >
+                Excel
+              </button>
             </div>
           </div>
 
           {mentors.length === 0 ? (
             <div className="mt-10 rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center">
-              <p className="text-lg font-semibold text-slate-900">No mentor accounts yet</p>
-              <p className="mt-3 text-sm text-slate-500">Mentor registrations will appear here once they sign up.</p>
+              <p className="text-lg font-semibold text-slate-900">No mentor registrations yet</p>
+              <p className="mt-3 text-sm text-slate-500">New mentor sign-ups will appear here automatically.</p>
             </div>
           ) : (
             <div className="mt-6 space-y-4">
@@ -102,6 +164,15 @@ const UsersPage = ({ mentors, members }: UsersPageProps) => {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
+                          <label className="block text-sm font-semibold text-slate-700">FIN</label>
+                          <input
+                            type="text"
+                            value={mentorForm.fin}
+                            onChange={(e) => setMentorForm({ ...mentorForm, fin: e.target.value })}
+                            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
                           <label className="block text-sm font-semibold text-slate-700">Email</label>
                           <input
                             type="email"
@@ -110,12 +181,23 @@ const UsersPage = ({ mentors, members }: UsersPageProps) => {
                             className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
                           />
                         </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-slate-700">Age</label>
+                          <label className="block text-sm font-semibold text-slate-700">Date of birth</label>
                           <input
-                            type="number"
-                            value={mentorForm.age}
-                            onChange={(e) => setMentorForm({ ...mentorForm, age: parseInt(e.target.value) })}
+                            type="text"
+                            value={mentorForm.dateOfBirth}
+                            onChange={(e) => setMentorForm({ ...mentorForm, dateOfBirth: e.target.value })}
+                            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700">Country</label>
+                          <input
+                            type="text"
+                            value={mentorForm.country}
+                            onChange={(e) => setMentorForm({ ...mentorForm, country: e.target.value })}
                             className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
                           />
                         </div>
@@ -136,15 +218,29 @@ const UsersPage = ({ mentors, members }: UsersPageProps) => {
                       </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                       <div>
-                        <p className="text-lg font-semibold text-slate-900">{mentor.name} {mentor.surname}</p>
+                        <p className="text-lg font-semibold text-slate-900">
+                          {mentor.name} {mentor.surname}
+                        </p>
                         <p className="text-sm text-slate-500">{mentor.email}</p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="space-y-1 text-sm text-slate-600">
-                          <p>Age: {mentor.age}</p>
-                          <p>Mentor ID: {mentor.id}</p>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-6">
+                        <div className="grid gap-1 text-sm text-slate-600 sm:grid-cols-2 sm:gap-x-6">
+                          <p>
+                            <span className="font-medium text-slate-700">FIN:</span> {mentor.fin || "—"}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">Date of birth:</span>{" "}
+                            {mentor.dateOfBirth || (mentor.age ? String(mentor.age) : "—")}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">Country:</span> {mentor.country || "—"}
+                          </p>
+                          <p>
+                            <span className="font-medium text-slate-700">Registered:</span>{" "}
+                            {mentor.registeredAt ? formatRegisteredAt(mentor.registeredAt) : "—"}
+                          </p>
                         </div>
                         <button
                           onClick={() => handleEditMentor(mentor)}
@@ -228,8 +324,12 @@ const UsersPage = ({ mentors, members }: UsersPageProps) => {
                   ) : (
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-semibold text-slate-900">{member.name} {member.surname}</p>
-                        <p className="text-sm text-slate-500">Age {member.age} • {member.email}</p>
+                        <p className="font-semibold text-slate-900">
+                          {member.name} {member.surname}
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          Age {member.age} • {member.email}
+                        </p>
                       </div>
                       <button
                         onClick={() => handleEditMember(member)}
@@ -253,8 +353,14 @@ const UsersPage = ({ mentors, members }: UsersPageProps) => {
                 <p className="mt-1 text-xl font-semibold text-slate-900">{mentors.length + members.length}</p>
               </div>
               <div className="rounded-3xl bg-slate-50 p-4">
-                <p className="text-sm text-slate-500">Engagement</p>
-                <p className="mt-1 text-xl font-semibold text-slate-900">{members.length > 0 ? Math.round((members.length / Math.max(mentors.length, 1)) * 100) : 0}%</p>
+                <p className="text-sm text-slate-500">Latest mentor sign-up</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">
+                  {mentors[0]?.registeredAt
+                    ? formatRegisteredAt(mentors[0].registeredAt)
+                    : mentors[0]
+                      ? `${mentors[0].name} ${mentors[0].surname}`
+                      : "None yet"}
+                </p>
               </div>
             </div>
           </div>

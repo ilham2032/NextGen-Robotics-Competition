@@ -28,20 +28,27 @@ const deriveHash = async (password: string, salt: string): Promise<string> => {
   return toBase64(new Uint8Array(derivedBits))
 }
 
-type SignUpInput = {
+export type SignUpMentorInput = {
   name: string
   surname: string
-  age: number
+  fin: string
   email: string
+  dateOfBirth: string
+  country: string
   password: string
 }
 
-export const signUpMentor = async (payload: SignUpInput): Promise<{ ok: boolean; message: string }> => {
+export const signUpMentor = async (payload: SignUpMentorInput): Promise<{ ok: boolean; message: string }> => {
   const mentors = getMentors()
   const email = payload.email.trim().toLowerCase()
+  const fin = payload.fin.trim().toUpperCase()
 
   if (mentors.some((mentor) => mentor.email === email)) {
-    return { ok: false, message: "Email already registered." }
+    return { ok: false, message: "This email is already registered." }
+  }
+
+  if (mentors.some((mentor) => mentor.fin && mentor.fin === fin)) {
+    return { ok: false, message: "This FIN is already registered." }
   }
 
   const salt = randomSalt()
@@ -51,8 +58,11 @@ export const signUpMentor = async (payload: SignUpInput): Promise<{ ok: boolean;
     id: createId("mentor"),
     name: payload.name.trim(),
     surname: payload.surname.trim(),
-    age: payload.age,
+    fin,
     email,
+    dateOfBirth: payload.dateOfBirth.trim(),
+    country: payload.country,
+    registeredAt: new Date().toISOString(),
     passwordHash,
     passwordSalt: salt,
   }
@@ -60,7 +70,7 @@ export const signUpMentor = async (payload: SignUpInput): Promise<{ ok: boolean;
   saveMentors([mentor, ...mentors])
   setMentorSession(mentor.id)
 
-  return { ok: true, message: "Mentor account created." }
+  return { ok: true, message: "Registration submitted successfully." }
 }
 
 export const signInMentor = async (email: string, password: string): Promise<{ ok: boolean; message: string }> => {
@@ -71,9 +81,13 @@ export const signInMentor = async (email: string, password: string): Promise<{ o
     return { ok: false, message: "Account not found." }
   }
 
+  if (!mentor.passwordHash || !mentor.passwordSalt) {
+    return { ok: false, message: "This account has no password set. Please register again or contact organizers." }
+  }
+
   const hash = await deriveHash(password, mentor.passwordSalt)
   if (hash !== mentor.passwordHash) {
-    return { ok: false, message: "Invalid credentials." }
+    return { ok: false, message: "Invalid email or password." }
   }
 
   setMentorSession(mentor.id)

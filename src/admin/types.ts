@@ -1,3 +1,7 @@
+export type TeamPaymentStatus = "pending" | "paid"
+
+export type TeamPaymentMethod = "card" | "bank_transfer"
+
 export type Team = {
   id: string
   name: string
@@ -9,6 +13,10 @@ export type Team = {
   memberNames?: string[]
   mentorId?: string
   mentorName?: string
+  paymentStatus?: TeamPaymentStatus
+  paymentAmount?: number
+  paymentMethod?: TeamPaymentMethod
+  paidAt?: string
 }
 
 export type Category = {
@@ -25,10 +33,15 @@ export type Mentor = {
   id: string
   name: string
   surname: string
-  age: number
+  fin: string
   email: string
-  passwordHash: string
-  passwordSalt: string
+  dateOfBirth: string
+  country: string
+  registeredAt: string
+  /** @deprecated Legacy accounts only */
+  age?: number
+  passwordHash?: string
+  passwordSalt?: string
 }
 
 export type Member = {

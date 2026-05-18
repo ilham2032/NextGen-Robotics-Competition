@@ -1,11 +1,17 @@
 import { useEffect, useMemo, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { createId, getCategories, getMembers, getMentors, getTeams, saveMembers, saveMentors, saveTeams } from "../../admin/storage"
-import type { Category, Member, Mentor, Team } from "../../admin/types"
+import type { Category, Member, Mentor, Team, TeamPaymentMethod } from "../../admin/types"
+import TeamPaymentPanel from "../../Components/TeamPaymentPanel"
+import TeamPublicCard from "../../Components/TeamPublicCard"
+import { COUNTRIES } from "../../data/countries"
+import { confirmTeamPayment } from "../../lib/stripePayments"
+import { isTeamPublishedOnMain, TEAM_REGISTRATION_FEE_AZN } from "../../utils/teamDisplay"
 import { getCurrentMentor, signOutMentor } from "../auth"
 
 const UserDashboard = () => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [mentor, setMentor] = useState<Mentor | null>(() => getCurrentMentor())
   const [allMembers, setAllMembers] = useState<Member[]>(() => getMembers())
   const [allTeams, setAllTeams] = useState<Team[]>(() => getTeams())
@@ -25,6 +31,8 @@ const UserDashboard = () => {
   const [teamDescription, setTeamDescription] = useState("")
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([])
   const [teamError, setTeamError] = useState("")
+  const [teamMessage, setTeamMessage] = useState("")
+  const [paymentTeamId, setPaymentTeamId] = useState<string | null>(null)
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null)
   const [editingTeamId, setEditingTeamId] = useState<string | null>(null)
   const [profileName, setProfileName] = useState(mentor?.name ?? "")
@@ -33,28 +41,7 @@ const UserDashboard = () => {
   const [profileError, setProfileError] = useState("")
   const [profileMessage, setProfileMessage] = useState("")
   const [activeTab, setActiveTab] = useState<"users" | "create-team" | "teams" | "schedule" | "profile">("users")
-  const countries = [
-    "Azerbaijan",
-    "Turkey",
-    "Kazakhstan",
-    "Uzbekistan",
-    "Georgia",
-    "Russia",
-    "United Arab Emirates",
-    "Saudi Arabia",
-    "Germany",
-    "United Kingdom",
-    "United States",
-    "Other",
-  ]
-
-  const navigationTabs = [
-    { id: "users", label: "Users" },
-    { id: "create-team", label: "Create Team" },
-    { id: "teams", label: "Teams" },
-    { id: "schedule", label: "Schedule" },
-    { id: "profile", label: "Profile" },
-  ]
+  const countries = COUNTRIES
 
   const mentorMembers = useMemo(
     () => allMembers.filter((member) => member.mentorId && member.mentorId === mentor?.id),
@@ -66,6 +53,24 @@ const UserDashboard = () => {
     [allTeams, mentor?.id],
   )
 
+  const publishedMentorTeams = useMemo(() => mentorTeams.filter(isTeamPublishedOnMain), [mentorTeams])
+
+  const pendingMentorTeams = useMemo(
+    () => mentorTeams.filter((team) => team.paymentStatus === "pending"),
+    [mentorTeams],
+  )
+
+  const navigationTabs = [
+    { id: "users", label: "Users" },
+    { id: "create-team", label: "Create Team" },
+    {
+      id: "teams",
+      label: pendingMentorTeams.length > 0 ? `Teams & pay (${pendingMentorTeams.length})` : "Teams & pay",
+    },
+    { id: "schedule", label: "Schedule" },
+    { id: "profile", label: "Profile" },
+  ]
+
   const handleLogout = () => {
     signOutMentor()
     navigate("/user/auth")
@@ -76,6 +81,97 @@ const UserDashboard = () => {
     setProfileSurname(mentor?.surname ?? "")
     setProfileEmail(mentor?.email ?? "")
   }, [mentor])
+
+  useEffect(() => {
+    if (activeTab === "teams" || activeTab === "create-team") {
+      setAllTeams(getTeams())
+    }
+  }, [activeTab])
+
+  useEffect(() => {
+    if (searchParams.get("tab") === "teams") {
+      setActiveTab("teams")
+    }
+  }, [searchParams])
+
+  useEffect(() => {
+    if (!paymentTeamId) {
+      return
+    }
+    setActiveTab("teams")
+    const timer = window.setTimeout(() => {
+      document.getElementById(`team-payment-${paymentTeamId}`)?.scrollIntoView({ behavior: "smooth", block: "start" })
+    }, 150)
+    return () => window.clearTimeout(timer)
+  }, [paymentTeamId])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const paymentIntentId = params.get("payment_intent")
+    const redirectStatus = params.get("redirect_status")
+
+    if (!paymentIntentId || redirectStatus !== "succeeded") {
+      return
+    }
+
+    setActiveTab("teams")
+
+    let cancelled = false
+
+    const finalizeReturn = async () => {
+      try {
+        const result = await confirmTeamPayment(paymentIntentId)
+        if (cancelled) {
+          return
+        }
+
+        const teams = getTeams()
+        const nextTeams = teams.map((team) =>
+          team.id === result.teamId
+            ? {
+                ...team,
+                paymentStatus: "paid" as const,
+                paymentMethod: "card" as TeamPaymentMethod,
+                paidAt: new Date().toISOString(),
+              }
+            : team,
+        )
+        setAllTeams(nextTeams)
+        saveTeams(nextTeams)
+        setTeamMessage("Payment complete. Your team is now visible on the main Participants page.")
+        window.setTimeout(() => setTeamMessage(""), 4000)
+        window.history.replaceState({}, "", window.location.pathname)
+      } catch {
+        if (!cancelled) {
+          setTeamMessage("Payment received but could not be verified. Please contact support.")
+        }
+      }
+    }
+
+    void finalizeReturn()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const completeTeamPayment = (teamId: string, method: TeamPaymentMethod) => {
+    const nextTeams = allTeams.map((team) =>
+      team.id === teamId
+        ? {
+            ...team,
+            paymentStatus: "paid" as const,
+            paymentMethod: method,
+            paidAt: new Date().toISOString(),
+          }
+        : team,
+    )
+    setAllTeams(nextTeams)
+    saveTeams(nextTeams)
+    setPaymentTeamId(null)
+    setTeamMessage("Payment complete. Your team is now visible on the main Participants page.")
+    window.setTimeout(() => setTeamMessage(""), 4000)
+  }
 
   const updateMentorProfile = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -323,6 +419,8 @@ const UserDashboard = () => {
       memberNames: selectedMembers.map((member) => `${member.name} ${member.surname}`),
       mentorId: mentor.id,
       mentorName: `${mentor.name} ${mentor.surname}`,
+      paymentStatus: "pending",
+      paymentAmount: TEAM_REGISTRATION_FEE_AZN,
     }
 
     const nextTeams = [newTeam, ...allTeams]
@@ -335,12 +433,17 @@ const UserDashboard = () => {
     setTeamDescription("")
     setSelectedMemberIds([])
     setTeamError("")
+    setPaymentTeamId(newTeam.id)
+    setActiveTab("teams")
   }
 
   const removeTeam = (teamId: string) => {
     const nextTeams = allTeams.filter((team) => team.id !== teamId)
     setAllTeams(nextTeams)
     saveTeams(nextTeams)
+    if (paymentTeamId === teamId) {
+      setPaymentTeamId(null)
+    }
   }
 
   const updateTeam = (event: React.FormEvent<HTMLFormElement>, teamId: string) => {
@@ -746,6 +849,10 @@ const UserDashboard = () => {
                   </div>
                 )}
 
+                <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                  Registration fee: <span className="font-semibold">{TEAM_REGISTRATION_FEE_AZN} AZN</span> per team. You will pay after creating the team to publish it on the main Participants page.
+                </p>
+
                 <div className="pt-2">
                   <button
                     type="submit"
@@ -877,15 +984,20 @@ const UserDashboard = () => {
                 </div>
                 <div className="ml-3">
                   <h2 className="text-xl font-semibold text-gray-900">Registered Teams</h2>
-                  <p className="text-sm text-gray-600">View and manage your competition teams</p>
+                  <p className="text-sm text-gray-600">Teams on the main site after {TEAM_REGISTRATION_FEE_AZN} AZN payment</p>
                 </div>
               </div>
               <div className="text-sm text-gray-500">
-                {mentorTeams.length} team{mentorTeams.length !== 1 ? 's' : ''}
+                {publishedMentorTeams.length} live · {pendingMentorTeams.length} pending
               </div>
             </div>
           </div>
           <div className="p-6">
+            {teamMessage && (
+              <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
+                {teamMessage}
+              </div>
+            )}
             {mentorTeams.length === 0 ? (
               <div className="text-center py-12">
                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -895,111 +1007,88 @@ const UserDashboard = () => {
                 <p className="mt-1 text-sm text-gray-500">Create your first team using the form above to enter competitions.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {mentorTeams.map((team) => (
-                  <div key={team.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
-                    {editingTeamId === team.id ? (
-                      <form className="space-y-3" onSubmit={(event) => updateTeam(event, team.id)}>
-                        <input name="teamName" defaultValue={team.name} placeholder="Team Name" className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
-                        <select
-                          name="categoryName"
-                          defaultValue={team.categoryName ?? ""}
-                          className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                          required
-                        >
-                          <option value="" disabled>Select Category</option>
-                          {categories.map((category) => (
-                            <option key={category.id} value={category.name}>{category.name}</option>
-                          ))}
-                        </select>
-                        <textarea
-                          name="description"
-                          defaultValue={team.description ?? ""}
-                          rows={3}
-                          placeholder="Robot description and technical details"
-                          className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                          required
-                        />
-                        <div className="border border-gray-300 rounded-md p-3 max-h-32 overflow-y-auto">
-                          <p className="text-sm font-medium text-gray-700 mb-2">Select Members</p>
-                          <div className="space-y-2">
-                            {mentorMembers.map((member) => (
-                              <label key={member.id} className="flex items-center">
-                                <input
-                                  type="checkbox"
-                                  name="memberIds"
-                                  value={member.id}
-                                  defaultChecked={team.memberIds?.includes(member.id)}
-                                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                                />
-                                <span className="ml-2 text-sm text-gray-700">{member.name} {member.surname}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-xs text-gray-500">Country: {team.school}</p>
-                        <div className="flex gap-2 pt-2">
-                          <button type="submit" className="flex-1 bg-green-600 text-white px-3 py-1 rounded-md text-sm font-medium hover:bg-green-700">Save</button>
-                          <button type="button" onClick={() => setEditingTeamId(null)} className="flex-1 border border-gray-300 text-gray-700 px-3 py-1 rounded-md text-sm hover:bg-gray-50">Cancel</button>
-                        </div>
-                      </form>
-                    ) : (
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-semibold text-gray-900 text-lg">{team.name}</h3>
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            {team.members} member{team.members !== 1 ? 's' : ''}
-                          </span>
-                        </div>
-                        <div className="mt-3 space-y-2 text-sm text-gray-600">
-                          <div className="flex items-center">
-                            <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064" />
-                            </svg>
-                            <span>{team.school || "N/A"}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>{team.categoryName ?? "N/A"}</span>
-                          </div>
-                          {team.description && (
-                            <div className="mt-2 rounded-md bg-slate-50 p-2">
-                              <p className="text-xs font-semibold text-slate-700">Robot Details</p>
-                              <p className="mt-1 text-xs text-slate-600">{team.description}</p>
-                            </div>
-                          )}
-                          {team.memberNames && team.memberNames.length > 0 && (
-                            <div className="mt-3">
-                              <div className="flex items-center mb-1">
-                                <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                                </svg>
-                                <span className="text-xs font-medium text-gray-700">Team Members:</span>
+              <div className="space-y-8">
+                {publishedMentorTeams.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-green-700">Live on Participants page</h3>
+                    <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
+                      {publishedMentorTeams.map((team) => (
+                        <div key={team.id} className="space-y-2">
+                          {editingTeamId === team.id ? (
+                            <form className="space-y-3 rounded-lg border border-gray-200 bg-white p-4" onSubmit={(event) => updateTeam(event, team.id)}>
+                              <input name="teamName" defaultValue={team.name} placeholder="Team Name" className="w-full rounded-md border-gray-300 text-sm shadow-sm" required />
+                              <select name="categoryName" defaultValue={team.categoryName ?? ""} className="w-full rounded-md border-gray-300 text-sm shadow-sm" required>
+                                <option value="" disabled>Select Category</option>
+                                {categories.map((category) => (
+                                  <option key={category.id} value={category.name}>{category.name}</option>
+                                ))}
+                              </select>
+                              <textarea name="description" defaultValue={team.description ?? ""} rows={3} className="w-full rounded-md border-gray-300 text-sm shadow-sm" required />
+                              <div className="flex gap-2">
+                                <button type="submit" className="flex-1 rounded-md bg-green-600 px-3 py-1 text-sm font-medium text-white">Save</button>
+                                <button type="button" onClick={() => setEditingTeamId(null)} className="flex-1 rounded-md border border-gray-300 px-3 py-1 text-sm">Cancel</button>
                               </div>
-                              <p className="text-xs text-gray-500 ml-6">{team.memberNames.join(", ")}</p>
+                            </form>
+                          ) : (
+                            <>
+                              <TeamPublicCard team={team} />
+                              <p className="px-1 text-xs text-slate-500">{team.categoryName} · {team.members} member{team.members !== 1 ? "s" : ""}</p>
+                              <div className="flex gap-2 px-1">
+                                <button type="button" onClick={() => setEditingTeamId(team.id)} className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50">Edit</button>
+                                <button type="button" onClick={() => removeTeam(team.id)} className="rounded-md border border-red-300 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-50">Remove</button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {pendingMentorTeams.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-amber-700">
+                      Pay here on mentor page — {TEAM_REGISTRATION_FEE_AZN} AZN per team
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-600">
+                      Click pay, enter your card on this page. Your team goes live on the Participants page after payment.
+                    </p>
+                    <div className="mt-4 space-y-6">
+                      {pendingMentorTeams.map((team) => (
+                        <div key={team.id} className="rounded-2xl border border-amber-200 bg-amber-50/40 p-4 shadow-sm">
+                          <TeamPublicCard team={team} />
+                          <p className="mt-2 px-1 text-xs text-slate-500">
+                            {team.categoryName} · Not on main site until paid
+                          </p>
+                          {paymentTeamId === team.id ? (
+                            <TeamPaymentPanel
+                              team={team}
+                              onCancel={() => setPaymentTeamId(null)}
+                              onComplete={completeTeamPayment}
+                            />
+                          ) : (
+                            <div className="mt-3 flex flex-wrap gap-2 px-1">
+                              <button
+                                type="button"
+                                onClick={() => setPaymentTeamId(team.id)}
+                                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                              >
+                                Pay {TEAM_REGISTRATION_FEE_AZN} AZN with card
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => removeTeam(team.id)}
+                                className="rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
+                              >
+                                Remove team
+                              </button>
                             </div>
                           )}
                         </div>
-                        <div className="mt-4 flex gap-2">
-                          <button onClick={() => setEditingTeamId(team.id)} className="flex-1 inline-flex justify-center items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            <svg className="-ml-1 mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Edit
-                          </button>
-                          <button onClick={() => removeTeam(team.id)} className="flex-1 inline-flex justify-center items-center px-3 py-1.5 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                            <svg className="-ml-1 mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                      ))}
+                    </div>
                   </div>
-                ))}
+                )}
               </div>
             )}
           </div>
