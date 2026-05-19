@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { FormEvent, useState } from "react"
 import { getCategories, createId } from "../../admin/storage"
 import type { Team } from "../../admin/types"
 
@@ -79,10 +79,29 @@ const TeamRegistration = () => {
     }
   }
 
+  const findCategoryByName = (name: string) => {
+    const normalized = name.trim().toLowerCase()
+    return categories.find((category) => category.name.trim().toLowerCase() === normalized)
+  }
+
+  const getCategoryMemberLimitHint = (name: string) => {
+    const category = findCategoryByName(name)
+    if (!category || category.maxMembers === undefined) {
+      return ""
+    }
+    return `Up to ${category.maxMembers} member${category.maxMembers === 1 ? "" : "s"} per team.`
+  }
+
   const validateForm = () => {
     if (!teamName.trim()) return "Team name is required"
     if (!school.trim()) return "School/Institution name is required"
     if (!categoryName) return "Please select a competition category"
+
+    const category = findCategoryByName(categoryName)
+    if (!category) return "Please select a valid competition category"
+    if (category.maxMembers !== undefined && members > category.maxMembers) {
+      return `This category allows up to ${category.maxMembers} member${category.maxMembers === 1 ? "" : "s"} per team.`
+    }
 
     for (let i = 0; i < members; i++) {
       if (!memberNames[i]?.trim()) return `Member ${i + 1} name is required`
@@ -94,7 +113,7 @@ const TeamRegistration = () => {
     return null
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setLoading(true)
     setError("")
@@ -144,7 +163,7 @@ const TeamRegistration = () => {
       localStorage.setItem("nextgen_admin_teams", JSON.stringify(updatedTeams))
       localStorage.setItem("nextgen_members", JSON.stringify(updatedMembers))
 
-      setSuccess("Team registered successfully! You will be notified once your registration is approved.")
+      setSuccess("Team registered successfully! Your registration is complete and your team will be reviewed for approval.")
 
       // Reset form
       setTeamName("")
@@ -165,7 +184,7 @@ const TeamRegistration = () => {
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
+    <section className="min-h-screen bg-linear-to-br from-blue-50 to-cyan-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
@@ -221,6 +240,9 @@ const TeamRegistration = () => {
                   <option key={category.id} value={category.name}>{category.name}</option>
                 ))}
               </select>
+              {categoryName && (
+                <p className="mt-2 text-sm text-slate-500">{getCategoryMemberLimitHint(categoryName)}</p>
+              )}
             </div>
           </div>
 
@@ -350,6 +372,7 @@ const TeamRegistration = () => {
         <div className="mt-8 text-center text-sm text-slate-600">
           <p>* Required fields</p>
           <p className="mt-2">All registrations are subject to approval. You will receive confirmation via email.</p>
+          <p className="mt-2">No payment is required during team registration.</p>
         </div>
       </div>
     </section>

@@ -17,8 +17,8 @@ const Regulations = () => {
 
   const categoryStyles: Record<string, { card: string; title: string; description: string; button: string; buttonAlt: string }> = {
     "Mini Sumo": {
-      card: "rounded-2xl p-5 shadow-sm border border-slate-200/70 bg-white",
-      title: "text-2xl font-semibold text-slate-950",
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
+      title: "text-2xl font-semibold text-slate-900",
       description: "mt-2 text-sm text-slate-600",
       button: primaryButton,
       buttonAlt: altButton,
@@ -98,7 +98,7 @@ const Regulations = () => {
   return (
     <section className="min-h-screen bg-slate-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
       <div className="mx-auto max-w-5xl">
-        <div className="rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 p-6 text-white shadow-lg sm:p-8">
+        <div className="rounded-3xl bg-linear-to-r from-blue-700 via-indigo-700 to-blue-900 p-6 text-white shadow-lg sm:p-8">
           <p className="text-xs font-semibold tracking-[0.25em] text-blue-100 uppercase">{t('Competition Guide')}</p>
           <h1 className="mt-2 font-display text-4xl font-bold sm:text-5xl">{t('Regulations')}</h1>
           <p className="mt-3 max-w-2xl text-sm text-blue-100 sm:text-base">
@@ -115,9 +115,9 @@ const Regulations = () => {
               "Lego Line": "/regulations/lego-line",
               "Line Follower": "/regulations/line-follower",
               "Drone": "/regulations/drone-race",
-              "1kg Lego Sumo": "/regulations/1kg-lego-sumo",
-              "3kg Lego Sumo": "/regulations/3kg-lego-sumo",
-              "Combat Robot": "/regulations/combat-robot",
+              "1kg Lego Sumo": "/regulations/lego-sumo",
+              "3kg Lego Sumo": "/regulations/lego-sumo-3kg",
+              "Combat Robot": "/regulations/bots-combat",
               "Start Up Junior": "/regulations/start-up-junior",
               "Start Up Senior": "/regulations/start-up-senior",
             }
@@ -136,11 +136,15 @@ const Regulations = () => {
                   </Link>
 
                   {category.pdfDataUrl ? (
-                    <a href={category.pdfDataUrl} download={category.pdfName} className='rounded-lg border border-blue-700 bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-900 '>
+                    <a
+                      href={category.pdfDataUrl}
+                      download={category.pdfName}
+                      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 transition hover:shadow-md"
+                    >
                       Download PDF
                     </a>
                   ) : (
-                    <span className="rounded-lg border border-blue-700 bg-slate-950 px-3 py-2 text-sm font-semibold text-white">
+                    <span className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900">
                       No PDF
                     </span>
                   )}

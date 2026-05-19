@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react"
-import { createId } from "../storage"
+import { createId, getCategories } from "../storage"
 import type { TeamRecord } from "./adminDashboardTypes"
 
 type CreateTeamPageProps = {
@@ -12,10 +12,25 @@ const CreateTeamPage = ({ onAddTeam }: CreateTeamPageProps) => {
   const [robotType, setRobotType] = useState("")
   const [members, setMembers] = useState(3)
   const [category, setCategory] = useState("")
+  const [error, setError] = useState("")
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setError("")
     if (!name.trim() || !school.trim() || !robotType.trim() || !category.trim()) {
+      setError("Please fill in all fields.")
+      return
+    }
+
+    const categories = getCategories()
+    const normalized = category.trim().toLowerCase()
+    const found = categories.find((c) => c.name.trim().toLowerCase() === normalized)
+    if (!found) {
+      setError("Selected category not found.")
+      return
+    }
+    if (found.maxMembers !== undefined && members > found.maxMembers) {
+      setError(`${found.name} allows up to ${found.maxMembers} member${found.maxMembers === 1 ? "" : "s"} per team.`)
       return
     }
 
@@ -43,6 +58,14 @@ const CreateTeamPage = ({ onAddTeam }: CreateTeamPageProps) => {
     setMembers(3)
     setCategory("")
   }
+
+  return (
+    <div className="space-y-8">
+      {error && (
+        <div className="rounded-lg bg-red-50 p-4 border border-red-200 text-sm text-red-700">
+          {error}
+        </div>
+      )}
 
   return (
     <div className="space-y-8">

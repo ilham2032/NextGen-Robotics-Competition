@@ -1,12 +1,9 @@
-import { useEffect, useMemo, useState } from "react"
+import { FormEvent, useEffect, useMemo, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { createId, getCategories, getMembers, getMentors, getTeams, saveMembers, saveMentors, saveTeams } from "../../admin/storage"
-import type { Category, Member, Mentor, Team, TeamPaymentMethod } from "../../admin/types"
-import TeamPaymentPanel from "../../Components/TeamPaymentPanel"
+import type { Category, Member, Mentor, Team } from "../../admin/types"
 import TeamPublicCard from "../../Components/TeamPublicCard"
 import { COUNTRIES } from "../../data/countries"
-import { confirmTeamPayment } from "../../lib/stripePayments"
-import { isTeamPublishedOnMain, TEAM_REGISTRATION_FEE_AZN } from "../../utils/teamDisplay"
 import { getCurrentMentor, signOutMentor } from "../auth"
 
 const UserDashboard = () => {
@@ -32,7 +29,6 @@ const UserDashboard = () => {
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([])
   const [teamError, setTeamError] = useState("")
   const [teamMessage, setTeamMessage] = useState("")
-  const [paymentTeamId, setPaymentTeamId] = useState<string | null>(null)
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null)
   const [editingTeamId, setEditingTeamId] = useState<string | null>(null)
   const [profileName, setProfileName] = useState(mentor?.name ?? "")
@@ -53,20 +49,10 @@ const UserDashboard = () => {
     [allTeams, mentor?.id],
   )
 
-  const publishedMentorTeams = useMemo(() => mentorTeams.filter(isTeamPublishedOnMain), [mentorTeams])
-
-  const pendingMentorTeams = useMemo(
-    () => mentorTeams.filter((team) => team.paymentStatus === "pending"),
-    [mentorTeams],
-  )
-
   const navigationTabs = [
     { id: "users", label: "Users" },
     { id: "create-team", label: "Create Team" },
-    {
-      id: "teams",
-      label: pendingMentorTeams.length > 0 ? `Teams & pay (${pendingMentorTeams.length})` : "Teams & pay",
-    },
+    { id: "teams", label: "Teams" },
     { id: "schedule", label: "Schedule" },
     { id: "profile", label: "Profile" },
   ]
@@ -94,86 +80,12 @@ const UserDashboard = () => {
     }
   }, [searchParams])
 
-  useEffect(() => {
-    if (!paymentTeamId) {
-      return
-    }
-    setActiveTab("teams")
-    const timer = window.setTimeout(() => {
-      document.getElementById(`team-payment-${paymentTeamId}`)?.scrollIntoView({ behavior: "smooth", block: "start" })
-    }, 150)
-    return () => window.clearTimeout(timer)
-  }, [paymentTeamId])
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const paymentIntentId = params.get("payment_intent")
-    const redirectStatus = params.get("redirect_status")
-
-    if (!paymentIntentId || redirectStatus !== "succeeded") {
-      return
-    }
-
-    setActiveTab("teams")
-
-    let cancelled = false
-
-    const finalizeReturn = async () => {
-      try {
-        const result = await confirmTeamPayment(paymentIntentId)
-        if (cancelled) {
-          return
-        }
-
-        const teams = getTeams()
-        const nextTeams = teams.map((team) =>
-          team.id === result.teamId
-            ? {
-                ...team,
-                paymentStatus: "paid" as const,
-                paymentMethod: "card" as TeamPaymentMethod,
-                paidAt: new Date().toISOString(),
-              }
-            : team,
-        )
-        setAllTeams(nextTeams)
-        saveTeams(nextTeams)
-        setTeamMessage("Payment complete. Your team is now visible on the main Participants page.")
-        window.setTimeout(() => setTeamMessage(""), 4000)
-        window.history.replaceState({}, "", window.location.pathname)
-      } catch {
-        if (!cancelled) {
-          setTeamMessage("Payment received but could not be verified. Please contact support.")
-        }
-      }
-    }
-
-    void finalizeReturn()
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  const completeTeamPayment = (teamId: string, method: TeamPaymentMethod) => {
-    const nextTeams = allTeams.map((team) =>
-      team.id === teamId
-        ? {
-            ...team,
-            paymentStatus: "paid" as const,
-            paymentMethod: method,
-            paidAt: new Date().toISOString(),
-          }
-        : team,
-    )
-    setAllTeams(nextTeams)
-    saveTeams(nextTeams)
-    setPaymentTeamId(null)
-    setTeamMessage("Payment complete. Your team is now visible on the main Participants page.")
+  const completeTeamRegistration = (teamId: string) => {
+    setTeamMessage("Team registration completed and ready for competition.")
     window.setTimeout(() => setTeamMessage(""), 4000)
   }
 
-  const updateMentorProfile = (event: React.FormEvent<HTMLFormElement>) => {
+  const updateMentorProfile = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!mentor) {
       setProfileError("Unable to update profile. Mentor session not found.")
@@ -217,7 +129,10 @@ const UserDashboard = () => {
       }
     })
 
-  const findCategoryByName = (categoryName: string) => categories.find((category) => category.name === categoryName)
+  const findCategoryByName = (categoryName: string) => {
+    const normalizedCategoryName = categoryName.trim().toLowerCase()
+    return categories.find((category) => category.name.trim().toLowerCase() === normalizedCategoryName)
+  }
 
   const getCategoryAgeHint = (categoryName: string) => {
     const category = findCategoryByName(categoryName)
@@ -262,7 +177,33 @@ const UserDashboard = () => {
     return null
   }
 
-  const addMember = (event: React.FormEvent<HTMLFormElement>) => {
+  const validateCategoryTeamSizeRules = (selectedMembers: Member[], categoryName: string) => {
+    const category = findCategoryByName(categoryName)
+    if (!category || category.maxMembers === undefined) {
+      return null
+    }
+
+    if (selectedMembers.length > category.maxMembers) {
+      return `Selected category only allows ${category.maxMembers} member${category.maxMembers === 1 ? "" : "s"} per team.`
+    }
+
+    return null
+  }
+
+  const getCategoryMemberLimitHint = (categoryName: string) => {
+    const category = findCategoryByName(categoryName)
+    if (!category || category.maxMembers === undefined) {
+      return ""
+    }
+    return `Up to ${category.maxMembers} member${category.maxMembers === 1 ? "" : "s"} per team.`
+  }
+
+  const getAssignedMemberIds = (excludeTeamId?: string) =>
+    allTeams
+      .filter((team) => team.id !== excludeTeamId)
+      .flatMap((team) => team.memberIds ?? [])
+
+  const addMember = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!mentor) {
       return
@@ -271,6 +212,11 @@ const UserDashboard = () => {
     const normalizedFin = memberFin.trim().toUpperCase()
     const finPattern = /^[A-Z0-9]{7,12}$/
     const phonePattern = /^\+?[0-9]{7,15}$/
+
+    if (!memberName.trim() || !memberSurname.trim() || !memberEmail.trim()) {
+      setMemberError("Please fill in all member fields.")
+      return
+    }
 
     if (!finPattern.test(normalizedFin)) {
       setMemberError("FIN must be 7-12 characters using letters/numbers.")
@@ -316,7 +262,7 @@ const UserDashboard = () => {
     setMemberError("")
   }
 
-  const updateMember = (event: React.FormEvent<HTMLFormElement>, memberId: string) => {
+  const updateMember = (event: FormEvent<HTMLFormElement>, memberId: string) => {
     event.preventDefault()
     if (!mentor) {
       return
@@ -375,14 +321,30 @@ const UserDashboard = () => {
     )
   }
 
-  const addTeam = (event: React.FormEvent<HTMLFormElement>) => {
+  const addTeam = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!mentor) {
       return
     }
 
-    if (!teamCategory) {
+    if (!teamName.trim()) {
+      setTeamError("Please enter a team name.")
+      return
+    }
+
+    if (!teamCountry.trim()) {
+      setTeamError("Please select a country.")
+      return
+    }
+
+    if (!teamCategory.trim()) {
       setTeamError("Please choose a category.")
+      return
+    }
+
+    const selectedCategory = findCategoryByName(teamCategory)
+    if (!selectedCategory) {
+      setTeamError("Selected category is no longer available. Please choose another category.")
       return
     }
 
@@ -408,6 +370,19 @@ const UserDashboard = () => {
       return
     }
 
+    const teamSizeValidationError = validateCategoryTeamSizeRules(selectedMembers, teamCategory)
+    if (teamSizeValidationError) {
+      setTeamError(teamSizeValidationError)
+      return
+    }
+
+    const assignedMemberIds = getAssignedMemberIds()
+    const duplicateMembers = selectedMemberIds.filter((memberId) => assignedMemberIds.includes(memberId))
+    if (duplicateMembers.length > 0) {
+      setTeamError("One or more selected members are already assigned to another team. Each member may only join one team.")
+      return
+    }
+
     const newTeam: Team = {
       id: createId("team"),
       name: teamName.trim(),
@@ -419,8 +394,6 @@ const UserDashboard = () => {
       memberNames: selectedMembers.map((member) => `${member.name} ${member.surname}`),
       mentorId: mentor.id,
       mentorName: `${mentor.name} ${mentor.surname}`,
-      paymentStatus: "pending",
-      paymentAmount: TEAM_REGISTRATION_FEE_AZN,
     }
 
     const nextTeams = [newTeam, ...allTeams]
@@ -433,20 +406,17 @@ const UserDashboard = () => {
     setTeamDescription("")
     setSelectedMemberIds([])
     setTeamError("")
-    setPaymentTeamId(newTeam.id)
     setActiveTab("teams")
+    completeTeamRegistration(newTeam.id)
   }
 
   const removeTeam = (teamId: string) => {
     const nextTeams = allTeams.filter((team) => team.id !== teamId)
     setAllTeams(nextTeams)
     saveTeams(nextTeams)
-    if (paymentTeamId === teamId) {
-      setPaymentTeamId(null)
-    }
   }
 
-  const updateTeam = (event: React.FormEvent<HTMLFormElement>, teamId: string) => {
+  const updateTeam = (event: FormEvent<HTMLFormElement>, teamId: string) => {
     event.preventDefault()
     if (!mentor) {
       return
@@ -475,6 +445,19 @@ const UserDashboard = () => {
       return
     }
 
+    const teamSizeValidationError = validateCategoryTeamSizeRules(selectedMembers, categoryName)
+    if (teamSizeValidationError) {
+      setTeamError(teamSizeValidationError)
+      return
+    }
+
+    const assignedMemberIds = getAssignedMemberIds(teamId)
+    const duplicateMembers = memberIds.filter((memberId) => assignedMemberIds.includes(memberId))
+    if (duplicateMembers.length > 0) {
+      setTeamError("One or more selected members are already assigned to another team. Each member may only join one team.")
+      return
+    }
+
     const nextTeams = allTeams.map((team) =>
       team.id === teamId
         ? {
@@ -499,7 +482,7 @@ const UserDashboard = () => {
     <div className="min-h-screen bg-slate-950/5 text-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Hero */}
-        <div className="mb-10 rounded-[2rem] bg-gradient-to-r from-slate-950 via-indigo-950 to-sky-700 p-8 text-white shadow-2xl shadow-slate-950/20 ring-1 ring-white/10 backdrop-blur-sm">
+        <div className="mb-10 rounded-4xl bg-linear-to-r from-slate-950 via-indigo-950 to-sky-700 p-8 text-white shadow-2xl shadow-slate-950/20 ring-1 ring-white/10 backdrop-blur-sm">
           <div className="flex flex-col gap-8 xl:flex-row xl:items-center xl:justify-between">
             <div className="max-w-3xl">
               <p className="text-xs uppercase tracking-[0.35em] text-cyan-200/80">Mentor dashboard</p>
@@ -523,9 +506,9 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        <div className="mt-8 lg:grid lg:grid-cols-[280px_1fr] lg:gap-8">
-          <aside className="space-y-6">
-            <div className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-[0_32px_80px_rgba(15,23,42,0.12)]">
+        <div className="mt-8 md:grid md:grid-cols-[300px_1fr] md:gap-8">
+          <aside className="space-y-6 md:sticky md:top-8">
+            <div className="rounded-4xl border border-slate-200/70 bg-white p-6 shadow-[0_32px_80px_rgba(15,23,42,0.12)]">
               <div className="mb-6">
                 <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Mentor toolkit</p>
                 <h2 className="mt-3 text-xl font-semibold text-slate-900">Dashboard navigation</h2>
@@ -554,7 +537,7 @@ const UserDashboard = () => {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-[0_32px_80px_rgba(15,23,42,0.12)]">
+            <div className="rounded-4xl border border-slate-200/70 bg-white p-6 shadow-[0_32px_80px_rgba(15,23,42,0.12)]">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Live overview</p>
@@ -584,7 +567,7 @@ const UserDashboard = () => {
           <div className={`rounded-[28px] border border-slate-200 bg-white shadow-lg shadow-slate-900/5 overflow-hidden ${activeTab !== "users" ? "hidden" : ""}`}>
             <div className="bg-slate-50 px-6 py-5 border-b border-slate-200">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
                     <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
@@ -686,7 +669,7 @@ const UserDashboard = () => {
                 {memberError && (
                   <div className="rounded-lg bg-red-50 p-4 border border-red-200">
                     <div className="flex">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                         </svg>
@@ -717,7 +700,7 @@ const UserDashboard = () => {
           <div className={`rounded-[28px] border border-slate-200 bg-white shadow-lg shadow-slate-900/5 overflow-hidden ${activeTab !== "create-team" ? "hidden" : ""}`}>
             <div className="bg-slate-50 px-6 py-5 border-b border-slate-200">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                     <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -795,7 +778,10 @@ const UserDashboard = () => {
                       ))}
                     </select>
                     {teamCategory && (
-                      <p className="mt-2 text-sm text-gray-500">{getCategoryAgeHint(teamCategory)}</p>
+                      <div className="space-y-1">
+                        <p className="mt-2 text-sm text-gray-500">{getCategoryAgeHint(teamCategory)}</p>
+                        <p className="text-sm text-gray-500">{getCategoryMemberLimitHint(teamCategory)}</p>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -837,7 +823,7 @@ const UserDashboard = () => {
                 {teamError && (
                   <div className="rounded-lg bg-red-50 p-4 border border-red-200">
                     <div className="flex">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                         </svg>
@@ -849,8 +835,8 @@ const UserDashboard = () => {
                   </div>
                 )}
 
-                <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                  Registration fee: <span className="font-semibold">{TEAM_REGISTRATION_FEE_AZN} AZN</span> per team. You will pay after creating the team to publish it on the main Participants page.
+                <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                  Team submissions are now registered immediately with no payment required to publish.
                 </p>
 
                 <div className="pt-2">
@@ -867,14 +853,13 @@ const UserDashboard = () => {
               </form>
             </div>
           </div>
-        </div>
 
         {/* Members List */}
         <div className={`mt-8 bg-white rounded-lg shadow-sm border border-gray-200 ${activeTab !== "users" ? "hidden" : ""}`}>
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                     <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
@@ -971,124 +956,78 @@ const UserDashboard = () => {
         </div>
 
         {/* Teams List */}
-        <div className={`mt-8 bg-white rounded-lg shadow-sm border border-gray-200 ${activeTab !== "teams" ? "hidden" : ""}`}>
-          <div className="px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                  </div>
+        <div className={`mt-8 bg-white rounded-3xl shadow-sm border border-slate-200 ${activeTab !== "teams" ? "hidden" : ""}`}>
+          <div className="px-6 py-5 border-b border-slate-200">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
                 </div>
-                <div className="ml-3">
-                  <h2 className="text-xl font-semibold text-gray-900">Registered Teams</h2>
-                  <p className="text-sm text-gray-600">Teams on the main site after {TEAM_REGISTRATION_FEE_AZN} AZN payment</p>
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-900">Registered Teams</h2>
+                  <p className="text-sm text-slate-500">All active entries are published immediately to the Participants page.</p>
                 </div>
               </div>
-              <div className="text-sm text-gray-500">
-                {publishedMentorTeams.length} live · {pendingMentorTeams.length} pending
+              <div className="flex flex-wrap gap-3 text-sm text-slate-600">
+                <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1">{mentorTeams.length} team{mentorTeams.length !== 1 ? "s" : ""}</span>
+                <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1">{mentorMembers.length} members</span>
               </div>
             </div>
           </div>
           <div className="p-6">
             {teamMessage && (
-              <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
+              <div className="mb-6 rounded-3xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-900">
                 {teamMessage}
               </div>
             )}
             {mentorTeams.length === 0 ? (
-              <div className="text-center py-12">
-                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="rounded-[28px] border border-dashed border-slate-200 bg-slate-50 px-8 py-14 text-center">
+                <svg className="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No teams created</h3>
-                <p className="mt-1 text-sm text-gray-500">Create your first team using the form above to enter competitions.</p>
+                <h3 className="mt-4 text-lg font-semibold text-slate-900">No teams have been created yet</h3>
+                <p className="mt-2 text-sm text-slate-500">Use the Create Team tab to add your first entry and begin tracking team progress.</p>
               </div>
             ) : (
-              <div className="space-y-8">
-                {publishedMentorTeams.length > 0 && (
-                  <div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wide text-green-700">Live on Participants page</h3>
-                    <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
-                      {publishedMentorTeams.map((team) => (
-                        <div key={team.id} className="space-y-2">
-                          {editingTeamId === team.id ? (
-                            <form className="space-y-3 rounded-lg border border-gray-200 bg-white p-4" onSubmit={(event) => updateTeam(event, team.id)}>
-                              <input name="teamName" defaultValue={team.name} placeholder="Team Name" className="w-full rounded-md border-gray-300 text-sm shadow-sm" required />
-                              <select name="categoryName" defaultValue={team.categoryName ?? ""} className="w-full rounded-md border-gray-300 text-sm shadow-sm" required>
-                                <option value="" disabled>Select Category</option>
-                                {categories.map((category) => (
-                                  <option key={category.id} value={category.name}>{category.name}</option>
-                                ))}
-                              </select>
-                              <textarea name="description" defaultValue={team.description ?? ""} rows={3} className="w-full rounded-md border-gray-300 text-sm shadow-sm" required />
-                              <div className="flex gap-2">
-                                <button type="submit" className="flex-1 rounded-md bg-green-600 px-3 py-1 text-sm font-medium text-white">Save</button>
-                                <button type="button" onClick={() => setEditingTeamId(null)} className="flex-1 rounded-md border border-gray-300 px-3 py-1 text-sm">Cancel</button>
-                              </div>
-                            </form>
-                          ) : (
-                            <>
-                              <TeamPublicCard team={team} />
-                              <p className="px-1 text-xs text-slate-500">{team.categoryName} · {team.members} member{team.members !== 1 ? "s" : ""}</p>
-                              <div className="flex gap-2 px-1">
-                                <button type="button" onClick={() => setEditingTeamId(team.id)} className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50">Edit</button>
-                                <button type="button" onClick={() => removeTeam(team.id)} className="rounded-md border border-red-300 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-50">Remove</button>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      ))}
+              <div className="grid gap-6 xl:grid-cols-2">
+                {mentorTeams.map((team) => (
+                  <div key={team.id} className="rounded-4xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0 space-y-2">
+                        <p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-700">{team.categoryName || "Uncategorized"}</p>
+                        <h3 className="text-xl font-semibold text-slate-900 truncate">{team.name}</h3>
+                        <p className="text-sm text-slate-500">{team.description || "No description provided."}</p>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <span className="rounded-full bg-slate-100 px-3 py-1">{team.members} member{team.members !== 1 ? "s" : ""}</span>
+                        <span className="rounded-full bg-slate-100 px-3 py-1">Country: {team.school || "N/A"}</span>
+                      </div>
                     </div>
-                  </div>
-                )}
 
-                {pendingMentorTeams.length > 0 && (
-                  <div>
-                    <h3 className="text-xs font-semibold uppercase tracking-wide text-amber-700">
-                      Pay here on mentor page — {TEAM_REGISTRATION_FEE_AZN} AZN per team
-                    </h3>
-                    <p className="mt-1 text-sm text-slate-600">
-                      Click pay, enter your card on this page. Your team goes live on the Participants page after payment.
-                    </p>
-                    <div className="mt-4 space-y-6">
-                      {pendingMentorTeams.map((team) => (
-                        <div key={team.id} className="rounded-2xl border border-amber-200 bg-amber-50/40 p-4 shadow-sm">
-                          <TeamPublicCard team={team} />
-                          <p className="mt-2 px-1 text-xs text-slate-500">
-                            {team.categoryName} · Not on main site until paid
-                          </p>
-                          {paymentTeamId === team.id ? (
-                            <TeamPaymentPanel
-                              team={team}
-                              onCancel={() => setPaymentTeamId(null)}
-                              onComplete={completeTeamPayment}
-                            />
-                          ) : (
-                            <div className="mt-3 flex flex-wrap gap-2 px-1">
-                              <button
-                                type="button"
-                                onClick={() => setPaymentTeamId(team.id)}
-                                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-                              >
-                                Pay {TEAM_REGISTRATION_FEE_AZN} AZN with card
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => removeTeam(team.id)}
-                                className="rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
-                              >
-                                Remove team
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                    <div className="mt-5">
+                      <TeamPublicCard team={team} className="bg-slate-50" />
+                    </div>
+
+                    <div className="mt-5 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setEditingTeamId(team.id)}
+                        className="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                      >
+                        Edit Team
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeTeam(team.id)}
+                        className="inline-flex items-center justify-center rounded-2xl border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-50"
+                      >
+                        Remove Team
+                      </button>
                     </div>
                   </div>
-                )}
+                ))}
               </div>
             )}
           </div>
@@ -1214,6 +1153,7 @@ const UserDashboard = () => {
       </div>
     </div>
   </div>
+</div>
   )
 }
 

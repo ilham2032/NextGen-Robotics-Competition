@@ -36,7 +36,7 @@ const TeamPublicCard = ({ team, className = "" }: TeamPublicCardProps) => {
         />
       ) : (
         <div
-          className="flex h-[2.1rem] w-[3.25rem] shrink-0 items-center justify-center rounded border border-dashed border-slate-300 bg-white text-xs text-slate-400"
+          className="flex h-[2.1rem] w-13 shrink-0 items-center justify-center rounded border border-dashed border-slate-300 bg-white text-xs text-slate-400"
           aria-hidden
         >
           —

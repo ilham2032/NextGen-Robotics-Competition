@@ -27,6 +27,7 @@ export type Category = {
   pdfDataUrl: string
   ageMin?: number
   ageMax?: number
+  maxMembers?: number
 }
 
 export type Mentor = {

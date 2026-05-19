@@ -150,7 +150,7 @@ const TeamPaymentPanel = ({ team, onCancel, onComplete }: TeamPaymentPanelProps)
   return (
     <div
       id={`team-payment-${team.id}`}
-      className="mt-4 rounded-2xl border-2 border-blue-200 bg-gradient-to-b from-blue-50 to-white p-5 shadow-sm"
+      className="mt-4 rounded-2xl border-2 border-blue-200 bg-linear-to-b from-blue-50 to-white p-5 shadow-sm"
     >
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-blue-100 pb-4">
         <div>

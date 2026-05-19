@@ -14,7 +14,95 @@ const SETTINGS_STORAGE_KEY = "nextgen_admin_settings"
 
 const defaultTeams: Team[] = []
 
-const defaultCategories: Category[] = []
+const defaultCategories: Category[] = [
+  {
+    id: "cat-1",
+    name: "Mini Sumo",
+    description: "Robots battle in a circular arena to push each other out.",
+    pdfName: "",
+    pdfDataUrl: "",
+    maxMembers: 3,
+  },
+  {
+    id: "cat-2", 
+    name: "Mini Sumo Kids",
+    description: "Mini Sumo competition designed for younger participants.",
+    pdfName: "",
+    pdfDataUrl: "",
+    maxMembers: 3,
+  },
+  {
+    id: "cat-3",
+    name: "Mega Sumo",
+    description: "Larger robots compete in sumo wrestling matches.",
+    pdfName: "",
+    pdfDataUrl: "",
+    maxMembers: 2,
+  },
+  {
+    id: "cat-4",
+    name: "Lego Line",
+    description: "Robots follow a line course using LEGO components.",
+    pdfName: "",
+    pdfDataUrl: "",
+    maxMembers: 3,
+  },
+  {
+    id: "cat-5",
+    name: "Line Follower",
+    description: "Autonomous robots navigate complex line courses.",
+    pdfName: "",
+    pdfDataUrl: "",
+    maxMembers: 3,
+  },
+  {
+    id: "cat-6",
+    name: "Drone",
+    description: "Drone racing and navigation challenges.",
+    pdfName: "",
+    pdfDataUrl: "",
+    maxMembers: 1,
+  },
+  {
+    id: "cat-7",
+    name: "1kg Lego Sumo",
+    description: "1kg LEGO robots compete in sumo battles.",
+    pdfName: "",
+    pdfDataUrl: "",
+    maxMembers: 3,
+  },
+  {
+    id: "cat-8",
+    name: "3kg Lego Sumo",
+    description: "3kg LEGO robots compete in sumo battles.",
+    pdfName: "",
+    pdfDataUrl: "",
+    maxMembers: 3,
+  },
+  {
+    id: "cat-9",
+    name: "Combat Robot",
+    description: "Combat robots battle in the arena.",
+    pdfName: "",
+    pdfDataUrl: "",
+  },
+  {
+    id: "cat-10",
+    name: "Start Up Junior",
+    description: "Junior startup robotics competition.",
+    pdfName: "",
+    pdfDataUrl: "",
+    maxMembers: 3,
+  },
+  {
+    id: "cat-11",
+    name: "Start Up Senior",
+    description: "Senior startup robotics competition.",
+    pdfName: "",
+    pdfDataUrl: "",
+    maxMembers: 3,
+  },
+]
 
 const parseStoredList = <T,>(raw: string | null): T[] | null => {
   if (!raw) {
@@ -40,7 +128,46 @@ export const saveTeams = (teams: Team[]): void => {
 
 export const getCategories = (): Category[] => {
   const stored = parseStoredList<Category>(localStorage.getItem(CATEGORY_STORAGE_KEY))
-  return stored && stored.length > 0 ? stored : defaultCategories
+  if (stored && stored.length > 0) {
+    // Migrate stored categories by filling missing `maxMembers` from defaults
+    const migrated = stored.map((cat) => {
+      const def = defaultCategories.find(
+        (d) => d.id === cat.id || d.name.trim().toLowerCase() === (cat.name || "").trim().toLowerCase(),
+      )
+      if (def && def.maxMembers !== undefined && cat.maxMembers === undefined) {
+        return { ...cat, maxMembers: def.maxMembers }
+      }
+
+      // Heuristic fallback: infer sensible defaults from category name when no exact default found
+      if (cat.maxMembers === undefined && cat.name) {
+        const lower = cat.name.trim().toLowerCase()
+        if (lower.includes("drone")) return { ...cat, maxMembers: 1 }
+        if (lower.includes("mega")) return { ...cat, maxMembers: 2 }
+        if (lower.includes("combat")) return { ...cat, maxMembers: 2 }
+        if (lower.includes("mini") || lower.includes("sumo") || lower.includes("lego") || lower.includes("line") || lower.includes("start")) {
+          return { ...cat, maxMembers: 3 }
+        }
+        // default fallback
+        return { ...cat, maxMembers: 3 }
+      }
+
+      return cat
+    })
+
+    // Persist migration if anything changed
+    try {
+      const changed = JSON.stringify(migrated) !== JSON.stringify(stored)
+      if (changed) localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(migrated))
+    } catch {
+      // ignore serialization errors and return stored as-is
+    }
+
+    return migrated
+  }
+
+  // Save defaults to localStorage if nothing is stored
+  localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(defaultCategories))
+  return defaultCategories
 }
 
 export const saveCategories = (categories: Category[]): void => {

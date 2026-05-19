@@ -11,9 +11,8 @@ export const getCountryCode = (countryName: string): string | null => {
   return result ? result.iso2 : null
 }
 
-/** Teams without paymentStatus are treated as paid (legacy). */
-export const isTeamPublishedOnMain = (team: Team): boolean =>
-  !team.paymentStatus || team.paymentStatus === "paid"
+/** All registered teams are now published on the Participants page. */
+export const isTeamPublishedOnMain = (_team: Team): boolean => true
 
 export const getTeamPaymentStatus = (team: Team): "paid" | "pending" =>
   team.paymentStatus === "pending" ? "pending" : "paid"

@@ -49,7 +49,7 @@ const Participants = () => {
   return (
     <section className="min-h-screen bg-slate-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
       <div className="mx-auto max-w-5xl">
-        <div className="rounded-3xl border border-blue-100 bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 p-6 text-white shadow-lg sm:p-8">
+        <div className="rounded-3xl border border-blue-100 bg-linear-to-r from-blue-700 via-indigo-700 to-blue-900 p-6 text-white shadow-lg sm:p-8">
           <p className="text-xs font-semibold tracking-[0.25em] text-blue-100 uppercase">{t("Competition Overview")}</p>
           <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">{t("Participants")}</h1>
           <p className="mt-3 max-w-2xl text-sm text-blue-100 sm:text-base">
