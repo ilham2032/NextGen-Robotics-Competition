@@ -67,8 +67,6 @@ const CreateTeamPage = ({ onAddTeam }: CreateTeamPageProps) => {
         </div>
       )}
 
-  return (
-    <div className="space-y-8">
       <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-xl shadow-slate-200/20">
         <div className="bg-gradient-to-r from-blue-900 via-indigo-800 to-cyan-700 px-8 py-10 text-white">
           <p className="uppercase tracking-[0.3em] text-xs text-slate-200">Create team</p>

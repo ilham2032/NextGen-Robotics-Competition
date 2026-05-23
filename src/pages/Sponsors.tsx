@@ -1,99 +1,94 @@
 import { Link } from 'react-router-dom'
-import YourVisaAssistance from '../assets/619395084_17896020795383433_1687352418807126550_n-removebg-preview.png'
 import { useTranslation } from 'react-i18next'
-import KapitalBank from '../assets/Kapital_Bank_logo_2025.png'
-import Kavkaz from '../assets/491497892_17926750140050283_2377610097470685483_n-removebg-preview.png'
-import RSMEDIA from '../assets/rs-media-logo-YAGN3-1G-removebg-preview (1).png'
+import OrganizationSection from '../Components/OrganizationSection'
+import { getOrganizationsByType } from '../data/organizations'
 
-const Partners = () => {
+const PartnersPage = () => {
   const { t } = useTranslation()
-
-  const sponsors = [
-    //{
-      //name: t('All Japan Robot Sumo Tournament'),
-      //description: t('Global robotics partner supporting competitive excellence and teamwork.'),
-      //src: 'https://www.fsi.co.jp/sumo/robot/en/AJRST2020_LOGO_2.png',
-      //alt: 'AJRST logo',
-    //},
-    //{
-      //name: t('RoboChallenge Romania'),
-      //description: t('Education partner advancing STEM learning for young innovators.'),
-      //src: 'https://www.robkod.org/wp-content/uploads/2024/01/logo.png',
-      //alt: 'RoboChallenge Romania logo',
-    //},
-    {
-      name: t('Kavkaz Robotics School'),
-      description: t('Educational partner delivering hands-on robotics training and competition-focused engineering development.'),
-      src: Kavkaz,
-      alt: 'Kavkaz Logo',
-    },
-    {
-      name: t('Your Visa Assistance'),
-      description: t('Logistics partner helping international teams participate with confidence.'),
-      src: YourVisaAssistance,
-      alt: 'Your Visa Assistance logo',
-    },
-    {
-      name: t('Victory Group'),
-      description: t('Strategic partner supporting community growth and event outreach.'),
-      src: '',
-      alt: 'Victory Group logo',
-    },
-    {
-      name: t('RS Media Team'),
-      description: t('Media partner providing event coverage, video production, and digital content creation.'),
-      src: RSMEDIA,
-      alt: 'RS MEDIA logo',
-    },
-    {
-      name: t('Kapital Bank'),
-      description: t('Financial partner investing in education, innovation, and student success.'),
-      src: KapitalBank,
-      alt: 'Kapital Bank logo',
-    },
-  ]
+  const sponsors = getOrganizationsByType('sponsor')
+  const partners = getOrganizationsByType('partner')
 
   return (
-    <section className='min-h-screen bg-slate-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28'>
-      <div className='mx-auto max-w-6xl'>
-        <div className='rounded-4xl bg-linear-to-r from-blue-700 via-indigo-700 to-blue-900 px-8 py-12 text-white shadow-2xl sm:px-10'>
-          <p className='text-xs font-semibold tracking-[0.3em] text-cyan-200 uppercase'>{t('NextGen Partners')}</p>
-          <h1 className='mt-3 text-4xl font-display font-bold tracking-tight sm:text-5xl'>{t('Our Partners')}</h1>
-          <p className='mt-5 max-w-2xl text-sm text-slate-200 sm:text-base'>
-            {t('Leading teams, technology, and logistics that elevate the NextGen Robotics experience.')}
+    <div className='min-h-screen bg-white'>
+      <section className='relative overflow-hidden px-4 pb-14 pt-24 sm:px-6 sm:pt-28'>
+        <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,.08),transparent_50%)]' />
+        <div className='relative mx-auto max-w-6xl'>
+          <div className='rounded-3xl bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 px-8 py-12 text-white shadow-xl sm:px-12 sm:py-14'>
+            <p className='text-xs font-semibold uppercase tracking-[0.35em] text-blue-200'>
+              {t('Partners & Sponsors')}
+            </p>
+            <h1 className='mt-4 max-w-3xl font-display text-4xl font-bold tracking-tight sm:text-5xl'>
+              {t('Organizations powering NextGen')}
+            </h1>
+            <p className='mt-5 max-w-2xl text-base leading-relaxed text-blue-100 sm:text-lg'>
+              {t('Partners & Sponsors page intro')}
+            </p>
+            <div className='mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap'>
+              <a
+                href='#sponsors'
+                className='inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-blue-900 transition hover:bg-blue-50'
+              >
+                {t('View sponsors')}
+              </a>
+              <a
+                href='#partners'
+                className='inline-flex items-center justify-center rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20'
+              >
+                {t('View partners')}
+              </a>
+              <Link
+                to='/contact'
+                className='inline-flex items-center justify-center rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10'
+              >
+                {t('Partnership inquiries')}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className='mx-auto max-w-6xl space-y-16 px-4 pb-20 sm:px-6'>
+        <OrganizationSection
+          id='sponsors'
+          title={t('Our Sponsors')}
+          description={t('Sponsors section description')}
+          organizations={sponsors}
+        />
+
+        <div className='h-px bg-blue-100' />
+
+        <OrganizationSection
+          id='partners'
+          title={t('Our Partners')}
+          description={t('Partners section description')}
+          organizations={partners}
+        />
+
+        <section className='rounded-2xl border border-blue-100 bg-blue-50/40 px-8 py-10 text-center sm:px-12 sm:py-12'>
+          <h2 className='font-display text-2xl font-bold text-slate-900 sm:text-3xl'>
+            {t('Interested in partnering with us?')}
+          </h2>
+          <p className='mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base'>
+            {t('Partnership CTA description')}
           </p>
-          <div className='mt-6 flex flex-col gap-3 sm:flex-row sm:items-center'>
-            <Link to='/contact' className='inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20'>
-              {t('Learn more')}
+          <div className='mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row'>
+            <Link
+              to='/contact'
+              className='inline-flex items-center justify-center rounded-full bg-blue-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-blue-700'
+            >
+              {t('Contact us')}
             </Link>
-            <a href='mailto:nextgenazer@gmail.com' className='inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20'>
+            <a
+              href='mailto:nextgenazer@gmail.com'
+              className='inline-flex items-center justify-center rounded-full border border-blue-200 bg-white px-8 py-3 text-sm font-semibold text-blue-900 transition hover:bg-blue-50'
+            >
               nextgenazer@gmail.com
             </a>
           </div>
-        </div>
-
-        <div className='mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3'>
-          {sponsors.map((sponsor) => (
-            <article key={sponsor.name} className='rounded-4xl border border-slate-200 bg-white p-6 shadow-lg transition duration-200 hover:-translate-y-1 hover:shadow-xl'>
-              <div className='flex h-24 items-center justify-center rounded-3xl bg-slate-100 p-4'>
-                <img src={sponsor.src} alt={sponsor.alt} className='max-h-20 object-contain' />
-              </div>
-              <div className='mt-5'>
-                <h2 className='text-lg font-semibold text-slate-900'>{sponsor.name}</h2>
-                <p className='mt-2 text-sm text-slate-600'>{sponsor.description}</p>
-              </div>
-              <div className='mt-6 text-white'>
-                <Link to='/contact' className='inline-flex rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700'>
-                  {t('Learn more')}
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
+        </section>
       </div>
-    </section>
+    </div>
   )
 }
 
-export default Partners
-
+export default PartnersPage

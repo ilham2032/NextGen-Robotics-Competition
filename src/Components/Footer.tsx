@@ -1,6 +1,14 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 const Footer = () => {
+  const { t } = useTranslation()
+
+  const categoryLinks = [
+    { label: t('Mini Sumo'), to: '/regulations/mini-sumo' },
+    { label: t('Mini Sumo Kids'), to: '/regulations/mini-sumo-kids' },
+    { label: t('Innovation Showcase'), to: '/participants' },
+  ]
   return (
     <footer className='relative bg-slate-900 text-slate-100 mt-20 overflow-hidden'>
       {/* Background Pattern */}
@@ -58,14 +66,26 @@ const Footer = () => {
 
           {/* Categories */}
           <div>
-            <h4 className='text-lg font-semibold text-white mb-6'>Competition Categories</h4>
+            <h4 className='text-lg font-semibold text-white mb-6'>{t('Competition Categories')}</h4>
             <ul className='space-y-3'>
-              <li><Link to='/rules/minisumo' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>Mini Sumo</Link></li>
-              <li><Link to='/rules/linefollower' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>Line Follower</Link></li>
-              <li><Link to='/rules/legoline' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>LEGO Line Follower</Link></li>
-              <li><Link to='/rules/legosumo' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>LEGO Sumo</Link></li>
-              <li><Link to='/rules/botscombat' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>Bots Combat</Link></li>
-              <li><Link to='/rules/drone' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>Drone Racing</Link></li>
+              {categoryLinks.map((category) => (
+                <li key={category.to}>
+                  <Link
+                    to={category.to}
+                    className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'
+                  >
+                    {category.label}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                  to='/regulations'
+                  className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm font-medium'
+                >
+                  {t('View all regulations')}
+                </Link>
+              </li>
             </ul>
           </div>
 

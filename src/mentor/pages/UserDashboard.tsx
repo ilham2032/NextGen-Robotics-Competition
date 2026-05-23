@@ -81,7 +81,8 @@ const UserDashboard = () => {
   }, [searchParams])
 
   const completeTeamRegistration = (teamId: string) => {
-    setTeamMessage("Team registration completed and ready for competition.")
+    const teamName = mentorTeams.find((team) => team.id === teamId)?.name ?? "Team"
+    setTeamMessage(`${teamName} registration completed and ready for competition.`)
     window.setTimeout(() => setTeamMessage(""), 4000)
   }
 
@@ -1011,13 +1012,66 @@ const UserDashboard = () => {
                     </div>
 
                     <div className="mt-5 flex flex-wrap gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setEditingTeamId(team.id)}
-                        className="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-                      >
-                        Edit Team
-                      </button>
+                      {editingTeamId === team.id ? (
+                        <form
+                          className="mt-4 w-full space-y-3 rounded-2xl border border-blue-100 bg-blue-50/50 p-4"
+                          onSubmit={(event) => updateTeam(event, team.id)}
+                        >
+                          <input
+                            name="teamName"
+                            defaultValue={team.name}
+                            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                            required
+                          />
+                          <input
+                            name="categoryName"
+                            defaultValue={team.categoryName}
+                            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                            required
+                          />
+                          <textarea
+                            name="description"
+                            defaultValue={team.description}
+                            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                            rows={2}
+                            required
+                          />
+                          {mentorMembers.map((member) => (
+                            <label key={member.id} className="flex items-center gap-2 text-sm text-slate-700">
+                              <input
+                                type="checkbox"
+                                name="memberIds"
+                                value={member.id}
+                                defaultChecked={team.memberIds?.includes(member.id)}
+                              />
+                              {member.name} {member.surname}
+                            </label>
+                          ))}
+                          <div className="flex gap-2">
+                            <button
+                              type="submit"
+                              className="rounded-2xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                            >
+                              Save changes
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingTeamId(null)}
+                              className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setEditingTeamId(team.id)}
+                          className="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                        >
+                          Edit Team
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => removeTeam(team.id)}
