@@ -4,8 +4,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NextGen Robotics Competition</title>
-    <script type="module" crossorigin src="/NextGen-Robotics-Competition/assets/index-B3OQZ0lO.js"></script>
-    <link rel="stylesheet" crossorigin href="/NextGen-Robotics-Competition/assets/index-SgC9UUNs.css">
+    <script type="text/javascript">
+      // Restore route after GitHub Pages SPA redirect
+      ;(function (location) {
+        if (location.search[1] === '/') {
+          var decoded = location.search
+            .slice(1)
+            .split('&')
+            .map(function (segment) {
+              return segment.replace(/~and~/g, '&')
+            })
+            .join('?')
+          window.history.replaceState(
+            null,
+            null,
+            location.pathname.slice(0, -1) + decoded + location.hash
+          )
+        }
+      })(window.location)
+    </script>
+    <script type="module" crossorigin src="/NextGen-Robotics-Competition/assets/index-7RRK4LhV.js"></script>
+    <link rel="stylesheet" crossorigin href="/NextGen-Robotics-Competition/assets/index-C-lQxuI7.css">
   </head>
   <body>
     <div id="root"></div>
