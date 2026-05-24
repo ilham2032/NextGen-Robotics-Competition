@@ -4,7 +4,7 @@ const megasumo = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-purple-900 via-indigo-800 to-purple-900 py-20">
+      <section className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-blue-800 to-blue-600 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 border border-white rounded-full"></div>
           <div className="absolute bottom-10 right-10 w-48 h-48 border border-white rounded-full"></div>

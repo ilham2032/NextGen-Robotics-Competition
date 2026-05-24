@@ -35,8 +35,8 @@ const defaultCategories: Category[] = [
     id: "cat-3",
     name: "Mega Sumo",
     description: "Larger robots compete in sumo wrestling matches.",
-    pdfName: "",
-    pdfDataUrl: "",
+    pdfName: "Mega Sumo Regulations",
+    pdfDataUrl: "https://docs.google.com/document/d/1edSrimx2D_CImUZcccPdxcUjjPq_LxcSjTzVvXkIsnk/edit?tab=t.0#heading=h.aq2en4ybnx2a",
     maxMembers: 2,
   },
   {
@@ -81,21 +81,6 @@ const defaultCategories: Category[] = [
   },
   {
     id: "cat-9",
-    name: "Combat Robot",
-    description: "Combat robots battle in the arena.",
-    pdfName: "",
-    pdfDataUrl: "",
-  },
-  {
-    id: "cat-10",
-    name: "Start Up Junior",
-    description: "Junior startup robotics competition.",
-    pdfName: "",
-    pdfDataUrl: "",
-    maxMembers: 3,
-  },
-  {
-    id: "cat-11",
     name: "Start Up Senior",
     description: "Senior startup robotics competition.",
     pdfName: "",

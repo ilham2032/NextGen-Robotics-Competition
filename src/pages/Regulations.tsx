@@ -12,7 +12,7 @@ const Regulations = () => {
     setCategories(getCategories())
   }, [])
 
-  const primaryButton = "rounded-lg px-3 py-2 text-sm font-semibold text-white bg-blue-700 shadow-lg shadow-blue-700/30 transition hover:bg-blue-600"
+  const primaryButton = " text-white rounded-lg px-3 py-2 text-sm font-semibold bg-blue-700 shadow-lg shadow-blue-700/30 transition hover:bg-blue-600"
   const altButton = "rounded-lg border border-blue-700 bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-900"
 
   const categoryStyles: Record<string, { card: string; title: string; description: string; button: string; buttonAlt: string }> = {
@@ -65,21 +65,7 @@ const Regulations = () => {
       button: primaryButton,
       buttonAlt: altButton,
     },
-    "Combat Robot": {
-      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
-      title: "text-2xl font-semibold text-slate-900",
-      description: "mt-2 text-sm text-slate-600",
-      button: primaryButton,
-      buttonAlt: altButton,
-    },
     "Mega Sumo": {
-      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
-      title: "text-2xl font-semibold text-slate-900",
-      description: "mt-2 text-sm text-slate-600",
-      button: primaryButton,
-      buttonAlt: altButton,
-    },
-    "Start Up Junior": {
       card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
       title: "text-2xl font-semibold text-slate-900",
       description: "mt-2 text-sm text-slate-600",

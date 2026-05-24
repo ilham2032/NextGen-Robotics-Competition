@@ -4,7 +4,7 @@ const LegoSumo3kg = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 py-20">
+      <section className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-blue-800 to-blue-600 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 border border-white rounded-full"></div>
           <div className="absolute bottom-10 right-10 w-48 h-48 border border-white rounded-full"></div>
@@ -15,7 +15,7 @@ const LegoSumo3kg = () => {
             NEXTGEN ROBOTICS COMPETITION 2026
           </span>
           <h1 className="font-display text-5xl md:text-6xl font-bold text-white mb-4">
-            LEGO Sumo (3kg)
+            3KG Lego Sumo
           </h1>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto">
             LEGO robot sumo wrestling - Push your opponent out of the ring
@@ -55,7 +55,7 @@ const LegoSumo3kg = () => {
           </h2>
           <div className="prose prose-lg max-w-none text-slate-700">
             <p className="mb-4">
-              The <strong>LEGO Sumo (3kg)</strong> category challenges teams to build autonomous LEGO robots 
+              The <strong>3KG Lego Sumo</strong> category challenges teams to build autonomous LEGO robots 
               that push opponent robots out of a circular ring (dohyo). This category follows the international 
               LEGO Sumo standards with a 3kg weight limit, combining mechanical design, programming, and strategy.
             </p>
@@ -110,7 +110,7 @@ const LegoSumo3kg = () => {
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-4 font-semibold text-slate-700">Drive System</td>
-                  <td className="p-4 text-slate-600">LEGO motors only (max 4 motors)</td>
+                  <td className="p-4 text-slate-600">LEGO motors only </td>
                 </tr>
               </tbody>
             </table>
@@ -128,7 +128,6 @@ const LegoSumo3kg = () => {
               <li><strong>Dohyo Diameter:</strong> 154cm (outer), 145cm (inner battle zone)</li>
               <li><strong>Surface:</strong> Flat white or light-colored mat</li>
               <li><strong>Border:</strong> Black or dark ring boundary (5cm wide)</li>
-              <li><strong>Starting Lines:</strong> Two parallel lines 30cm from center</li>
               <li><strong>Height:</strong> Dohyo elevated 5-10cm from floor</li>
             </ul>
 
@@ -152,15 +151,15 @@ const LegoSumo3kg = () => {
               <li><strong>Bout:</strong> Best of 3 matches</li>
               <li><strong>Match:</strong> Single round within the dohyo</li>
               <li><strong>Match Duration:</strong> Maximum 3 minutes</li>
-              <li><strong>Rest Period:</strong> 2 minutes between matches</li>
+              <li><strong>Rest Period:</strong> 1 minutes between matches</li>
             </ol>
 
             <h3 className="text-xl font-semibold text-slate-900 mb-3">4.2 Match Procedure</h3>
             <ul className="list-disc pl-6 space-y-2">
               <li>Robots placed on shikiri-sen (starting lines)</li>
               <li>Judge gives "Ready" command</li>
-              <li>After 5 seconds, judge gives "Start" signal</li>
-              <li>Robots must begin moving within 3 seconds</li>
+              <li>After 3 seconds, judge gives "Start" signal</li>
+              <li>Robots must begin moving within 5 seconds</li>
               <li>Robots battle until one is pushed out of dohyo</li>
               <li>Judge may stop match for violations</li>
             </ul>

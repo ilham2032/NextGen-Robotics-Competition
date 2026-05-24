@@ -9,11 +9,9 @@ const NextGenAzerbaijan1st = () => {
             <li className="text-slate-600">Mini Sumo Kids</li>
             <li className="text-slate-600">1kg Lego Sumo</li>
             <li className="text-slate-600">3kg Lego Sumo</li>
-            <li className="text-slate-600">Combat Robot</li>
             <li className="text-slate-600">Lego Line</li>
             <li className="text-slate-600">Line Follower</li>
             <li className="text-slate-600">Drone</li>
-            <li className="text-slate-600">Start Up(junior)</li>
             <li className="text-slate-600">Start Up(senior)</li>
         </ul>
         <p className="text-slate-600 mt-4 text-sm lg:text-base">Join us for an unforgettable experience and showcase your skills in robotics!</p>

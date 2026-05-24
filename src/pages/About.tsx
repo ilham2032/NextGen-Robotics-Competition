@@ -79,7 +79,7 @@ const About = () => {
               <li>
                 {t('Email')}: <a href='mailto:nextgenazer@gmail.com' className='text-cyan-600 underline'>nextgenazer@gmail.com</a>
               </li>
-              <li>{t('Phone')}: <strong>+994 55 718 68 58</strong></li>
+              <li>{t('Phone')}: <strong>+994 77 626 68 58</strong></li>
               <li>{t('Location')}: <strong>Baku, Azerbaijan</strong></li>
             </ul>
           </article>

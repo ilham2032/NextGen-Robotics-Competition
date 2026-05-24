@@ -22,12 +22,12 @@ const Contact = () => {
             <div className="space-y-5">
               <div>
                 <p className="text-xs font-semibold text-slate-500 uppercase mb-1">{t('Email')}</p>
-                <a href="mailto:nextgenazer@gmail.com" className="text-base font-semibold text-blue-600 hover:text-blue-700">nextgenazer@gmail.com</a>
+                <a href="mailto:nextgenazer@gmail.com" className="text-base font-semibold text-blue-600 hover:text-blue-700">nextgenaze@gmail.com</a>
               </div>
 
               <div>
                 <p className="text-xs font-semibold text-slate-500 uppercase mb-1">{t('Phone')}</p>
-                <p className="text-base font-semibold text-slate-800">+994 55 718 68 58</p>
+                <p className="text-base font-semibold text-slate-800">+994 77 626 68 58</p>
               </div>
 
               <div>

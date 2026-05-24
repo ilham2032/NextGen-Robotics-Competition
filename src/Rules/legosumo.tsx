@@ -4,7 +4,7 @@ const LegoSumo = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 py-20">
+      <section className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-blue-800 to-blue-600 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 border border-white rounded-full"></div>
           <div className="absolute bottom-10 right-10 w-48 h-48 border border-white rounded-full"></div>
@@ -15,10 +15,10 @@ const LegoSumo = () => {
             NEXTGEN ROBOTICS COMPETITION 2026
           </span>
           <h1 className="font-display text-5xl md:text-6xl font-bold text-white mb-4">
-            LEGO Sumo (Standard)
+            1KG Lego Sumo
           </h1>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            Standard LEGO robot sumo - The classic sumo competition
+            1KG Lego robot sumo - The classic sumo competition
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
@@ -55,7 +55,7 @@ const LegoSumo = () => {
           </h2>
           <div className="prose prose-lg max-w-none text-slate-700">
             <p className="mb-4">
-              The <strong>LEGO Sumo (Standard)</strong> category is the classic LEGO robot sumo competition 
+              The <strong>1KG Lego Sumo</strong> category is the classic LEGO robot sumo competition 
               where two autonomous LEGO robots battle in a dohyo (ring), attempting to push each other out. 
               This category follows international sumo robot standards and is perfect for teams new to 
               competitive robotics.
@@ -91,7 +91,7 @@ const LegoSumo = () => {
                 </tr>
                 <tr className="border-b border-slate-200">
                   <td className="p-4 font-semibold text-slate-700">Maximum Dimensions</td>
-                  <td className="p-4 text-slate-600">150mm × 150mm × 150mm (L×W×H)</td>
+                  <td className="p-4 text-slate-600">100mm × 100mm × 100mm (L×W×H)</td>
                 </tr>
                 <tr className="border-b border-slate-200 bg-slate-50">
                   <td className="p-4 font-semibold text-slate-700">Control Type</td>
@@ -111,7 +111,7 @@ const LegoSumo = () => {
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-4 font-semibold text-slate-700">Drive System</td>
-                  <td className="p-4 text-slate-600">LEGO motors only (max 3 motors)</td>
+                  <td className="p-4 text-slate-600">LEGO motors only</td>
                 </tr>
               </tbody>
             </table>
@@ -126,7 +126,7 @@ const LegoSumo = () => {
           <div className="prose prose-lg max-w-none text-slate-700">
             <h3 className="text-xl font-semibold text-slate-900 mb-3">3.1 Ring Specifications</h3>
             <ul className="list-disc pl-6 space-y-2 mb-6">
-              <li><strong>Dohyo Diameter:</strong> 100cm (outer), 90cm (inner battle zone)</li>
+              <li><strong>Dohyo Diameter:</strong> 77cm (outer), 67cm (inner battle zone)</li>
               <li><strong>Surface:</strong> White or light-colored smooth surface</li>
               <li><strong>Border:</strong> Black line (3cm wide) marking boundary</li>
               <li><strong>Starting Lines:</strong> Two parallel lines 20cm from center</li>
@@ -151,7 +151,7 @@ const LegoSumo = () => {
             <h3 className="text-xl font-semibold text-slate-900 mb-3">4.1 Match Structure</h3>
             <ol className="list-decimal pl-6 space-y-2 mb-6">
               <li><strong>Bout:</strong> Best of 3 matches (first to 2 wins)</li>
-              <li><strong>Match Duration:</strong> Maximum 2 minutes</li>
+              <li><strong>Match Duration:</strong> Maximum 3 minutes</li>
               <li><strong>Rest Time:</strong> 1 minute between matches</li>
               <li><strong>Inspection:</strong> Robots checked before each bout</li>
             </ol>
@@ -161,7 +161,7 @@ const LegoSumo = () => {
               <li>Robots placed on opposite shikiri-sen lines</li>
               <li>Judge announces "Ready"</li>
               <li>3-second countdown to "Start"</li>
-              <li>Robots must start within 3 seconds of signal</li>
+              <li>Robots must start within 5 seconds of signal</li>
               <li>Battle continues until robot exits dohyo</li>
               <li>Judge declares winner or calls for rematch</li>
             </ul>

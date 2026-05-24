@@ -2,6 +2,8 @@ import YourVisaAssistance from '../assets/619395084_17896020795383433_1687352418
 import KapitalBank from '../assets/Kapital_Bank_logo_2025.png'
 import Kavkaz from '../assets/491497892_17926750140050283_2377610097470685483_n-removebg-preview.png'
 import RSMEDIA from '../assets/rs-media-logo-YAGN3-1G-removebg-preview (1).png'
+import AsanXidmet from '../assets/asan-xidmt-logo-png_seeklogo-352725.png'
+import INNOVATIONS from '../assets/images.jpg'
 
 export type OrganizationType = 'partner' | 'sponsor'
 
@@ -26,13 +28,30 @@ export const ORGANIZATIONS: OrganizationDefinition[] = [
     website: 'https://yourvisaassistance.com',
   },
   {
-    id: 'kapital-bank',
+    id: 'asan-xidmət',
     type: 'sponsor',
-    nameKey: 'Kapital Bank',
-    descriptionKey: 'Sponsor description: Kapital Bank',
-    logo: KapitalBank,
-    logoAlt: 'Kapital Bank logo',
-    website: 'https://www.kapitalbank.az',
+    nameKey: 'Asan Xidmət',
+    descriptionKey: 'Official partner supporting innovation, youth development, and technology initiatives to empower the next generation of engineers and creators.',
+    logo: AsanXidmet,
+    logoAlt: 'Asan Xidmət logo',
+    website: 'https://asan.gov.az',
+  },
+   {
+    id: 'it-innovations',
+    type: 'sponsor',
+    nameKey: 'IT INNOVATIONS Academy',
+    descriptionKey: 'Educational partner empowering students with advanced skills in programming, robotics, and technology innovation for the future.',
+    logo: INNOVATIONS,
+    logoAlt: 'IT INNOVATIONS logo',
+    website: 'https://itinnovations.az/az/home',
+  },
+    {
+    id: 'victory-group',
+    type: 'sponsor',
+    nameKey: 'Victory Group',
+    descriptionKey: 'Official sponsor providing guidance and support for students applying to study abroad and international education programs.',
+    logoAlt: 'Victory Group logo',
+    website: 'https://victorygroup.az',
   },
   {
     id: 'kavkaz-robotics',
@@ -50,15 +69,7 @@ export const ORGANIZATIONS: OrganizationDefinition[] = [
     descriptionKey: 'Partner description: RS Media Team',
     logo: RSMEDIA,
     logoAlt: 'RS Media Team logo',
-    website: 'https://rsm.az',
-  },
-  {
-    id: 'victory-group',
-    type: 'partner',
-    nameKey: 'Victory Group',
-    descriptionKey: 'Partner description: Victory Group',
-    logoAlt: 'Victory Group logo',
-    website: 'https://victorygroup.az',
+    website: 'https://rsmediateam.com',
   },
 ]
 

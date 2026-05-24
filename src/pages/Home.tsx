@@ -61,7 +61,7 @@ const Home = () => {
             </Reveal>
             <Reveal immediate animation="fade-in-left" delay={0.4}>
               <p className="mt-5 text-xl font-medium text-blue-100 md:text-2xl lg:text-xl">
-                {t('July 23-24 - Build, Battle, and Innovate')}
+                {t('August 26-27 - Build, Battle, and Innovate')}
               </p>
             </Reveal>
             <Reveal immediate animation="fade-in-up" delay={0.55}>
