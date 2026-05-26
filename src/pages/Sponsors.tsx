@@ -13,7 +13,7 @@ const PartnersPage = () => {
       <section className='relative overflow-hidden px-4 pb-14 pt-24 sm:px-6 sm:pt-28'>
         <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,.08),transparent_50%)]' />
         <div className='relative mx-auto max-w-6xl'>
-          <div className='rounded-3xl bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 px-8 py-12 text-white shadow-xl sm:px-12 sm:py-14'>
+          <div className='rounded-3xl bg-gradient-to-br from-blue-700 via-indigo-700 to-blue-900 px-8 py-12 text-white shadow-xl sm:px-12 sm:py-14'>
             <p className='text-xs font-semibold uppercase tracking-[0.35em] text-blue-200'>
               {t('Partners & Sponsors')}
             </p>

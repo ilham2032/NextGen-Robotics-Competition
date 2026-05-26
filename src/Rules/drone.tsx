@@ -15,7 +15,7 @@ const Drone = () => {
             NEXTGEN ROBOTICS COMPETITION 2026
           </span>
           <h1 className="font-display text-5xl md:text-6xl font-bold text-white mb-4">
-            Drone Race
+            Drone 
           </h1>
           <p className="text-xl text-blue-300 max-w-2xl mx-auto">
             FPV drone racing competition - Speed, agility, and piloting skill

@@ -4,14 +4,14 @@ const megasumo = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-blue-800 to-blue-600 py-20">
+      <section className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 border border-white rounded-full"></div>
           <div className="absolute bottom-10 right-10 w-48 h-48 border border-white rounded-full"></div>
           <div className="absolute top-1/2 left-1/4 w-24 h-24 border border-white rounded-full"></div>
         </div>
         <div className="relative mx-auto max-w-6xl px-6 text-center">
-          <span className="inline-block rounded-full bg-purple-500/20 px-4 py-2 text-sm font-semibold text-purple-200 mb-4 mt-6">
+          <span className="inline-block rounded-full bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-200 mb-4 mt-6">
             NEXTGEN ROBOTICS COMPETITION 2026
           </span>
           <h1 className="font-display text-5xl md:text-6xl font-bold text-white mb-4">

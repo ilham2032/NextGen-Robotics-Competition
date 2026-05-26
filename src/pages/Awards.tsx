@@ -5,7 +5,7 @@ const Awards = () => {
   return (
     <section className='min-h-screen bg-gradient-to-b from-blue-50 to-white px-4 pb-16 pt-24 sm:px-6 sm:pt-28'>
       <div className='mx-auto max-w-6xl'>
-        <div className='rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-600 px-6 py-10 text-white shadow-xl sm:px-10'>
+        <div className='rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 px-6 py-10 text-white shadow-xl sm:px-10'>
           <p className='text-xs tracking-[0.2em] text-blue-100 uppercase'>{t('NextGen Robotics Competition')}</p>
           <h1 className='mt-2 text-4xl font-display font-bold sm:text-5xl'>{t('Awards & Prizes')}</h1>
           <p className='mt-4 max-w-3xl text-blue-100'>
