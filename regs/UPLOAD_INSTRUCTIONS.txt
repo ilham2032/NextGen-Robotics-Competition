@@ -1,0 +1,5 @@
+Place the official 3kg Lego Sumo regulations PDF here with the filename:
+
+3kg-lego-sumo.pdf
+
+Once the PDF is added, the rules page will show a download button at /rules/3kglegosumo and visitors will be able to download the file.
