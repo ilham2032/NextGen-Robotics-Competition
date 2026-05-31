@@ -27,6 +27,15 @@ const LineFollower = () => {
             >
               ← Back to Regulations
             </Link>
+            <a
+              href="/regs/line-follower.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="rounded-lg bg-white px-6 py-3 text-blue-700 font-semibold hover:bg-slate-100 transition"
+            >
+              Download Line Follower PDF
+            </a>
           </div>
         </div>
       </section>
@@ -83,11 +92,11 @@ const LineFollower = () => {
               <tbody>
                 <tr className="border-b border-slate-200">
                   <td className="p-4 font-semibold text-slate-700">Maximum Dimensions</td>
-                  <td className="p-4 text-slate-600">250mm × 250mm × 250mm (L×W×H)</td>
+                  <td className="p-4 text-slate-600">300mm × 300mm × 300mm (L×W×H)</td>
                 </tr>
                 <tr className="border-b border-slate-200 bg-slate-50">
                   <td className="p-4 font-semibold text-slate-700">Weight Limit</td>
-                  <td className="p-4 text-slate-600">No limit (recommended under 1.5kg)</td>
+                  <td className="p-4 text-slate-600">Maximum 3kg</td>
                 </tr>
                 <tr className="border-b border-slate-200">
                   <td className="p-4 font-semibold text-slate-700">Control Type</td>
@@ -95,7 +104,7 @@ const LineFollower = () => {
                 </tr>
                 <tr className="border-b border-slate-200 bg-slate-50">
                   <td className="p-4 font-semibold text-slate-700">Power Supply</td>
-                  <td className="p-4 text-slate-600">Internal battery only (max 12V)</td>
+                  <td className="p-4 text-slate-600">Internal battery only</td>
                 </tr>
                 <tr className="border-b border-slate-200">
                   <td className="p-4 font-semibold text-slate-700">Sensors Allowed</td>
@@ -212,7 +221,7 @@ const LineFollower = () => {
             <h3 className="text-xl font-semibold text-slate-900 mb-3">6.1 Penalties</h3>
             <table className="w-full border-collapse mb-6">
               <thead>
-                <tr className="bg-orange-500 text-white">
+                <tr className="bg-blue-600 text-white">
                   <th className="p-4 text-left font-semibold">Violation</th>
                   <th className="p-4 text-left font-semibold">Penalty</th>
                 </tr>
