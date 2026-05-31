@@ -1,4 +1,4 @@
-import type { Category, Member, Mentor, Team, Referee, MatchResult, CompetitionResult } from "./types"
+import type { Category, Member, Mentor, Team, Referee, MatchResult, CompetitionResult, TrackResult } from "./types"
 import type { EventSettings } from "./pages/adminDashboardTypes"
 
 const TEAM_STORAGE_KEY = "nextgen_admin_teams"
@@ -10,6 +10,7 @@ const REFEREE_STORAGE_KEY = "nextgen_referees"
 const REFEREE_SESSION_KEY = "nextgen_referee_session"
 const MATCH_RESULTS_KEY = "nextgen_match_results"
 const COMPETITION_RESULTS_KEY = "nextgen_competition_results"
+const TRACK_RESULTS_KEY = "nextgen_track_results"
 const SETTINGS_STORAGE_KEY = "nextgen_admin_settings"
 
 const defaultTeams: Team[] = []
@@ -19,16 +20,16 @@ const defaultCategories: Category[] = [
     id: "cat-1",
     name: "Mini Sumo",
     description: "Robots battle in a circular arena to push each other out.",
-    pdfName: "",
-    pdfDataUrl: "",
+    pdfName: "Mini Sumo Regulations",
+    pdfDataUrl: "regs/mini-sumo.pdf",
     maxMembers: 3,
   },
   {
     id: "cat-2", 
     name: "Mini Sumo Kids",
     description: "Mini Sumo competition designed for younger participants.",
-    pdfName: "",
-    pdfDataUrl: "",
+    pdfName: "Mini Sumo Kids Regulations",
+    pdfDataUrl: "regs/mini-sumo-kids.pdf",
     maxMembers: 3,
   },
   {
@@ -36,51 +37,43 @@ const defaultCategories: Category[] = [
     name: "Mega Sumo",
     description: "Larger robots compete in sumo wrestling matches.",
     pdfName: "Mega Sumo Regulations",
-    pdfDataUrl: "https://docs.google.com/document/d/1edSrimx2D_CImUZcccPdxcUjjPq_LxcSjTzVvXkIsnk/edit?tab=t.0#heading=h.aq2en4ybnx2a",
+    pdfDataUrl: "regs/mega-sumo.pdf",
     maxMembers: 2,
   },
   {
     id: "cat-4",
     name: "Lego Line",
     description: "Robots follow a line course using LEGO components.",
-    pdfName: "",
-    pdfDataUrl: "",
+    pdfName: "Lego Line Regulations",
+    pdfDataUrl: "regs/lego-line.pdf",
     maxMembers: 3,
   },
   {
     id: "cat-5",
     name: "Line Follower",
     description: "Autonomous robots navigate complex line courses.",
-    pdfName: "",
-    pdfDataUrl: "",
+    pdfName: "Line Follower Regulations",
+    pdfDataUrl: "regs/line-follower.pdf",
     maxMembers: 3,
   },
   {
     id: "cat-6",
-    name: "Drone",
-    description: "Drone racing and navigation challenges.",
-    pdfName: "",
-    pdfDataUrl: "",
-    maxMembers: 1,
+    name: "1kg Lego Sumo",
+    description: "1kg LEGO robots compete in sumo battles.",
+    pdfName: "1kg Lego Sumo Regulations",
+    pdfDataUrl: "regs/1kg-lego-sumo.pdf",
+    maxMembers: 3,
   },
   {
     id: "cat-7",
-    name: "1kg Lego Sumo",
-    description: "1kg LEGO robots compete in sumo battles.",
-    pdfName: "",
-    pdfDataUrl: "",
+    name: "3kg Lego Sumo",
+    description: "3kg LEGO robots compete in sumo battles.",
+    pdfName: "3kg Lego Sumo Regulations",
+    pdfDataUrl: "regs/3kg-lego-sumo.pdf",
     maxMembers: 3,
   },
   {
     id: "cat-8",
-    name: "3kg Lego Sumo",
-    description: "3kg LEGO robots compete in sumo battles.",
-    pdfName: "",
-    pdfDataUrl: "",
-    maxMembers: 3,
-  },
-  {
-    id: "cat-9",
     name: "Start Up Senior",
     description: "Senior startup robotics competition.",
     pdfName: "",
@@ -88,6 +81,8 @@ const defaultCategories: Category[] = [
     maxMembers: 3,
   },
 ]
+
+const REMOVED_CATEGORY_NAMES = new Set(["drone", "combat robot", "start up junior"])
 
 const parseStoredList = <T,>(raw: string | null): T[] | null => {
   if (!raw) {
@@ -116,43 +111,71 @@ export const getCategories = (): Category[] => {
   if (stored && stored.length > 0) {
     // Migrate stored categories by filling missing `maxMembers` from defaults
     const migrated = stored.map((cat) => {
+      let updatedCat = cat
+
+      if (updatedCat.pdfDataUrl?.startsWith('/regs/')) {
+        updatedCat = { ...updatedCat, pdfDataUrl: updatedCat.pdfDataUrl.replace(/^\//, '') }
+      }
+
       const def = defaultCategories.find(
         (d) => d.id === cat.id || d.name.trim().toLowerCase() === (cat.name || "").trim().toLowerCase(),
       )
-      if (def && def.maxMembers !== undefined && cat.maxMembers === undefined) {
-        return { ...cat, maxMembers: def.maxMembers }
+      if (def) {
+        if (def.maxMembers !== undefined && updatedCat.maxMembers === undefined) {
+          updatedCat = { ...updatedCat, maxMembers: def.maxMembers }
+        }
+
+        if ((!updatedCat.pdfName || updatedCat.pdfName.trim() === "") && def.pdfName) {
+          updatedCat = { ...updatedCat, pdfName: def.pdfName }
+        }
+
+        const lowerName = (updatedCat.name || "").trim().toLowerCase()
+        if (def.pdfDataUrl && (lowerName === "mega sumo" || lowerName === "3kg lego sumo")) {
+          if (!updatedCat.pdfDataUrl || updatedCat.pdfDataUrl.trim() === "" || updatedCat.pdfDataUrl !== def.pdfDataUrl) {
+            updatedCat = { ...updatedCat, pdfDataUrl: def.pdfDataUrl }
+          }
+        } else if ((!updatedCat.pdfDataUrl || updatedCat.pdfDataUrl.trim() === "") && def.pdfDataUrl) {
+          updatedCat = { ...updatedCat, pdfDataUrl: def.pdfDataUrl }
+        }
       }
 
       // Heuristic fallback: infer sensible defaults from category name when no exact default found
-      if (cat.maxMembers === undefined && cat.name) {
-        const lower = cat.name.trim().toLowerCase()
-        if (lower.includes("drone")) return { ...cat, maxMembers: 1 }
-        if (lower.includes("mega")) return { ...cat, maxMembers: 2 }
-        if (lower.includes("combat")) return { ...cat, maxMembers: 2 }
+      if (updatedCat.maxMembers === undefined && updatedCat.name) {
+        const lower = updatedCat.name.trim().toLowerCase()
+        if (lower.includes("drone")) return { ...updatedCat, maxMembers: 1 }
+        if (lower.includes("mega")) return { ...updatedCat, maxMembers: 2 }
+        if (lower.includes("combat")) return { ...updatedCat, maxMembers: 2 }
         if (lower.includes("mini") || lower.includes("sumo") || lower.includes("lego") || lower.includes("line") || lower.includes("start")) {
-          return { ...cat, maxMembers: 3 }
+          return { ...updatedCat, maxMembers: 3 }
         }
-        // default fallback
-        return { ...cat, maxMembers: 3 }
+        return { ...updatedCat, maxMembers: 3 }
       }
 
-      return cat
+      return updatedCat
     })
+
+    const sanitized = migrated.filter(
+      (cat) => !REMOVED_CATEGORY_NAMES.has((cat.name || "").trim().toLowerCase()),
+    )
 
     // Persist migration if anything changed
     try {
-      const changed = JSON.stringify(migrated) !== JSON.stringify(stored)
-      if (changed) localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(migrated))
+      const changed = JSON.stringify(sanitized) !== JSON.stringify(stored)
+      if (changed) localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(sanitized))
     } catch {
       // ignore serialization errors and return stored as-is
     }
 
-    return migrated
+    return sanitized
   }
 
+  const sanitizedDefaults = defaultCategories.filter(
+    (cat) => !REMOVED_CATEGORY_NAMES.has((cat.name || "").trim().toLowerCase()),
+  )
+
   // Save defaults to localStorage if nothing is stored
-  localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(defaultCategories))
-  return defaultCategories
+  localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(sanitizedDefaults))
+  return sanitizedDefaults
 }
 
 export const saveCategories = (categories: Category[]): void => {
@@ -212,6 +235,13 @@ export const saveCompetitionResults = (results: CompetitionResult[]): void => {
   localStorage.setItem(COMPETITION_RESULTS_KEY, JSON.stringify(results))
 }
 
+export const getTrackResults = (): TrackResult[] =>
+  parseStoredList<TrackResult>(localStorage.getItem(TRACK_RESULTS_KEY)) ?? []
+
+export const saveTrackResults = (results: TrackResult[]): void => {
+  localStorage.setItem(TRACK_RESULTS_KEY, JSON.stringify(results))
+}
+
 export const getSettings = (): EventSettings | null => {
   const stored = localStorage.getItem(SETTINGS_STORAGE_KEY)
   if (!stored) return null
@@ -236,4 +266,5 @@ export const clearAllData = (): void => {
   localStorage.removeItem(REFEREE_SESSION_KEY)
   localStorage.removeItem(MATCH_RESULTS_KEY)
   localStorage.removeItem(COMPETITION_RESULTS_KEY)
+  localStorage.removeItem(TRACK_RESULTS_KEY)
 }

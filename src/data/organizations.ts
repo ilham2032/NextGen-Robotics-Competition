@@ -1,5 +1,4 @@
 import YourVisaAssistance from '../assets/619395084_17896020795383433_1687352418807126550_n-removebg-preview.png'
-import KapitalBank from '../assets/Kapital_Bank_logo_2025.png'
 import Kavkaz from '../assets/491497892_17926750140050283_2377610097470685483_n-removebg-preview.png'
 import RSMEDIA from '../assets/rs-media-logo-YAGN3-1G-removebg-preview (1).png'
 import AsanXidmet from '../assets/asan-xidmt-logo-png_seeklogo-352725.png'

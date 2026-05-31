@@ -27,9 +27,9 @@ const Home = () => {
       route: "/regulations/mini-sumo-kids",
     },
     {
-      title: t("Innovation Showcase"),
+      title: t("Start Up"),
       description: t("Teams present creative robotics projects that solve everyday problems with practical and impactful solutions."),
-      route: "/participants",
+      route: "/regulations/start-up-senior",
     },
   ]
 
@@ -67,7 +67,7 @@ const Home = () => {
             <Reveal immediate animation="fade-in-up" delay={0.55}>
               <div className="mt-10 flex flex-wrap justify-center gap-4 lg:justify-start text-white">
                 <Link
-                  to="/participants"
+                  to="/user/auth"
                   className="group relative overflow-hidden rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-8 py-4 font-semibold text-slate-950 shadow-lg shadow-cyan-400/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-cyan-400/40"
                 >
                   <span className="relative z-10">{t('Register Team')}</span>
@@ -241,7 +241,7 @@ const Home = () => {
               </p>
               <div className="mt-10 flex flex-wrap justify-center gap-6">
                 <Link
-                  to="/participants"
+                  to="/user/auth"
                   className="group relative rounded-full border-2 border-white/60 px-10 py-4 font-semibold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-white/10 hover:border-white/80"
                 >
                   <span className="relative z-10">{t('Join Now')}</span>
@@ -250,7 +250,7 @@ const Home = () => {
                   to="/contact"
                   className="group rounded-full border-2 border-white/60 px-10 py-4 font-semibold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-white/10 hover:border-white/80"
                 >
-                  {t('Contact Organizer')}
+                  {t('Contact Us')}
                 </Link>
               </div>
             </div>

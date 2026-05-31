@@ -8,7 +8,7 @@ type ProtectedRefereeRouteProps = {
 
 const ProtectedRefereeRoute = ({ children }: ProtectedRefereeRouteProps) => {
   if (!isRefereeAuthenticated()) {
-    return <Navigate to="/referee/login" replace />
+    return <Navigate to="/teamszone/referee" replace />
   }
 
   return <>{children}</>

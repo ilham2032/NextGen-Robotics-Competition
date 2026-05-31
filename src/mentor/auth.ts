@@ -36,6 +36,13 @@ export type SignUpMentorInput = {
   dateOfBirth: string
   country: string
   password: string
+  phone?: string
+}
+
+export const createPasswordHash = async (password: string): Promise<{ passwordHash: string; passwordSalt: string }> => {
+  const salt = randomSalt()
+  const passwordHash = await deriveHash(password, salt)
+  return { passwordHash, passwordSalt: salt }
 }
 
 export const signUpMentor = async (payload: SignUpMentorInput): Promise<{ ok: boolean; message: string }> => {
@@ -51,8 +58,7 @@ export const signUpMentor = async (payload: SignUpMentorInput): Promise<{ ok: bo
     return { ok: false, message: "This FIN is already registered." }
   }
 
-  const salt = randomSalt()
-  const passwordHash = await deriveHash(payload.password, salt)
+  const { passwordHash, passwordSalt } = await createPasswordHash(payload.password)
 
   const mentor: Mentor = {
     id: createId("mentor"),
@@ -63,8 +69,9 @@ export const signUpMentor = async (payload: SignUpMentorInput): Promise<{ ok: bo
     dateOfBirth: payload.dateOfBirth.trim(),
     country: payload.country,
     registeredAt: new Date().toISOString(),
+    phone: payload.phone?.trim() ?? "",
     passwordHash,
-    passwordSalt: salt,
+    passwordSalt,
   }
 
   saveMentors([mentor, ...mentors])

@@ -17,6 +17,8 @@ export type Team = {
   paymentAmount?: number
   paymentMethod?: TeamPaymentMethod
   paidAt?: string
+  /** Tournament group label, e.g. "A" or "B" */
+  group?: string
 }
 
 export type Category = {
@@ -39,6 +41,7 @@ export type Mentor = {
   dateOfBirth: string
   country: string
   registeredAt: string
+  phone?: string
   /** @deprecated Legacy accounts only */
   age?: number
   passwordHash?: string
@@ -64,6 +67,7 @@ export type Referee = {
   passwordHash: string
   passwordSalt: string
   role: 'referee' | 'judge' | 'organizer'
+  categoryId?: string
 }
 
 export type MatchResult = {
@@ -78,6 +82,19 @@ export type MatchResult = {
   round: number
   matchDate: string
   notes?: string
+  /** Tournament group this battle belongs to */
+  group?: string
+}
+
+export type TrackResult = {
+  id: string
+  categoryId: string
+  teamId: string
+  /** Time to finish the track in seconds — lower is better */
+  finishTime: number
+  refereeId: string
+  recordedAt: string
+  notes?: string
 }
 
 export type CompetitionResult = {
@@ -89,4 +106,8 @@ export type CompetitionResult = {
   matchesPlayed: number
   refereeId: string
   finalized: boolean
+  /** Tournament group for grouped categories */
+  group?: string
+  /** Finish time in seconds for track categories */
+  trackFinishTime?: number
 }

@@ -21,6 +21,7 @@ const AdminNav = ({ activePage }: AdminNavProps) => {
     { id: 'users', title: 'Members', icon: '👥', link: 'admin/users' },
     { id: 'teams', title: 'Teams', icon: '🤖', link: 'admin/teams' },
     { id: 'category', title: 'Categories', icon: '📂', link: 'admin/category' },
+    { id: 'referees', title: 'Referees', icon: '🏁', link: 'admin/referees' },
     { id: 'schedule', title: 'Schedule', icon: '📅', link: 'admin/schedule' },
     { id: 'profile', title: 'Profile', icon: '⚙️', link: 'admin/profile' },
     { id: 'about-event', title: 'Event Info', icon: 'ℹ️', link: 'admin/about-event' },

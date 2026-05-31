@@ -2,9 +2,8 @@ import { FormEvent, useEffect, useMemo, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { createId, getCategories, getMembers, getMentors, getTeams, saveMembers, saveMentors, saveTeams } from "../../admin/storage"
 import type { Category, Member, Mentor, Team } from "../../admin/types"
-import TeamPublicCard from "../../Components/TeamPublicCard"
-import { COUNTRIES } from "../../data/countries"
-import { getCurrentMentor, signOutMentor } from "../auth"
+import { createPasswordHash, getCurrentMentor, signOutMentor } from "../auth"
+import { formatDateOfBirthInput, isValidDateOfBirth } from "../validation"
 
 const UserDashboard = () => {
   const navigate = useNavigate()
@@ -16,14 +15,13 @@ const UserDashboard = () => {
 
   const [memberName, setMemberName] = useState("")
   const [memberSurname, setMemberSurname] = useState("")
-  const [memberAge, setMemberAge] = useState(16)
+  const [memberAgeDate, setMemberAgeDate] = useState("")
   const [memberFin, setMemberFin] = useState("")
   const [memberEmail, setMemberEmail] = useState("")
   const [memberPhone, setMemberPhone] = useState("")
   const [memberError, setMemberError] = useState("")
 
   const [teamName, setTeamName] = useState("")
-  const [teamCountry, setTeamCountry] = useState("")
   const [teamCategory, setTeamCategory] = useState("")
   const [teamDescription, setTeamDescription] = useState("")
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([])
@@ -31,13 +29,18 @@ const UserDashboard = () => {
   const [teamMessage, setTeamMessage] = useState("")
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null)
   const [editingTeamId, setEditingTeamId] = useState<string | null>(null)
+  const [showAddParticipantForm, setShowAddParticipantForm] = useState(false)
   const [profileName, setProfileName] = useState(mentor?.name ?? "")
   const [profileSurname, setProfileSurname] = useState(mentor?.surname ?? "")
   const [profileEmail, setProfileEmail] = useState(mentor?.email ?? "")
+  const [profileFin, setProfileFin] = useState(mentor?.fin ?? "")
+  const [profileDateOfBirth, setProfileDateOfBirth] = useState(mentor?.dateOfBirth ?? "")
+  const [profilePhone, setProfilePhone] = useState(mentor?.phone ?? "")
+  const [profilePassword, setProfilePassword] = useState("")
   const [profileError, setProfileError] = useState("")
   const [profileMessage, setProfileMessage] = useState("")
   const [activeTab, setActiveTab] = useState<"users" | "create-team" | "teams" | "schedule" | "profile">("users")
-  const countries = COUNTRIES
+  const mentorCountry = mentor?.country?.trim() ?? ""
 
   const mentorMembers = useMemo(
     () => allMembers.filter((member) => member.mentorId && member.mentorId === mentor?.id),
@@ -47,6 +50,11 @@ const UserDashboard = () => {
   const mentorTeams = useMemo(
     () => allTeams.filter((team) => team.mentorId && team.mentorId === mentor?.id),
     [allTeams, mentor?.id],
+  )
+
+  const mentorCategoryCount = useMemo(
+    () => new Set(mentorTeams.map((team) => team.categoryName?.trim() || "")).size,
+    [mentorTeams],
   )
 
   const navigationTabs = [
@@ -66,11 +74,21 @@ const UserDashboard = () => {
     setProfileName(mentor?.name ?? "")
     setProfileSurname(mentor?.surname ?? "")
     setProfileEmail(mentor?.email ?? "")
+    setProfileFin(mentor?.fin ?? "")
+    setProfileDateOfBirth(mentor?.dateOfBirth ?? "")
+    setProfilePhone(mentor?.phone ?? "")
+    setProfilePassword("")
   }, [mentor])
 
   useEffect(() => {
     if (activeTab === "teams" || activeTab === "create-team") {
       setAllTeams(getTeams())
+    }
+  }, [activeTab])
+
+  useEffect(() => {
+    if (activeTab !== "users") {
+      setShowAddParticipantForm(false)
     }
   }, [activeTab])
 
@@ -86,7 +104,7 @@ const UserDashboard = () => {
     window.setTimeout(() => setTeamMessage(""), 4000)
   }
 
-  const updateMentorProfile = (event: FormEvent<HTMLFormElement>) => {
+  const updateMentorProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!mentor) {
       setProfileError("Unable to update profile. Mentor session not found.")
@@ -94,8 +112,34 @@ const UserDashboard = () => {
     }
 
     const normalizedEmail = profileEmail.trim().toLowerCase()
-    if (!profileName.trim() || !profileSurname.trim() || !normalizedEmail) {
+    const normalizedFin = profileFin.trim().toUpperCase()
+    const normalizedDob = profileDateOfBirth.trim()
+    const normalizedPhone = profilePhone.trim()
+    const finPattern = /^[A-Z0-9]{7,12}$/
+    const phonePattern = /^\+?[0-9]{7,15}$/
+
+    if (!profileName.trim() || !profileSurname.trim() || !normalizedEmail || !normalizedFin || !normalizedDob || !normalizedPhone) {
       setProfileError("Please fill in all profile fields.")
+      return
+    }
+
+    if (!finPattern.test(normalizedFin)) {
+      setProfileError("FIN must be 7-12 letters or numbers.")
+      return
+    }
+
+    if (!isValidDateOfBirth(normalizedDob)) {
+      setProfileError("Please enter a valid date of birth in dd/mm/yyyy format.")
+      return
+    }
+
+    if (!phonePattern.test(normalizedPhone)) {
+      setProfileError("Phone must contain 7-15 digits and may start with +.")
+      return
+    }
+
+    if (profilePassword && profilePassword.length < 8) {
+      setProfileError("Password must be at least 8 characters long.")
       return
     }
 
@@ -110,13 +154,23 @@ const UserDashboard = () => {
       name: profileName.trim(),
       surname: profileSurname.trim(),
       email: normalizedEmail,
+      fin: normalizedFin,
+      dateOfBirth: normalizedDob,
+      phone: normalizedPhone,
+    }
+
+    if (profilePassword) {
+      const { passwordHash, passwordSalt } = await createPasswordHash(profilePassword)
+      updatedMentor.passwordHash = passwordHash
+      updatedMentor.passwordSalt = passwordSalt
     }
 
     const nextMentors = mentors.map((item) => (item.id === mentor.id ? updatedMentor : item))
     saveMentors(nextMentors)
     setMentor(updatedMentor)
+    setProfilePassword("")
     setProfileError("")
-    setProfileMessage("Profile updated successfully.")
+    setProfileMessage(profilePassword ? "Profile and password updated successfully." : "Profile updated successfully.")
   }
 
   const normalizeAndSyncTeams = (teams: Team[], members: Member[]): Team[] =>
@@ -214,8 +268,21 @@ const UserDashboard = () => {
     const finPattern = /^[A-Z0-9]{7,12}$/
     const phonePattern = /^\+?[0-9]{7,15}$/
 
-    if (!memberName.trim() || !memberSurname.trim() || !memberEmail.trim()) {
+    if (!memberName.trim() || !memberSurname.trim() || !memberEmail.trim() || !memberAgeDate.trim()) {
       setMemberError("Please fill in all member fields.")
+      return
+    }
+
+    const dateOfBirth = new Date(memberAgeDate)
+    if (Number.isNaN(dateOfBirth.getTime())) {
+      setMemberError("Please enter a valid date of birth.")
+      return
+    }
+
+    const ageDiff = Date.now() - dateOfBirth.getTime()
+    const ageFromDate = Math.floor(new Date(ageDiff).getUTCFullYear() - 1970)
+    if (ageFromDate < 6) {
+      setMemberError("Participants must be at least 6 years old.")
       return
     }
 
@@ -244,7 +311,7 @@ const UserDashboard = () => {
       mentorId: mentor.id,
       name: memberName.trim(),
       surname: memberSurname.trim(),
-      age: memberAge,
+      age: ageFromDate,
       fin: normalizedFin,
       email: memberEmail.trim().toLowerCase(),
       phone: memberPhone.trim(),
@@ -256,11 +323,12 @@ const UserDashboard = () => {
 
     setMemberName("")
     setMemberSurname("")
-    setMemberAge(16)
+    setMemberAgeDate("")
     setMemberFin("")
     setMemberEmail("")
     setMemberPhone("")
     setMemberError("")
+    setShowAddParticipantForm(false)
   }
 
   const updateMember = (event: FormEvent<HTMLFormElement>, memberId: string) => {
@@ -307,6 +375,10 @@ const UserDashboard = () => {
   }
 
   const removeMember = (memberId: string) => {
+    if (!window.confirm("Are you sure you want to remove this participant? This cannot be undone.")) {
+      return
+    }
+
     const nextMembers = allMembers.filter((member) => member.id !== memberId)
     setAllMembers(nextMembers)
     saveMembers(nextMembers)
@@ -333,8 +405,8 @@ const UserDashboard = () => {
       return
     }
 
-    if (!teamCountry.trim()) {
-      setTeamError("Please select a country.")
+    if (!mentorCountry) {
+      setTeamError("Your mentor profile must include a country. Please update your profile before registering teams.")
       return
     }
 
@@ -387,7 +459,7 @@ const UserDashboard = () => {
     const newTeam: Team = {
       id: createId("team"),
       name: teamName.trim(),
-      school: teamCountry.trim(),
+      school: mentorCountry,
       members: selectedMembers.length,
       description: teamDescription.trim(),
       categoryName: teamCategory,
@@ -402,7 +474,6 @@ const UserDashboard = () => {
     saveTeams(nextTeams)
 
     setTeamName("")
-    setTeamCountry("")
     setTeamCategory("")
     setTeamDescription("")
     setSelectedMemberIds([])
@@ -412,6 +483,10 @@ const UserDashboard = () => {
   }
 
   const removeTeam = (teamId: string) => {
+    if (!window.confirm("Are you sure you want to remove this team? This action cannot be undone.")) {
+      return
+    }
+
     const nextTeams = allTeams.filter((team) => team.id !== teamId)
     setAllTeams(nextTeams)
     saveTeams(nextTeams)
@@ -483,152 +558,163 @@ const UserDashboard = () => {
     <div className="min-h-screen bg-slate-950/5 text-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Hero */}
-        <div className="mb-10 rounded-4xl bg-linear-to-r from-slate-950 via-indigo-950 to-sky-700 p-8 text-white shadow-2xl shadow-slate-950/20 ring-1 ring-white/10 backdrop-blur-sm">
+        <div className="mb-10 rounded-[2.5rem] bg-gradient-to-br from-slate-950 via-indigo-950 to-sky-700 px-8 py-10 text-white shadow-[0_30px_90px_rgba(15,23,42,0.35)] ring-1 ring-white/10 backdrop-blur-sm sm:px-10 sm:py-12">
           <div className="flex flex-col gap-8 xl:flex-row xl:items-center xl:justify-between">
             <div className="max-w-3xl">
-              <p className="text-xs uppercase tracking-[0.35em] text-cyan-200/80">Mentor dashboard</p>
-              <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Welcome back, {mentor?.name ?? "Mentor"}</h1>
-              <p className="mt-4 text-sm leading-7 text-slate-200/90">
-                Manage your mentor program, register teams, and review progress from a polished center of command built for NextGen competition success.
+              <p className="text-xs uppercase tracking-[0.35em] text-cyan-200/80">NextGen Robotics Mentor Portal</p>
+              <h1 className="mt-4 text-3xl font-display font-semibold tracking-tight text-white sm:text-5xl">
+                Welcome back, {mentor?.name ?? 'Mentor'}
+              </h1>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-200/90 sm:text-base">
+                Organize participants, build teams, and track competition readiness in one polished mentor dashboard.
               </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('users')
+                    setShowAddParticipantForm(true)
+                  }}
+                  className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-white/20 transition hover:bg-slate-100"
+                >
+                  Add participant
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('create-team')}
+                  className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
+                >
+                  Create a team
+                </button>
+              </div>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-3">
               <div className="rounded-[22px] bg-white/10 border border-white/15 p-5 shadow-lg shadow-slate-950/20 backdrop-blur-sm">
-                <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Team Members</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Participants</p>
                 <p className="mt-4 text-3xl font-semibold text-white">{mentorMembers.length}</p>
-                <p className="mt-2 text-sm text-slate-300">Your active mentees</p>
+                <p className="mt-2 text-sm text-slate-300">Active team members</p>
               </div>
               <div className="rounded-[22px] bg-white/10 border border-white/15 p-5 shadow-lg shadow-slate-950/20 backdrop-blur-sm">
-                <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Registered Teams</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Teams</p>
                 <p className="mt-4 text-3xl font-semibold text-white">{mentorTeams.length}</p>
-                <p className="mt-2 text-sm text-slate-300">Teams ready for competition</p>
+                <p className="mt-2 text-sm text-slate-300">Competition-ready squads</p>
+              </div>
+              <div className="rounded-[22px] bg-white/10 border border-white/15 p-5 shadow-lg shadow-slate-950/20 backdrop-blur-sm">
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Categories</p>
+                <p className="mt-4 text-3xl font-semibold text-white">{mentorCategoryCount}</p>
+                <p className="mt-2 text-sm text-slate-300">Event categories used</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-8 md:grid md:grid-cols-[300px_1fr] md:gap-8">
+        <div className="mt-8 md:grid md:grid-cols-[280px_1fr] md:gap-8">
           <aside className="space-y-6 md:sticky md:top-8">
             <div className="rounded-4xl border border-slate-200/70 bg-white p-6 shadow-[0_32px_80px_rgba(15,23,42,0.12)]">
-              <div className="mb-6">
-                <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Mentor toolkit</p>
-                <h2 className="mt-3 text-xl font-semibold text-slate-900">Dashboard navigation</h2>
-                <p className="mt-2 text-sm text-slate-600">Quickly move between users, teams, schedule, and profile settings.</p>
-              </div>
-              <div className="space-y-3">
+              <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Mentor toolkit</p>
+              <h2 className="mt-3 text-xl font-semibold text-slate-900">Navigation</h2>
+              <p className="mt-2 text-sm text-slate-600">Select a section to manage participants, teams, schedule, or profile.</p>
+              <nav className="mt-6 space-y-2">
                 {navigationTabs.map((tab) => (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                    className={`flex w-full items-center justify-between rounded-3xl px-4 py-3 text-left text-sm font-semibold transition ${
+                    className={`flex w-full items-center justify-between rounded-3xl px-4 py-4 text-left text-sm font-semibold transition ${
                       activeTab === tab.id
-                        ? "bg-slate-900 text-white shadow-lg shadow-slate-900/10"
+                        ? "bg-slate-950 text-white shadow-lg shadow-slate-950/10"
                         : "bg-slate-50 text-slate-700 hover:bg-slate-100"
                     }`}
                   >
-                    {tab.label}
-                    <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition ${
+                    <span>{tab.label}</span>
+                    <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold transition ${
                       activeTab === tab.id ? "bg-cyan-300 text-slate-950" : "bg-slate-200 text-slate-500"
                     }`}>
-                      {tab.id === "users" ? "U" : tab.id === "create-team" ? "+" : tab.id === "teams" ? "T" : tab.id === "schedule" ? "S" : "P"}
+                      {tab.label.charAt(0)}
                     </span>
                   </button>
                 ))}
-              </div>
-            </div>
-
-            <div className="rounded-4xl border border-slate-200/70 bg-white p-6 shadow-[0_32px_80px_rgba(15,23,42,0.12)]">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Live overview</p>
-                  <h3 className="mt-2 text-base font-semibold text-slate-900">Performance at a glance</h3>
-                </div>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Current</span>
-              </div>
-              <div className="mt-5 grid gap-4">
-                <div className="rounded-3xl bg-slate-50 p-4">
-                  <p className="text-sm text-slate-500">Total members</p>
-                  <p className="mt-2 text-3xl font-semibold text-slate-900">{mentorMembers.length}</p>
-                </div>
-                <div className="rounded-3xl bg-slate-50 p-4">
-                  <p className="text-sm text-slate-500">Active teams</p>
-                  <p className="mt-2 text-3xl font-semibold text-slate-900">{mentorTeams.length}</p>
-                </div>
-                <div className="rounded-3xl bg-slate-50 p-4">
-                  <p className="text-sm text-slate-500">Selected category</p>
-                  <p className="mt-2 text-3xl font-semibold text-slate-900">{teamCategory || "None"}</p>
-                </div>
-              </div>
+              </nav>
             </div>
           </aside>
 
           <div className="space-y-6">
             {/* Add Member Section */}
-          <div className={`rounded-[28px] border border-slate-200 bg-white shadow-lg shadow-slate-900/5 overflow-hidden ${activeTab !== "users" ? "hidden" : ""}`}>
-            <div className="bg-slate-50 px-6 py-5 border-b border-slate-200">
-              <div className="flex items-center">
-                <div className="shrink-0">
-                  <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div
+            id="add-participant-form"
+            className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-200 ${
+              activeTab !== "users" || !showAddParticipantForm ? "pointer-events-none opacity-0" : "pointer-events-auto opacity-100"
+            }`}
+          >
+            <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onClick={() => setShowAddParticipantForm(false)} />
+            <div className="relative w-full max-w-2xl overflow-hidden rounded-[30px] bg-white shadow-2xl ring-1 ring-slate-200">
+              <div className="bg-slate-50 px-6 py-5 border-b border-slate-200 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="shrink-0 flex h-12 w-12 items-center justify-center rounded-3xl bg-slate-900/10 text-cyan-500">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                     </svg>
                   </div>
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-display font-semibold text-slate-900">Add Participant</h2>
+                    <p className="text-sm text-slate-600">Provide participant details for your team roster.</p>
+                  </div>
                 </div>
-                <div className="ml-3">
-                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Add New Member</h2>
-                  <p className="text-sm text-gray-600">Register team members under your mentorship</p>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAddParticipantForm(false)}
+                  className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                  aria-label="Close participant form"
+                >
+                  ✕
+                </button>
               </div>
-            </div>
             <div className="p-6">
               <form className="space-y-6" onSubmit={addMember}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="memberName" className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                    <label htmlFor="memberName" className="block text-sm font-medium text-slate-700 mb-2">First Name *</label>
                     <input
                       id="memberName"
                       type="text"
                       value={memberName}
                       onChange={(event) => setMemberName(event.target.value)}
                       placeholder="Enter first name"
-                      className="block w-full px-4 py-3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base"
+                      className="block w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-200"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="memberSurname" className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                    <label htmlFor="memberSurname" className="block text-sm font-medium text-slate-700 mb-2">Last Name *</label>
                     <input
                       id="memberSurname"
                       type="text"
                       value={memberSurname}
                       onChange={(event) => setMemberSurname(event.target.value)}
                       placeholder="Enter last name"
-                      className="block w-full px-4 py-3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base"
+                      className="block w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-200"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                  <div>
-                    <label htmlFor="memberAge" className="block text-sm font-medium text-gray-700 mb-2">Age *</label>
+                  <div className="sm:col-span-2">
+                    <label htmlFor="memberAgeDate" className="block text-sm font-medium text-slate-700 mb-2">Date of Birth *</label>
                     <input
-                      id="memberAge"
-                      type="number"
-                      min={6}
-                      max={90}
-                      value={memberAge}
-                      onChange={(event) => setMemberAge(Number(event.target.value))}
-                      placeholder="Age"
-                      className="block w-full px-4 py-3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base"
+                      id="memberAgeDate"
+                      type="date"
+                      value={memberAgeDate}
+                      onChange={(event) => setMemberAgeDate(event.target.value)}
+                      placeholder="mm/dd/yyyy"
+                      className="block w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-200"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="memberFin" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="memberFin" className="block text-sm font-medium text-slate-700 mb-2">
                       FIN *
-                      <span className="text-xs text-gray-500 ml-1" title="Personal Identification Number - 7-12 alphanumeric characters">ⓘ</span>
+                      <span className="text-xs text-slate-500 ml-1" title="Personal Identification Number - 7-12 alphanumeric characters">ⓘ</span>
                     </label>
                     <input
                       id="memberFin"
@@ -636,19 +722,19 @@ const UserDashboard = () => {
                       value={memberFin}
                       onChange={(event) => setMemberFin(event.target.value)}
                       placeholder="e.g., ABC123456"
-                      className="block w-full px-4 py-3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base uppercase"
+                      className="block w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-200 uppercase"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="memberPhone" className="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
+                    <label htmlFor="memberPhone" className="block text-sm font-medium text-slate-700 mb-2">Contact number *</label>
                     <input
                       id="memberPhone"
                       type="tel"
                       value={memberPhone}
                       onChange={(event) => setMemberPhone(event.target.value)}
-                      placeholder="+994 XX XXX XX XX"
-                      className="block w-full px-4 py-3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base"
+                      placeholder="Enter phone"
+                      className="block w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-200"
                       required
                     />
                   </div>
@@ -695,6 +781,7 @@ const UserDashboard = () => {
                 </div>
               </form>
             </div>
+          </div>
           </div>
 
           {/* Create Team Section */}
@@ -744,25 +831,18 @@ const UserDashboard = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="teamCountry" className="block text-sm font-medium text-gray-700 mb-2">Country *</label>
-                    <select
-                      id="teamCountry"
-                      value={teamCountry}
-                      onChange={(event) => setTeamCountry(event.target.value)}
-                      className="block w-full px-4 py-3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base"
-                      required
-                    >
-                      <option value="">Select Country</option>
-                      {countries.map((country) => (
-                        <option key={country} value={country}>
-                          {country}
-                        </option>
-                      ))}
-                    </select>
+                <div className="grid grid-cols-1 gap-6">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-sm text-gray-700">
+                      Your team country is automatically assigned from your mentor profile: 
+                      <span className="font-medium">{mentorCountry || "Not set"}</span>.
+                    </p>
+                    {!mentorCountry && (
+                      <p className="mt-2 text-sm text-red-600">Please update your mentor profile to include a country before creating teams.</p>
+                    )}
                   </div>
-                  <div>
+                </div>
+                <div>
                     <label htmlFor="teamCategory" className="block text-sm font-medium text-gray-700 mb-2">Competition Category *</label>
                     <select
                       id="teamCategory"
@@ -785,7 +865,6 @@ const UserDashboard = () => {
                       </div>
                     )}
                   </div>
-                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -856,103 +935,95 @@ const UserDashboard = () => {
           </div>
 
         {/* Members List */}
-        <div className={`mt-8 bg-white rounded-lg shadow-sm border border-gray-200 ${activeTab !== "users" ? "hidden" : ""}`}>
-          <div className="px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="shrink-0">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="ml-3">
-                  <h2 className="text-xl font-semibold text-gray-900">Users</h2>
-                  <p className="text-sm text-gray-600">Manage your registered users</p>
-                </div>
+        <div className={`mt-8 bg-white rounded-3xl shadow-sm border border-slate-200 ${activeTab !== "users" ? "hidden" : ""}`}>
+          <div className="px-6 py-5 border-b border-slate-200 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900">Participants</h2>
+              <p className="mt-2 text-sm text-slate-600">Manage your team members with a clean, professional roster.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('users')
+                setShowAddParticipantForm(true)
+              }}
+              className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-sky-600 to-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-600/20 transition hover:from-sky-500 hover:to-indigo-700"
+            >
+              Add participant
+            </button>
+          </div>
+          <div className="p-6 overflow-x-auto">
+            <div className="min-w-full">
+              <div className="hidden sm:grid grid-cols-[1.8fr_0.7fr_1.3fr_1.8fr_1fr_200px] gap-4 rounded-3xl bg-slate-950/5 px-4 py-3 text-xs uppercase tracking-[0.2em] text-slate-500">
+                <span>Name</span>
+                <span>Age</span>
+                <span>Contact</span>
+                <span>Email</span>
+                <span>ID / Passport</span>
+                <span>Actions</span>
               </div>
-              <div className="text-sm text-gray-500">
-                {mentorMembers.length} member{mentorMembers.length !== 1 ? 's' : ''}
+              <div className="mt-3 space-y-3">
+                {mentorMembers.length === 0 ? (
+                  <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-8 py-12 text-center text-sm text-slate-500">
+                    No participants registered yet. Add your first participant using the form above.
+                  </div>
+                ) : (
+                  mentorMembers.map((member) => (
+                    <div
+                      key={member.id}
+                      className="grid gap-4 rounded-3xl border border-slate-200 bg-white px-4 py-4 shadow-sm sm:grid-cols-[1.8fr_0.7fr_1.3fr_1.8fr_1fr_200px] sm:items-center"
+                    >
+                      {editingMemberId === member.id ? (
+                        <div className="col-span-full space-y-4">
+                          <form className="grid gap-4 sm:grid-cols-[1.4fr_0.7fr_1.3fr_1.8fr_1fr]" onSubmit={(event) => updateMember(event, member.id)}>
+                            <input name="name" defaultValue={member.name} placeholder="First name" className="rounded-2xl border border-slate-300 px-3 py-2 text-sm" required />
+                            <input name="surname" defaultValue={member.surname} placeholder="Last name" className="rounded-2xl border border-slate-300 px-3 py-2 text-sm" required />
+                            <input name="age" type="number" min={6} defaultValue={member.age} placeholder="Age" className="rounded-2xl border border-slate-300 px-3 py-2 text-sm" required />
+                            <input name="phone" defaultValue={member.phone} placeholder="Contact" className="rounded-2xl border border-slate-300 px-3 py-2 text-sm" required />
+                            <input name="email" type="email" defaultValue={member.email} placeholder="Email" className="rounded-2xl border border-slate-300 px-3 py-2 text-sm" required />
+                            <input name="fin" defaultValue={member.fin} placeholder="ID / Passport" className="rounded-2xl border border-slate-300 px-3 py-2 text-sm col-span-full" required />
+                            <div className="col-span-full flex flex-wrap gap-2">
+                              <button type="submit" className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Save</button>
+                              <button type="button" onClick={() => setEditingMemberId(null)} className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+                            </div>
+                          </form>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="space-y-1">
+                            <span className="block text-[10px] uppercase tracking-[0.18em] text-slate-400 sm:hidden">Name</span>
+                            <p className="font-semibold text-slate-900">{member.name} {member.surname}</p>
+                          </div>
+                          <div>
+                            <span className="block text-[10px] uppercase tracking-[0.18em] text-slate-400 sm:hidden">Age</span>
+                            <div className="text-slate-600">{member.age}</div>
+                          </div>
+                          <div>
+                            <span className="block text-[10px] uppercase tracking-[0.18em] text-slate-400 sm:hidden">Contact</span>
+                            <div className="text-slate-600 truncate">{member.phone}</div>
+                          </div>
+                          <div>
+                            <span className="block text-[10px] uppercase tracking-[0.18em] text-slate-400 sm:hidden">Email</span>
+                            <div className="text-slate-600 truncate">{member.email}</div>
+                          </div>
+                          <div>
+                            <span className="block text-[10px] uppercase tracking-[0.18em] text-slate-400 sm:hidden">ID / Passport</span>
+                            <div className="text-slate-600">{member.fin}</div>
+                          </div>
+                          <div>
+                            <span className="block text-[10px] uppercase tracking-[0.18em] text-slate-400 sm:hidden">Actions</span>
+                            <div className="flex flex-wrap gap-2">
+                              <button onClick={() => setEditingMemberId(member.id)} className="rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Edit</button>
+                              <button onClick={() => removeMember(member.id)} className="rounded-full border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100">Remove</button>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))
+                )}
               </div>
             </div>
-          </div>
-          <div className="p-6">
-            {mentorMembers.length === 0 ? (
-              <div className="text-center py-12">
-                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No members registered</h3>
-                <p className="mt-1 text-sm text-gray-500">Get started by adding your first team member using the form above.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {mentorMembers.map((member) => (
-                  <div key={member.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
-                    {editingMemberId === member.id ? (
-                      <form className="space-y-3" onSubmit={(event) => updateMember(event, member.id)}>
-                        <div className="grid grid-cols-2 gap-2">
-                          <input name="name" defaultValue={member.name} placeholder="First Name" className="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
-                          <input name="surname" defaultValue={member.surname} placeholder="Last Name" className="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
-                        </div>
-                        <input name="age" type="number" min={6} max={90} defaultValue={member.age} placeholder="Age" className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
-                        <input name="fin" defaultValue={member.fin} placeholder="FIN" className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
-                        <input name="email" type="email" defaultValue={member.email} placeholder="Email" className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
-                        <input name="phone" type="tel" defaultValue={member.phone} placeholder="Phone" className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" required />
-                        <div className="flex gap-2 pt-2">
-                          <button type="submit" className="flex-1 bg-indigo-600 text-white px-3 py-1 rounded-md text-sm font-medium hover:bg-indigo-700">Save</button>
-                          <button type="button" onClick={() => setEditingMemberId(null)} className="flex-1 border border-gray-300 text-gray-700 px-3 py-1 rounded-md text-sm hover:bg-gray-50">Cancel</button>
-                        </div>
-                      </form>
-                    ) : (
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-semibold text-gray-900 text-lg">{member.name} {member.surname}</h3>
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            Age {member.age}
-                          </span>
-                        </div>
-                        <div className="mt-3 space-y-2 text-sm text-gray-600">
-                          <div className="flex items-center">
-                            <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                            <span className="truncate">{member.email}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                            </svg>
-                            <span>{member.phone}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span className="font-mono text-xs">{member.fin}</span>
-                          </div>
-                        </div>
-                        <div className="mt-4 flex gap-2">
-                          <button onClick={() => setEditingMemberId(member.id)} className="flex-1 inline-flex justify-center items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            <svg className="-ml-1 mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Edit
-                          </button>
-                          <button onClick={() => removeMember(member.id)} className="flex-1 inline-flex justify-center items-center px-3 py-1.5 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                            <svg className="-ml-1 mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
@@ -994,45 +1065,53 @@ const UserDashboard = () => {
             ) : (
               <div className="grid gap-6 xl:grid-cols-2">
                 {mentorTeams.map((team) => (
-                  <div key={team.id} className="rounded-4xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div key={team.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0 space-y-2">
-                        <p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-700">{team.categoryName || "Uncategorized"}</p>
-                        <h3 className="text-xl font-semibold text-slate-900 truncate">{team.name}</h3>
-                        <p className="text-sm text-slate-500">{team.description || "No description provided."}</p>
+                        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">{team.categoryName || "Uncategorized"}</p>
+                        <h3 className="text-2xl font-semibold text-slate-900 truncate">{team.name}</h3>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <div className="flex flex-wrap gap-2 text-sm text-slate-500">
                         <span className="rounded-full bg-slate-100 px-3 py-1">{team.members} member{team.members !== 1 ? "s" : ""}</span>
-                        <span className="rounded-full bg-slate-100 px-3 py-1">Country: {team.school || "N/A"}</span>
+                        <span className="rounded-full bg-slate-100 px-3 py-1">{team.school || "No school"}</span>
                       </div>
                     </div>
 
-                    <div className="mt-5">
-                      <TeamPublicCard team={team} className="bg-slate-50" />
+                    <p className="mt-4 text-sm leading-6 text-slate-600">{team.description || "No description provided."}</p>
+
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-3xl bg-slate-50 p-4 text-sm text-slate-700">
+                        <p className="font-semibold text-slate-900">Members</p>
+                        <p className="mt-2 text-base text-slate-800">{team.members}</p>
+                      </div>
+                      <div className="rounded-3xl bg-slate-50 p-4 text-sm text-slate-700">
+                        <p className="font-semibold text-slate-900">Category</p>
+                        <p className="mt-2 text-base text-slate-800">{team.categoryName || "Uncategorized"}</p>
+                      </div>
                     </div>
 
-                    <div className="mt-5 flex flex-wrap gap-3">
+                    <div className="mt-5 flex flex-wrap items-center gap-3">
                       {editingTeamId === team.id ? (
                         <form
-                          className="mt-4 w-full space-y-3 rounded-2xl border border-blue-100 bg-blue-50/50 p-4"
+                          className="mt-4 w-full space-y-3 rounded-3xl border border-slate-200 bg-slate-50 p-4"
                           onSubmit={(event) => updateTeam(event, team.id)}
                         >
                           <input
                             name="teamName"
                             defaultValue={team.name}
-                            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                            className="w-full rounded-2xl border border-slate-300 px-3 py-2 text-sm"
                             required
                           />
                           <input
                             name="categoryName"
                             defaultValue={team.categoryName}
-                            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                            className="w-full rounded-2xl border border-slate-300 px-3 py-2 text-sm"
                             required
                           />
                           <textarea
                             name="description"
                             defaultValue={team.description}
-                            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                            className="w-full rounded-2xl border border-slate-300 px-3 py-2 text-sm"
                             rows={2}
                             required
                           />
@@ -1043,11 +1122,12 @@ const UserDashboard = () => {
                                 name="memberIds"
                                 value={member.id}
                                 defaultChecked={team.memberIds?.includes(member.id)}
+                                className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                               />
                               {member.name} {member.surname}
                             </label>
                           ))}
-                          <div className="flex gap-2">
+                          <div className="flex flex-wrap gap-2">
                             <button
                               type="submit"
                               className="rounded-2xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
@@ -1057,28 +1137,30 @@ const UserDashboard = () => {
                             <button
                               type="button"
                               onClick={() => setEditingTeamId(null)}
-                              className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700"
+                              className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                             >
                               Cancel
                             </button>
                           </div>
                         </form>
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => setEditingTeamId(team.id)}
-                          className="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-                        >
-                          Edit Team
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => setEditingTeamId(team.id)}
+                            className="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                          >
+                            Edit Team
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeTeam(team.id)}
+                            className="inline-flex items-center justify-center rounded-2xl border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-50"
+                          >
+                            Remove Team
+                          </button>
+                        </>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => removeTeam(team.id)}
-                        className="inline-flex items-center justify-center rounded-2xl border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-50"
-                      >
-                        Remove Team
-                      </button>
                     </div>
                   </div>
                 ))}
@@ -1087,7 +1169,7 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        <div className={`mt-8 bg-white rounded-lg shadow-sm border border-gray-200 ${activeTab !== "schedule" ? "hidden" : ""}`}>
+        <div className={`mt-8 bg-white rounded-3xl shadow-sm border border-gray-200 ${activeTab !== "schedule" ? "hidden" : ""}`}>
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -1116,7 +1198,7 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        <div className={`mt-8 bg-white rounded-lg shadow-sm border border-gray-200 ${activeTab !== "profile" ? "hidden" : ""}`}>
+        <div className={`mt-8 bg-white rounded-3xl shadow-sm border border-gray-200 ${activeTab !== "profile" ? "hidden" : ""}`}>
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -1154,7 +1236,7 @@ const UserDashboard = () => {
                 />
               </div>
 
-              <div className="rounded-3xl bg-slate-50 p-5 md:col-span-2">
+              <div className="rounded-3xl bg-slate-50 p-5">
                 <label htmlFor="profileEmail" className="block text-sm font-medium text-slate-600 mb-2">Email Address</label>
                 <input
                   id="profileEmail"
@@ -1164,6 +1246,60 @@ const UserDashboard = () => {
                   className="block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   required
                 />
+              </div>
+
+              <div className="rounded-3xl bg-slate-50 p-5">
+                <label htmlFor="profileFin" className="block text-sm font-medium text-slate-600 mb-2">
+                  FIN
+                  <span className="text-xs text-slate-500 ml-1" title="Personal Identification Number">ⓘ</span>
+                </label>
+                <input
+                  id="profileFin"
+                  type="text"
+                  value={profileFin}
+                  onChange={(event) => setProfileFin(event.target.value)}
+                  className="block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase"
+                  required
+                />
+              </div>
+
+              <div className="rounded-3xl bg-slate-50 p-5">
+                <label htmlFor="profileDateOfBirth" className="block text-sm font-medium text-slate-600 mb-2">Date of Birth</label>
+                <input
+                  id="profileDateOfBirth"
+                  type="text"
+                  value={profileDateOfBirth}
+                  onChange={(event) => setProfileDateOfBirth(formatDateOfBirthInput(event.target.value))}
+                  placeholder="dd/mm/yyyy"
+                  className="block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+
+              <div className="rounded-3xl bg-slate-50 p-5">
+                <label htmlFor="profilePhone" className="block text-sm font-medium text-slate-600 mb-2">Phone Number</label>
+                <input
+                  id="profilePhone"
+                  type="tel"
+                  value={profilePhone}
+                  onChange={(event) => setProfilePhone(event.target.value)}
+                  placeholder="e.g. +994501234567"
+                  className="block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+
+              <div className="rounded-3xl bg-slate-50 p-5 md:col-span-2">
+                <label htmlFor="profilePassword" className="block text-sm font-medium text-slate-600 mb-2">New Password</label>
+                <input
+                  id="profilePassword"
+                  type="password"
+                  value={profilePassword}
+                  onChange={(event) => setProfilePassword(event.target.value)}
+                  placeholder="Leave blank to keep existing password"
+                  className="block w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <p className="mt-2 text-sm text-slate-500">Provide a new password only if you want to update it.</p>
               </div>
 
               <div className="md:col-span-2">
@@ -1194,8 +1330,16 @@ const UserDashboard = () => {
                 <p className="mt-2 text-lg font-semibold text-slate-900">{mentor?.email}</p>
               </div>
               <div className="rounded-3xl bg-slate-50 p-5">
-                <p className="text-sm text-slate-500">Category focus</p>
-                <p className="mt-2 text-lg font-semibold text-slate-900">{teamCategory || "Not selected"}</p>
+                <p className="text-sm text-slate-500">Date of Birth</p>
+                <p className="mt-2 text-lg font-semibold text-slate-900">{mentor?.dateOfBirth || "Not set"}</p>
+              </div>
+              <div className="rounded-3xl bg-slate-50 p-5">
+                <p className="text-sm text-slate-500">FIN</p>
+                <p className="mt-2 text-lg font-semibold text-slate-900">{mentor?.fin || "Not set"}</p>
+              </div>
+              <div className="rounded-3xl bg-slate-50 p-5">
+                <p className="text-sm text-slate-500">Phone Number</p>
+                <p className="mt-2 text-lg font-semibold text-slate-900">{mentor?.phone || "Not set"}</p>
               </div>
               <div className="rounded-3xl bg-slate-50 p-5">
                 <p className="text-sm text-slate-500">Teams managed</p>

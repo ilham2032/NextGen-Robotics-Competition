@@ -1,20 +1,7 @@
-import { useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { getCurrentReferee } from '../../referee/auth'
+import { Link } from 'react-router-dom'
 import { getCategories, getTeams } from '../../admin/storage'
 
 const TeamDrone = () => {
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    const referee = getCurrentReferee()
-    if (referee) {
-      // If user is a referee, redirect to referee dashboard
-      navigate('/referee/dashboard')
-      return
-    }
-  }, [navigate])
-
   const categories = getCategories()
   const allTeams = getTeams()
 

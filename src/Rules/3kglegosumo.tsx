@@ -34,6 +34,7 @@ const LegoSumo3kg = () => {
       {/* Content */}
       <div className="mx-auto max-w-5xl px-6 py-16">
         
+
         {/* Table of Contents */}
         <nav className="mb-12 rounded-2xl bg-blue-50 p-6 border border-blue-100">
           <h2 className="text-xl font-bold text-blue-900 mb-4">Contents</h2>

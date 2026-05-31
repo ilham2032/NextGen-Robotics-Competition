@@ -72,7 +72,11 @@ const TeamsPage = ({ teams, matches, onDeleteTeam, onToggleCheckIn, onAssignMatc
                       </button>
                       <button
                         type='button'
-                        onClick={() => onDeleteTeam(team.id)}
+                        onClick={() => {
+                          if (window.confirm(`Delete team ${team.name}? This cannot be undone.`)) {
+                            onDeleteTeam(team.id)
+                          }
+                        }}
                         className='rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100'
                       >
                         Remove

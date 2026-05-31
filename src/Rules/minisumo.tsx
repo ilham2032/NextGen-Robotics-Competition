@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { resolvePublicUrl } from "../utils/publicAsset"
 
 const minisumo = () => {
   return (
@@ -18,7 +19,7 @@ const minisumo = () => {
             Mini Sumo
           </h1>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            Autonomous & RC robot sumo competition - Push your opponent out of the ring
+            Regulations for the 500g Mini Sumo category, covering autonomous and RC competition on a 77cm dohyo.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
@@ -27,6 +28,15 @@ const minisumo = () => {
             >
               ← Back to Regulations
             </Link>
+            <a
+              href={resolvePublicUrl("regs/mini-sumo.pdf")}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="rounded-lg bg-white px-6 py-3 text-blue-700 font-semibold hover:bg-slate-100 transition"
+            >
+              Download Mini Sumo PDF
+            </a>
           </div>
         </div>
       </section>
@@ -40,11 +50,11 @@ const minisumo = () => {
           <ol className="space-y-2 text-blue-700">
             <li><a href="#glossary" className="hover:text-blue-900">1. Glossary</a></li>
             <li><a href="#general-provisions" className="hover:text-blue-900">2. General Provisions</a></li>
-            <li><a href="#match-definition" className="hover:text-blue-900">3. Match Definition</a></li>
+            <li><a href="#match-definition" className="hover:text-blue-900">3. Match Structure</a></li>
             <li><a href="#dohyo-specs" className="hover:text-blue-900">4. Dohyo Specifications</a></li>
             <li><a href="#robot-specs" className="hover:text-blue-900">5. Robot Specifications</a></li>
             <li><a href="#movement-conditions" className="hover:text-blue-900">6. Movement Conditions</a></li>
-            <li><a href="#prohibited-matters" className="hover:text-blue-900">7. Prohibited Matters & Weapons</a></li>
+            <li><a href="#prohibited-matters" className="hover:text-blue-900">7. Prohibitions</a></li>
             <li><a href="#match-rules" className="hover:text-blue-900">8. Match Rules</a></li>
             <li><a href="#match-execution" className="hover:text-blue-900">9. Match Execution</a></li>
             <li><a href="#victory-conditions" className="hover:text-blue-900">10. Victory Conditions</a></li>
@@ -146,12 +156,12 @@ const minisumo = () => {
           </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
-              <p className='font-semibold'>1.1 Objective</p>
-              <p>This regulation defines the rules of a battle and regulations for the Mini Sumo category, ensuring fair and safe competition.</p>
+              <p className='font-semibold'>2.1 Objective</p>
+              <p>This regulation defines the competition format and technical requirements for Mini Sumo, ensuring safety, fairness, and consistent judging.</p>
             </div>
             <div>
-              <p className='font-semibold'>1.2 Autonomy Requirement</p>
-              <p>Robots must operate either as fully autonomous units or via radio control after match start, according to their specified type.</p>
+              <p className='font-semibold'>2.2 Autonomy Requirement</p>
+              <p>Robots may compete as either fully autonomous or radio-controlled units, but no external control is permitted once the match starts.</p>
             </div>
           </div>
         </section>
@@ -159,12 +169,12 @@ const minisumo = () => {
         {/* Section 3: Match Definition */}
         <section id="match-definition" className="mb-12">
           <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
-            3. Match Definition
+            3. Match Structure
           </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
-              <p className='font-semibold'>2.1 Match Format</p>
-              <p>In a match, both contestants compete for a Yuko Point using Radio-Control or Autonomous type robots in a Dohyo according to this regulation.</p>
+              <p className='font-semibold'>3.1 Match Format</p>
+              <p>Each match is contested between two robots in a standard dohyo. The objective is to score Yuko points by forcing the opponent outside the boundary or otherwise satisfying victory conditions.</p>
             </div>
           </div>
         </section>
@@ -205,28 +215,28 @@ const minisumo = () => {
           </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
-              <p className='font-semibold'>4.1 Dimensions</p>
-              <p>Maximum width and depth: 10 cm each. No height restrictions, provided stability is maintained.</p>
+              <p className='font-semibold'>5.1 Dimensions</p>
+              <p>Maximum width and depth: 10 cm each. Height is unrestricted provided the robot remains stable and safe.</p>
             </div>
             <div>
-              <p className='font-semibold'>4.2 Maximum Weight</p>
-              <p>500 g maximum (including accessories); PCS weight excluded for RC type.</p>
+              <p className='font-semibold'>5.2 Maximum Weight</p>
+              <p>Maximum weight is 500 g including all accessories; PCS weight is excluded for RC robots.</p>
             </div>
             <div>
-              <p className='font-semibold'>4.3 Radio Frequency</p>
-              <p>Narrow band waves of 2.4 GHz, 27 MHz or 40 MHz for RC-type robots.</p>
+              <p className='font-semibold'>5.3 Radio Frequency</p>
+              <p>Permitted frequencies for RC robots are 2.4 GHz, 27 MHz, or 40 MHz only.</p>
             </div>
             <div>
-              <p className='font-semibold'>4.4 Control System</p>
-              <p>Only one PCS allowed. Approved brands: Fujisoft Shin Rajikon System, Futaba, JR, Sanwa, Kondo Kagaku.</p>
+              <p className='font-semibold'>5.4 Control System</p>
+              <p>Only one PCS system is permitted. Approved systems include Fujisoft Shin Rajikon, Futaba, JR, Sanwa, and Kondo Kagaku.</p>
             </div>
             <div>
-              <p className='font-semibold'>4.5 Autonomous Control</p>
-              <p>Autonomous robots start with Judge Remote Control signal and stop via same signal or player remote.</p>
+              <p className='font-semibold'>5.5 Autonomous Control</p>
+              <p>Autonomous robots must begin after the judge signal and may be stopped only by judge control or the designated player remote.</p>
             </div>
             <div>
-              <p className='font-semibold'>4.6 Structural Requirements</p>
-              <p>Prohibited materials that can break into separate parts. Safety equipment like fuses required.</p>
+              <p className='font-semibold'>5.6 Structural Requirements</p>
+              <p>Robots must not include materials that can break into separate parts. Required safety components such as fuses must be installed.</p>
             </div>
           </div>
         </section>

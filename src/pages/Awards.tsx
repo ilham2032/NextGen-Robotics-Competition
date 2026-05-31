@@ -16,19 +16,19 @@ const Awards = () => {
         <div className='mt-8 grid gap-5 md:grid-cols-3'>
           <article className='rounded-2xl border border-yellow-200 bg-white p-6 shadow-sm'>
             <p className='text-sm font-semibold text-yellow-600 uppercase'>{t('1st Place Winner')}</p>
-            <h2 className='mt-2 text-4xl font-bold text-blue-900'>$500</h2>
+            <h2 className='mt-2 text-4xl font-bold text-blue-900'>---</h2>
             <p className='mt-2 text-sm text-slate-600'>{t('Awarded to the champion team in each category.')}</p>
           </article>
 
           <article className='rounded-2xl border border-slate-200 bg-white p-6 shadow-sm'>
             <p className='text-sm font-semibold text-slate-600 uppercase'>{t('2nd Place Winner')}</p>
-            <h2 className='mt-2 text-4xl font-bold text-blue-900'>$300</h2>
+            <h2 className='mt-2 text-4xl font-bold text-blue-900'>---</h2>
             <p className='mt-2 text-sm text-slate-600'>{t('Given to the runner-up team in each category.')}</p>
           </article>
 
           <article className='rounded-2xl border border-orange-200 bg-white p-6 shadow-sm'>
             <p className='text-sm font-semibold text-orange-600 uppercase'>{t('3rd Place Winner')}</p>
-            <h2 className='mt-2 text-4xl font-bold text-blue-900'>$200</h2>
+            <h2 className='mt-2 text-4xl font-bold text-blue-900'>---</h2>
             <p className='mt-2 text-sm text-slate-600'>{t('Presented to the third best team in each category.')}</p>
           </article>
         </div>

@@ -1,0 +1,126 @@
+62
+---About the competition
+src\pages\About.tsx:12
+---Acceptance of Terms
+src\pages\TermsOfService.tsx:13
+---At NextGen Robotics, students build autonomous systems that compete in dynamic arenas while developing technical skills, strategic thinking, and strong teamwork.
+src\pages\About.tsx:24
+---August 26-27 - Build, Battle, and Innovate
+src\pages\Home.tsx:64
+---Builds confidence in science, technology, and engineering skills.
+src\pages\About.tsx:32
+---Contact Information
+src\pages\TermsOfService.tsx:66
+---Contact the Partnership Team
+src\pages\PartnershipInquiries.tsx:41
+---Contact the team
+src\pages\About.tsx:90
+---Description of Service
+src\pages\TermsOfService.tsx:20
+---Empowering the next generation of engineers and innovators through robotics competition
+src\pages\Home.tsx:158
+---Event Starts In
+src\pages\Home.tsx:100
+---Experience
+src\pages\About.tsx:35
+---Explore different competition categories
+src\pages\Home.tsx:201
+---Finalize the partnership agreement
+src\pages\PartnershipInquiries.tsx:34
+---Find out how your organization can become an official partner or sponsor of the NextGen Robotics Competition.
+src\pages\PartnershipInquiries.tsx:13
+---For sponsorship or partnership inquiries, please contact our partnership team by email. We welcome interest from technology firms, educational institutions, foundations, and regional businesses seeking a strategic collaboration.
+src\pages\PartnershipInquiries.tsx:43
+---Governing Law
+src\pages\TermsOfService.tsx:59
+---High school and university teams
+src\pages\About.tsx:67
+---How can sponsors or volunteers contact the team?
+src\pages\FAQ.tsx:31
+---How to Become a Partner
+src\pages\PartnershipInquiries.tsx:19
+---Impact
+src\pages\About.tsx:31
+---Includes robotics, AI, and strategy categories
+src\pages\About.tsx:69
+---Information to include
+src\pages\PartnershipInquiries.tsx:53
+---Intellectual Property
+src\pages\TermsOfService.tsx:38
+---Join Now
+src\pages\Home.tsx:247
+---Limitation of Liability
+src\pages\TermsOfService.tsx:45
+---Location
+src\pages\About.tsx:83
+---NextGen Robotics Competition is a premier STEM event designed to inspire young innovators through immersive robotics challenges, expert mentorship, and industry collaboration.
+src\pages\About.tsx:17
+---Offers hands-on challenges, technical coaching, and real-time scoring.
+src\pages\About.tsx:36
+---Once your inquiry is received, we will follow up with a formal proposal, terms, and the agreement required to confirm the partnership.
+src\pages\PartnershipInquiries.tsx:35
+---Organization name and industry
+src\pages\PartnershipInquiries.tsx:55
+---Other Categories
+src\pages\Participants.tsx:43
+---Our mission
+src\pages\About.tsx:58
+---Our team is ready to help with registration, rule clarification, and sponsorship information.
+src\pages\About.tsx:76
+---Our team typically replies to partnership inquiries within 2 business days. If you need an urgent response, please include that note in your email subject line.
+src\pages\PartnershipInquiries.tsx:64
+---Partner with NextGen Robotics
+src\pages\PartnershipInquiries.tsx:71
+---Partnering with NextGen Robotics provides a valuable opportunity to support STEM development, increase brand visibility, and contribute to the growth of the robotics community.
+src\pages\PartnershipInquiries.tsx:72
+---Partnership
+src\pages\PartnershipInquiries.tsx:10
+---Please include your organization name, sponsorship interest, preferred level of engagement, and any questions regarding sponsor benefits and visibility.
+src\pages\PartnershipInquiries.tsx:27
+---Preferred focus areas, such as event support, prizes, workshops, or promotional visibility
+src\pages\PartnershipInquiries.tsx:57
+---Prepare your sponsorship inquiry
+src\pages\PartnershipInquiries.tsx:26
+---Primary contact name, role, and email address
+src\pages\PartnershipInquiries.tsx:58
+---Registered Teams
+src\pages\Participants.tsx:30
+---Response timeline
+src\pages\PartnershipInquiries.tsx:63
+---Review our sponsorship opportunities
+src\pages\PartnershipInquiries.tsx:22
+---Send your inquiry to the partnership team and we will provide details on available options, sponsorship recognition, and the next steps.
+src\pages\PartnershipInquiries.tsx:31
+---Sponsorship type or estimated support level
+src\pages\PartnershipInquiries.tsx:56
+---Start Up
+src\Components\Footer.tsx:10
+src\pages\Home.tsx:30
+---Students building robotics projects
+src\pages\About.tsx:43
+---Submit your inquiry by email
+src\pages\PartnershipInquiries.tsx:30
+---Team size: up to 4 members
+src\pages\About.tsx:68
+---Termination
+src\pages\TermsOfService.tsx:52
+---Terms of Service
+src\pages\TermsOfService.tsx:9
+---The event combines robotics, artificial intelligence, and engineering design into a professional competition experience that prepares participants for future STEM careers.
+src\pages\About.tsx:27
+---Through competition and collaboration, participants gain confidence, teamwork experience, and a stronger foundation to shape tomorrow\'s technology.
+src\pages\Home.tsx:189
+---To empower the next generation of innovators by creating educational opportunities that blend engineering, autonomy, and competitive teamwork.
+src\pages\About.tsx:60
+---Use the Contact page to reach organizers. You can also apply as a volunteer using the registration link provided there.
+src\pages\FAQ.tsx:32
+---User Responsibilities
+src\pages\TermsOfService.tsx:27
+---We host a competitive robotics event that emphasizes creativity, precision, and teamwork. Participants design, build, and test robots in a supportive, high-energy environment.
+src\pages\About.tsx:53
+---We offer structured partnership packages for companies, educational organizations, and community sponsors interested in supporting robotics education and competitive events.
+src\pages\PartnershipInquiries.tsx:23
+---What we do
+src\pages\About.tsx:51
+---Who can join
+src\pages\About.tsx:65

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { getCategories } from "../admin/storage"
 import type { Category } from "../admin/types"
 import { useTranslation } from 'react-i18next'
+import { resolvePublicUrl } from "../utils/publicAsset"
 
 const Regulations = () => {
   const { t } = useTranslation()
@@ -12,10 +13,48 @@ const Regulations = () => {
     setCategories(getCategories())
   }, [])
 
-  const primaryButton = " text-white rounded-lg px-3 py-2 text-sm font-semibold bg-blue-700 shadow-lg shadow-blue-700/30 transition hover:bg-blue-600"
-  const altButton = "rounded-lg border border-blue-700 bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-900"
+  const primaryButton = "rounded-lg bg-blue-700 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-700/30 transition hover:bg-blue-600"
+  const altButton = "rounded-lg border border-blue-700 bg-blue-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-600"
+
+  const categoryOrder = [
+    "Mega Sumo",
+    "Mini Sumo",
+    "Mini Sumo Kids",
+    "1kg Lego Sumo",
+    "3kg Lego Sumo",
+    "Line Follower",
+    "Lego Line",
+    "Start Up Senior",
+  ]
+
+  const fallbackPdfUrls: Record<string, string> = {
+    "Mega Sumo": "regs/mega-sumo.pdf",
+    "Mini Sumo": "regs/mini-sumo.pdf",
+    "Mini Sumo Kids": "regs/mini-sumo-kids.pdf",
+    "1kg Lego Sumo": "regs/1kg-lego-sumo.pdf",
+    "3kg Lego Sumo": "regs/3kg-lego-sumo.pdf",
+    "Line Follower": "regs/line-follower.pdf",
+    "Lego Line": "regs/lego-line.pdf",
+  }
+
+  const fallbackPdfNames: Record<string, string> = {
+    "Mega Sumo": "Mega Sumo Regulations",
+    "Mini Sumo": "Mini Sumo Regulations",
+    "Mini Sumo Kids": "Mini Sumo Kids Regulations",
+    "1kg Lego Sumo": "1kg Lego Sumo Regulations",
+    "3kg Lego Sumo": "3kg Lego Sumo Regulations",
+    "Line Follower": "Line Follower Regulations",
+    "Lego Line": "Lego Line Regulations",
+  }
 
   const categoryStyles: Record<string, { card: string; title: string; description: string; button: string; buttonAlt: string }> = {
+      "Mega Sumo": {
+      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
+      title: "text-2xl font-semibold text-slate-900",
+      description: "mt-2 text-sm text-slate-600",
+      button: primaryButton,
+      buttonAlt: altButton,
+    },
     "Mini Sumo": {
       card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
       title: "text-2xl font-semibold text-slate-900",
@@ -44,13 +83,6 @@ const Regulations = () => {
       button: primaryButton,
       buttonAlt: altButton,
     },
-    "Drone": {
-      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
-      title: "text-2xl font-semibold text-slate-900",
-      description: "mt-2 text-sm text-slate-600",
-      button: primaryButton,
-      buttonAlt: altButton,
-    },
     "1kg Lego Sumo": {
       card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
       title: "text-2xl font-semibold text-slate-900",
@@ -59,13 +91,6 @@ const Regulations = () => {
       buttonAlt: altButton,
     },
     "3kg Lego Sumo": {
-      card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
-      title: "text-2xl font-semibold text-slate-900",
-      description: "mt-2 text-sm text-slate-600",
-      button: primaryButton,
-      buttonAlt: altButton,
-    },
-    "Mega Sumo": {
       card: "rounded-2xl p-5 shadow-sm border border-slate-200 bg-white",
       title: "text-2xl font-semibold text-slate-900",
       description: "mt-2 text-sm text-slate-600",
@@ -81,6 +106,15 @@ const Regulations = () => {
     },
   }
 
+  const sortedCategories = [...categories].sort((a, b) => {
+    const aIndex = categoryOrder.indexOf(a.name)
+    const bIndex = categoryOrder.indexOf(b.name)
+    if (aIndex === -1 && bIndex === -1) return 0
+    if (aIndex === -1) return 1
+    if (bIndex === -1) return -1
+    return aIndex - bIndex
+  })
+
   return (
     <section className="min-h-screen bg-slate-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
       <div className="mx-auto max-w-5xl">
@@ -93,18 +127,15 @@ const Regulations = () => {
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category) => {
+          {sortedCategories.map((category) => {
             const routeMap: Record<string, string> = {
               "Mini Sumo": "/regulations/mini-sumo",
               "Mini Sumo Kids": "/regulations/mini-sumo-kids",
               "Mega Sumo": "/regulations/mega-sumo",
               "Lego Line": "/regulations/lego-line",
               "Line Follower": "/regulations/line-follower",
-              "Drone": "/regulations/drone-race",
               "1kg Lego Sumo": "/regulations/lego-sumo",
               "3kg Lego Sumo": "/regulations/lego-sumo-3kg",
-              "Combat Robot": "/regulations/bots-combat",
-              "Start Up Junior": "/regulations/start-up-junior",
               "Start Up Senior": "/regulations/start-up-senior",
             }
 
@@ -117,14 +148,16 @@ const Regulations = () => {
                 <h2 className={style.title}>{category.name}</h2>
                 <p className={style.description}>{category.description}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <Link to={categoryPath} className={style.button}>
+                    <Link to={categoryPath} className={`${style.button} text-white`}>
                     View
                   </Link>
 
-                  {category.pdfDataUrl ? (
+                  {(fallbackPdfUrls[category.name] || category.pdfDataUrl) ? (
                     <a
-                      href={category.pdfDataUrl}
-                      download={category.pdfName}
+                      href={resolvePublicUrl(fallbackPdfUrls[category.name] || category.pdfDataUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download={fallbackPdfNames[category.name] || category.pdfName}
                       className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 transition hover:shadow-md"
                     >
                       Download PDF

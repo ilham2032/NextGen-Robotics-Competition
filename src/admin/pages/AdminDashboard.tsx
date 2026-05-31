@@ -9,6 +9,7 @@ import ProfilePage from "./ProfilePage"
 import TeamsPage from "./TeamsPage"
 import UsersPage from "./UsersPage"
 import CategoryPage from "./CategoryPage"
+import RefereesPage from "./RefereesPage"
 import AboutEventPage from "./AboutEventPage"
 
 const defaultScoringRules: ScoringRule[] = []
@@ -32,6 +33,7 @@ const navItems = [
   { id: "users", title: "Users" },
   { id: "teams", title: "Teams" },
   { id: "category", title: "Category" },
+  { id: "referees", title: "Referees" },
   { id: "schedule", title: "Schedule" },
   { id: "profile", title: "Profile" },
   { id: "about-event", title: "About Event" },
@@ -388,7 +390,7 @@ const AdminDashboard = () => {
           )}
 
           {activePage === "users" && (
-            <UsersPage mentors={mentors} members={members} onMentorsChange={setMentors} />
+            <UsersPage mentors={mentors} members={members} onMentorsChange={setMentors} onMembersChange={setMembers} />
           )}
 
           {activePage === "teams" && (
@@ -402,6 +404,8 @@ const AdminDashboard = () => {
           )}
 
           {activePage === "category" && <CategoryPage onNotify={notify} />}
+
+          {activePage === "referees" && <RefereesPage onNotify={notify} />}
 
           {activePage === "schedule" && (
             <MatchesPage

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { resolvePublicUrl } from "../utils/publicAsset"
 
 const minisumokids = () => {
   return (
@@ -18,7 +19,7 @@ const minisumokids = () => {
             Mini Sumo Kids
           </h1>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            Junior sumo robotics competition - Designed for young participants aged 8-12
+            Junior regulation summary for young competitors, balancing safety with robot performance in a scaled Mini Sumo format.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
@@ -27,6 +28,15 @@ const minisumokids = () => {
             >
               ← Back to Regulations
             </Link>
+            <a
+              href={resolvePublicUrl("regs/mini-sumo-kids.pdf")}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="rounded-lg bg-white px-6 py-3 text-blue-700 font-semibold hover:bg-slate-100 transition"
+            >
+              Download Mini Sumo Kids PDF
+            </a>
           </div>
         </div>
       </section>
@@ -40,17 +50,17 @@ const minisumokids = () => {
           <ol className="space-y-2 text-blue-700">
             <li><a href="#glossary" className="hover:text-blue-900">1. Glossary of Terms</a></li>
             <li><a href="#general-provisions" className="hover:text-blue-900">2. General Provisions</a></li>
-            <li><a href="#match-definition" className="hover:text-blue-900">3. Match Definition</a></li>
+            <li><a href="#match-definition" className="hover:text-blue-900">3. Match Structure</a></li>
             <li><a href="#dohyo-specs" className="hover:text-blue-900">4. Dohyo Specifications</a></li>
             <li><a href="#robot-specs" className="hover:text-blue-900">5. Robot Specifications</a></li>
             <li><a href="#movement-conditions" className="hover:text-blue-900">6. Movement Conditions</a></li>
             <li><a href="#prohibited-matters" className="hover:text-blue-900">7. Prohibited Matters</a></li>
             <li><a href="#battle-rules" className="hover:text-blue-900">8. Battle Rules</a></li>
             <li><a href="#match-execution" className="hover:text-blue-900">9. Match Execution</a></li>
-            <li><a href="#yuko-points" className="hover:text-blue-900">10. Yuko Point, Shinitai and Yusei</a></li>
-            <li><a href="#penalties" className="hover:text-blue-900">11. Hansoku and Keikoku</a></li>
-            <li><a href="#disqualification" className="hover:text-blue-900">12. Hansoku-make, Shikkaku</a></li>
-            <li><a href="#appendix" className="hover:text-blue-900">13. Appendix: Notes and Cases</a></li>
+            <li><a href="#yuko-points" className="hover:text-blue-900">10. Yuko Points</a></li>
+            <li><a href="#penalties" className="hover:text-blue-900">11. Penalties</a></li>
+            <li><a href="#disqualification" className="hover:text-blue-900">12. Disqualification</a></li>
+            <li><a href="#appendix" className="hover:text-blue-900">13. Appendix</a></li>
           </ol>
         </nav>
 
@@ -146,8 +156,12 @@ const minisumokids = () => {
           </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
-              <p className='font-semibold'>Objective</p>
-              <p>This regulation defines the rules of a battle and regulations for the Mini Sumo category.</p>
+              <p className='font-semibold'>2.1 Objective</p>
+              <p>These regulations define the structure and technical requirements for Mini Sumo Kids to ensure a fair, safe, and engaging youth competition.</p>
+            </div>
+            <div>
+              <p className='font-semibold'>2.2 Age Group</p>
+              <p>This category is intended for participants aged 8–12. Teams should ensure robots are safe for junior operators and spectators.</p>
             </div>
           </div>
         </section>
@@ -258,12 +272,22 @@ const minisumokids = () => {
             7. Prohibited Matters
           </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
-            <p>No disturbing wave generators, lasers, flash, infrared.</p>
-            <p>No components scratching Dohyo surface.</p>
-            <p>No spraying devices.</p>
-            <p>No ignition devices.</p>
-            <p>No shooting/throwing devices.</p>
-            <p>No fixing devices like suckers or glue.</p>
+            <div>
+              <p className='font-semibold'>7.1 Restricted Devices</p>
+              <p>The following are prohibited: disturbing wave generators, lasers, rapid-flash devices, and infrared emitters.</p>
+            </div>
+            <div>
+              <p className='font-semibold'>7.2 Arena Safety</p>
+              <p>Robots must not scratch or damage the dohyo surface. All contact surfaces must be smooth.</p>
+            </div>
+            <div>
+              <p className='font-semibold'>7.3 Prohibited Offensive Systems</p>
+              <p>No spraying, ignition, shooting, throwing, or entanglement mechanisms are allowed.</p>
+            </div>
+            <div>
+              <p className='font-semibold'>7.4 Adhesives and Suction</p>
+              <p>Adhesive devices, vacuum suckers or glue-based traction systems are prohibited.</p>
+            </div>
           </div>
         </section>
 
@@ -273,9 +297,18 @@ const minisumokids = () => {
             8. Battle Rules
           </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
-            <p>Battle time: 3 matches within 3 minutes. Winner gets 2 Yuko points.</p>
-            <p>If tie, decided by Yusei. Extension if needed.</p>
-            <p>No maintenance during battle except allowed setups.</p>
+            <div>
+              <p className='font-semibold'>8.1 Match Duration</p>
+              <p>Each contest consists of up to 3 rounds. Victory is awarded to the first robot to score two Yuko points.</p>
+            </div>
+            <div>
+              <p className='font-semibold'>8.2 Tie Resolution</p>
+              <p>If the contest is tied after three rounds, judges decide the winner based on Yusei criteria or order an extension round.</p>
+            </div>
+            <div>
+              <p className='font-semibold'>8.3 Maintenance</p>
+              <p>No maintenance is allowed during an active contest, except for approved setup or repair interventions between rounds.</p>
+            </div>
           </div>
         </section>
 
@@ -362,15 +395,14 @@ const minisumokids = () => {
         {/* Section 13: Appendix: Notes and Cases */}
         <section id="appendix" className="mb-12">
           <h2 className="font-display text-3xl font-bold text-slate-900 mb-6 pb-3 border-b-2 border-blue-500">
-            13. Appendix: Notes and Cases
+            13. Appendix
           </h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
-            <p>Adapted notes for Mini Sumo: Similar to Mega Sumo but scaled for 500g robots and 77cm arena.</p>
-            <p>Inspection box: 105x105mm for 10cm robots.</p>
-            <p>Blade rules: Same as Mega Sumo, no breaking into parts.</p>
-            <p>Maintenance: Limited to cleaning, verification, minor fixes.</p>
-            <p>Yuko Point: First to touch outside loses.</p>
-            <p>Assistant cannot become operator if injured.</p>
+            <p>These notes adapt the Mini Sumo rules for junior participants, preserving the same technical structure as the broader Mega Sumo standards.</p>
+            <p>The inspection box for Mini Sumo Kids is 105×105 mm for robots measuring 10 cm on each side.</p>
+            <p>Robots must comply with blade and fragmentation safety rules; any part that separates during a match is not permitted.</p>
+            <p>Maintenance between rounds is limited to cleaning, verification, and minor adjustments approved by referees.</p>
+            <p>A robot touching the outside boundary first may result in a Yuko point for the opponent under the governing rules.</p>
           </div>
         </section>
 

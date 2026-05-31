@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 
-const repositoryBase = '/NextGen-Robotics-Competition/'
+const repositoryBase = process.env.VITE_BASE_PATH || '/NextGen-Robotics-Competition/'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({

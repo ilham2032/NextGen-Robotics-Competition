@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { resolvePublicUrl } from "../utils/publicAsset"
 
 const megasumo = () => {
   return (
@@ -18,7 +19,7 @@ const megasumo = () => {
             Mega Sumo
           </h1>
           <p className="text-xl text-purple-100 max-w-2xl mx-auto">
-            Advanced autonomous robot sumo competition - Large-scale engineering and intelligent design
+            Advanced autonomous robot sumo regulations for high-performance engineering and intelligent match strategy.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
@@ -27,6 +28,15 @@ const megasumo = () => {
             >
               ← Back to Regulations
             </Link>
+            <a
+              href={resolvePublicUrl("regs/mega-sumo.pdf")}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="rounded-lg bg-white px-6 py-3 text-blue-700 font-semibold hover:bg-slate-100 transition"
+            >
+              Download Full Mega Sumo Regulations
+            </a>
           </div>
         </div>
       </section>
@@ -79,7 +89,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 2: Robot Specifications */}
-        <section className='mb-12'>
+        <section id='robot-specs' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>2. ROBOT SPECIFICATIONS</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
@@ -106,7 +116,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 3: Materials and Construction */}
-        <section className='mb-12'>
+        <section id='materials-construction' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>3. MATERIALS AND CONSTRUCTION</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
@@ -133,7 +143,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 4: Power and Electronics */}
-        <section className='mb-12'>
+        <section id='power-electronics' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>4. POWER AND ELECTRONICS</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
@@ -160,7 +170,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 5: Sensors and AI */}
-        <section className='mb-12'>
+        <section id='sensors-ai' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>5. SENSORS AND AI</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
@@ -183,7 +193,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 6: Dohyo Specifications */}
-        <section className='mb-12'>
+        <section id='dohyo-specs' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>6. DOHYO SPECIFICATIONS</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
@@ -210,7 +220,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 7: Match Rules */}
-        <section className='mb-12'>
+        <section id='match-rules' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>7. MATCH RULES</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
@@ -237,7 +247,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 8: Victory Conditions */}
-        <section className='mb-12'>
+        <section id='victory-conditions' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>8. VICTORY CONDITIONS</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
@@ -260,8 +270,8 @@ const megasumo = () => {
         </section>
 
         {/* Section 9: Scoring Criteria */}
-        <section className='mb-12'>
-          <h2 className='text-3xl font-bold text-slate-900 mb-6'>9. SCORING CRITERIA (FOR JUDGES IF NEEDED)</h2>
+        <section id='scoring-criteria' className='mb-12'>
+          <h2 className='text-3xl font-bold text-slate-900 mb-6'>9. SCORING CRITERIA</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
               <p className='font-semibold'>9.1 Aggression Scoring</p>
@@ -279,7 +289,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 10: Prohibited Weapons and Actions */}
-        <section className='mb-12'>
+        <section id='prohibited-weapons' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>10. PROHIBITED WEAPONS AND ACTIONS</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
@@ -310,7 +320,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 11: Safety and Inspection */}
-        <section className='mb-12'>
+        <section id='safety-inspection' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>11. SAFETY AND INSPECTION</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
@@ -333,7 +343,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 12: Penalties */}
-        <section className='mb-12'>
+        <section id='penalties' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>12. PENALTIES</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
@@ -356,7 +366,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 13: Edge Case Rules */}
-        <section className='mb-12'>
+        <section id='edge-cases' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>13. EDGE CASE RULES</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
@@ -379,7 +389,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 14: Team Responsibilities */}
-        <section className='mb-12'>
+        <section id='team-responsibilities' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>14. TEAM RESPONSIBILITIES</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
@@ -398,7 +408,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 15: Referee Authority */}
-        <section className='mb-12'>
+        <section id='referee-authority' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>15. REFEREE AUTHORITY</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>
@@ -417,7 +427,7 @@ const megasumo = () => {
         </section>
 
         {/* Section 16: Document Standards */}
-        <section className='mb-12'>
+        <section id='regulatory-standards' className='mb-12'>
           <h2 className='text-3xl font-bold text-slate-900 mb-6'>16. REGULATORY DOCUMENT STANDARDS</h2>
           <div className='space-y-4 text-slate-700 leading-relaxed'>
             <div>

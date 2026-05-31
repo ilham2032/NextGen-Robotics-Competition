@@ -53,7 +53,7 @@ const Participants = () => {
           <p className="text-xs font-semibold tracking-[0.25em] text-blue-100 uppercase">{t("Competition Overview")}</p>
           <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">{t("Participants")}</h1>
           <p className="mt-3 max-w-2xl text-sm text-blue-100 sm:text-base">
-            {t("Explore registered teams by category and see the growing international robotics community joining NextGen.")}
+            {t("Explore registered teams by category and see the growing international robotics community joining NextGen Robotics Competition.")}
           </p>
         </div>
 

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { resolvePublicUrl } from "../utils/publicAsset"
 
 const LegoSumo = () => {
   return (
@@ -27,6 +28,15 @@ const LegoSumo = () => {
             >
               ← Back to Regulations
             </Link>
+            <a
+              href={resolvePublicUrl("regs/1kg-lego-sumo.pdf")}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="rounded-lg bg-white px-6 py-3 text-blue-700 font-semibold hover:bg-slate-100 transition"
+            >
+              Download 1kg Lego Sumo PDF
+            </a>
           </div>
         </div>
       </section>
@@ -107,7 +117,7 @@ const LegoSumo = () => {
                 </tr>
                 <tr className="border-b border-slate-200">
                   <td className="p-4 font-semibold text-slate-700">Power Supply</td>
-                  <td className="p-4 text-slate-600">LEGO battery pack or AA batteries (max 9V)</td>
+                  <td className="p-4 text-slate-600">LEGO battery pack or AA batteries</td>
                 </tr>
                 <tr className="bg-slate-50">
                   <td className="p-4 font-semibold text-slate-700">Drive System</td>

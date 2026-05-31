@@ -5,7 +5,7 @@ import { signInMentor, signUpMentor } from "../auth"
 import { formatDateOfBirthInput, isValidDateOfBirth } from "../validation"
 
 const inputClassName =
-  "w-full rounded-[20px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+  "w-full rounded-[20px] border border-blue-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-200"
 
 const UserAuth = () => {
   const navigate = useNavigate()
@@ -75,32 +75,32 @@ const UserAuth = () => {
   }
 
   return (
-    <section className="min-h-screen bg-slate-950 text-white px-4 py-12 sm:px-6 sm:py-20">
-      <div className="mx-auto max-w-2xl rounded-[32px] bg-white p-8 shadow-2xl shadow-slate-950/10 border border-slate-200/80 text-slate-900 sm:p-10">
+    <section className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-sky-900 px-4 py-12 sm:px-6 sm:py-20">
+      <div className="mx-auto max-w-2xl rounded-[32px] bg-white/95 p-8 shadow-2xl shadow-slate-950/20 border border-white/80 text-slate-900 sm:p-10">
         <div className="mb-8 text-center">
-          <p className="text-sm font-semibold tracking-widest text-sky-600 uppercase">Mentor portal</p>
+          <p className="text-sm font-semibold tracking-[0.35em] text-blue-700 uppercase">NextGen Robotics</p>
           <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-            {mode === "signup" ? "Sign up" : "Log in"}
+            {mode === "signup" ? "Mentor Sign Up" : "Mentor Log In"}
           </h1>
-          <p className="mt-3 text-sm text-slate-600">
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-600">
             {mode === "signup"
-              ? "Create your mentor account, then continue to your dashboard."
-              : "Sign in with the email and password you used when registering."}
+              ? "Join the NextGen Robotics Competition mentor portal to register your team and access the competition dashboard."
+              : "Enter your mentor credentials to continue managing your team and submitting registration details."}
           </p>
         </div>
 
-        <div className="mb-6 grid grid-cols-2 gap-2 rounded-full bg-slate-100 p-1 text-sm">
+        <div className="mb-6 grid grid-cols-2 gap-2 rounded-full bg-blue-100/50 p-1 text-sm shadow-inner shadow-sky-900/5">
           <button
             type="button"
             onClick={() => switchMode("signup")}
-            className={`rounded-full px-4 py-2.5 font-medium transition ${mode === "signup" ? "bg-slate-900 text-white shadow" : "text-slate-600 hover:bg-slate-200"}`}
+            className={`rounded-full px-4 py-2.5 font-medium transition ${mode === "signup" ? "bg-blue-950 text-white shadow-lg shadow-blue-500/20" : "text-slate-700 hover:bg-white hover:text-slate-900"}`}
           >
             Sign up
           </button>
           <button
             type="button"
             onClick={() => switchMode("login")}
-            className={`rounded-full px-4 py-2.5 font-medium transition ${mode === "login" ? "bg-slate-900 text-white shadow" : "text-slate-600 hover:bg-slate-200"}`}
+            className={`rounded-full px-4 py-2.5 font-medium transition ${mode === "login" ? "bg-blue-950 text-white shadow-lg shadow-blue-500/20" : "text-slate-700 hover:bg-white hover:text-slate-900"}`}
           >
             Log in
           </button>
@@ -216,9 +216,16 @@ const UserAuth = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+            className="w-full rounded-2xl bg-blue-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {loading ? "Please wait..." : mode === "signup" ? "Register and continue" : "Log in"}
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="mt-4 w-full rounded-2xl border border-blue-200 bg-white px-4 py-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
+          >
+            Return to main page
           </button>
         </form>
       </div>

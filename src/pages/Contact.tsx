@@ -22,7 +22,7 @@ const Contact = () => {
             <div className="space-y-5">
               <div>
                 <p className="text-xs font-semibold text-slate-500 uppercase mb-1">{t('Email')}</p>
-                <a href="mailto:nextgenazer@gmail.com" className="text-base font-semibold text-blue-600 hover:text-blue-700">nextgenaze@gmail.com</a>
+                <a href="mailto:nextgenazer@gmail.com" className="text-base font-semibold text-blue-600 hover:text-blue-700">nextgenazer@gmail.com</a>
               </div>
 
               <div>

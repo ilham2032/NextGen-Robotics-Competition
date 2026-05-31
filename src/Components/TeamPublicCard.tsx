@@ -15,7 +15,7 @@ const TeamPublicCard = ({ team, className = "" }: TeamPublicCardProps) => {
     <article
       className={`flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 shadow-sm transition-shadow hover:shadow-md ${className}`}
     >
-      <div className="min-w-0 space-y-1 text-sm sm:text-base">
+      <div className="min-w-0 space-y-3 text-sm sm:text-base">
         <p className="text-slate-700">
           <span>Team: </span>
           <span className="font-bold text-slate-900">{team.name}</span>

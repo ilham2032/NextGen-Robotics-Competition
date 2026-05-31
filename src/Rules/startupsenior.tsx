@@ -54,7 +54,7 @@ const StartupSenior = () => {
             2. Team and Project Requirements
           </h2>
           <ul className="list-disc space-y-2 pl-6 text-slate-700">
-            <li>Team size: 2-6 participants.</li>
+            <li>Team size: Max 4 participants.</li>
             <li>One active mentor/advisor per team is allowed.</li>
             <li>Solution must include robotics hardware and control/software logic.</li>
             <li>Project should target real deployment potential.</li>

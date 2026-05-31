@@ -32,6 +32,9 @@ jobs:
 
       - name: Build for GitHub Pages
         run: npm run build
+        env:
+          # Must match your repository name (see package.json homepage and vite.config.ts base)
+          VITE_BASE_PATH: /NextGen-Robotics-Competition/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

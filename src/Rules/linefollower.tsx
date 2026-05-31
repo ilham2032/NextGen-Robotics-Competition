@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { resolvePublicUrl } from "../utils/publicAsset"
 
 const LineFollower = () => {
   return (
@@ -28,7 +29,7 @@ const LineFollower = () => {
               ← Back to Regulations
             </Link>
             <a
-              href="/regs/line-follower.pdf"
+              href={resolvePublicUrl("regs/line-follower.pdf")}
               target="_blank"
               rel="noopener noreferrer"
               download

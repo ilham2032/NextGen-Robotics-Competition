@@ -1,11 +1,17 @@
 import { Link } from 'react-router-dom'
-import { getCategories, getTeams } from '../admin/storage'
+import { getCategories, getTeams, getMatchResults } from '../admin/storage'
 
 const Teamszone = () => {
   const categories = getCategories()
   const teams = getTeams()
+  const matchResults = getMatchResults()
+  const totalBattles = matchResults.length
 
-  const categoryStats = categories.map(category => {
+  const filteredCategories = categories.filter(
+    (category) => !['Drone', 'Combat Robot', 'Start Up Junior'].includes(category.name),
+  )
+
+  const categoryStats = filteredCategories.map(category => {
     const categoryTeams = teams.filter(team => team.categoryName?.trim() === category.name)
     return {
       ...category,
@@ -23,8 +29,8 @@ const Teamszone = () => {
             TEAMS ZONE
           </h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Referee operations area for reviewing category participation and team statistics.
-            Competition joining and team creation are handled through the mentor portal.
+            Browse registered teams by category, follow robot battles, and see live standings and winners.
+            Team registration is handled through the mentor portal.
           </p>
         </div>
 
@@ -45,10 +51,8 @@ const Teamszone = () => {
             <div className="text-sm text-slate-600 font-medium">Categories</div>
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-blue-100 p-6 text-center">
-            <div className="text-3xl font-bold text-blue-600 mb-1">
-              {new Set(teams.map(t => t.school).filter(Boolean)).size}
-            </div>
-            <div className="text-sm text-slate-600 font-medium">Countries</div>
+            <div className="text-3xl font-bold text-blue-600 mb-1">{totalBattles}</div>
+            <div className="text-sm text-slate-600 font-medium">Battles Played</div>
           </div>
         </div>
 
@@ -64,9 +68,8 @@ const Teamszone = () => {
                 '3kg Lego Sumo': '/teamszone/3kg-lego-sumo',
                 'Line Follower': '/teamszone/line-follower',
                 'Lego Line': '/teamszone/lego-line',
-                'Drone': '/teamszone/drone',
-                'Mini Sumo Kids': '/teamszone/start-up-junior',
-                'Combat Robot': '/teamszone/start-up-senior'
+                'Mini Sumo Kids': '/teamszone/mini-sumo-kids',
+                'Mega Sumo': '/teamszone/mega-sumo',
               }
 
               const routePath = routeMap[category.name] || `/teamszone/${category.name.toLowerCase().replace(/\s+/g, '-')}`
@@ -99,20 +102,38 @@ const Teamszone = () => {
         </div>
 
         {/* Portal Guidance */}
-        <div className="text-center bg-white rounded-xl shadow-sm border border-blue-100 p-8">
-          <h3 className="text-xl font-semibold text-slate-800 mb-3">Team Registration is in Mentor Portal</h3>
-          <p className="text-slate-600 mb-6 max-w-md mx-auto">
-            Participants and mentors should create teams from the mentor account page, not from Teams Zone.
-          </p>
-          <Link
-            to="/user/auth"
-            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
-          >
-            Open Mentor Portal
-            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </Link>
+        <div className="grid gap-6 md:grid-cols-2 mb-8">
+          <div className="text-center bg-white rounded-xl shadow-sm border border-blue-100 p-8">
+            <h3 className="text-xl font-semibold text-slate-800 mb-3">Team Registration</h3>
+            <p className="text-slate-600 mb-6 max-w-md mx-auto">
+              Participants and mentors create teams from the mentor account page.
+            </p>
+            <Link
+              to="/user/auth"
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
+            >
+              Open Mentor Portal
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+
+          <div className="text-center bg-white rounded-xl shadow-sm border border-blue-100 p-8">
+            <h3 className="text-xl font-semibold text-slate-800 mb-3">Referee Portal</h3>
+            <p className="text-slate-600 mb-6 max-w-md mx-auto">
+              Category referees sign in to record battles, enter points, and announce winners.
+            </p>
+            <Link
+              to="/teamszone/referee"
+              className="inline-flex items-center px-6 py-3 bg-slate-800 text-white font-medium rounded-lg hover:bg-slate-700 transition-colors duration-200"
+            >
+              Referee Login
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
     </section>
