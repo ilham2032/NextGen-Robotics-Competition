@@ -23,14 +23,18 @@ const defaultCategories: Category[] = [
     pdfName: "Mini Sumo Regulations",
     pdfDataUrl: "regs/mini-sumo.pdf",
     maxMembers: 3,
+    ageMin: 18,
+    ageMax: 30,
   },
   {
-    id: "cat-2", 
+    id: "cat-2",
     name: "Mini Sumo Kids",
     description: "Mini Sumo competition designed for younger participants.",
     pdfName: "Mini Sumo Kids Regulations",
     pdfDataUrl: "regs/mini-sumo-kids.pdf",
     maxMembers: 3,
+    ageMin: 13,
+    ageMax: 17,
   },
   {
     id: "cat-3",
@@ -39,6 +43,8 @@ const defaultCategories: Category[] = [
     pdfName: "Mega Sumo Regulations",
     pdfDataUrl: "regs/mega-sumo.pdf",
     maxMembers: 2,
+    ageMin: 18,
+    ageMax: 30,
   },
   {
     id: "cat-4",
@@ -47,6 +53,8 @@ const defaultCategories: Category[] = [
     pdfName: "Lego Line Regulations",
     pdfDataUrl: "regs/lego-line.pdf",
     maxMembers: 3,
+    ageMin: 8,
+    ageMax: 12,
   },
   {
     id: "cat-5",
@@ -55,6 +63,8 @@ const defaultCategories: Category[] = [
     pdfName: "Line Follower Regulations",
     pdfDataUrl: "regs/line-follower.pdf",
     maxMembers: 3,
+    ageMin: 13,
+    ageMax: 18,
   },
   {
     id: "cat-6",
@@ -63,6 +73,8 @@ const defaultCategories: Category[] = [
     pdfName: "1kg Lego Sumo Regulations",
     pdfDataUrl: "regs/1kg-lego-sumo.pdf",
     maxMembers: 3,
+    ageMin: 8,
+    ageMax: 12,
   },
   {
     id: "cat-7",
@@ -71,6 +83,8 @@ const defaultCategories: Category[] = [
     pdfName: "3kg Lego Sumo Regulations",
     pdfDataUrl: "regs/3kg-lego-sumo.pdf",
     maxMembers: 3,
+    ageMin: 8,
+    ageMax: 12,
   },
   {
     id: "cat-8",
@@ -79,6 +93,8 @@ const defaultCategories: Category[] = [
     pdfName: "",
     pdfDataUrl: "",
     maxMembers: 3,
+    ageMin: 18,
+    ageMax: 25,
   },
 ]
 
@@ -106,6 +122,74 @@ export const saveTeams = (teams: Team[]): void => {
   localStorage.setItem(TEAM_STORAGE_KEY, JSON.stringify(teams))
 }
 
+const hasSupabase = Boolean(
+  typeof import.meta !== "undefined" &&
+    import.meta.env?.VITE_SUPABASE_URL &&
+    import.meta.env?.VITE_SUPABASE_ANON_KEY,
+)
+
+const REMOTE_API_URL = typeof import.meta !== 'undefined' ? (import.meta.env?.VITE_REMOTE_API_URL as string) || '' : ''
+
+// Try Supabase first (if present), then fallback to optional remote API, then localStorage
+export const fetchRemoteTeams = async (): Promise<Team[] | null> => {
+  try {
+    if (hasSupabase) {
+      // dynamic import to avoid static dependency when package missing
+      const { getTeamsFromSupabase } = await import('../lib/supabaseClient')
+      const teams = await getTeamsFromSupabase()
+      if (teams) return teams
+    }
+  } catch {
+    // ignore and fallback
+  }
+
+  if (REMOTE_API_URL) {
+    try {
+      const res = await fetch(`${REMOTE_API_URL.replace(/\/$/, '')}/api/teams`)
+      if (!res.ok) return null
+      const data = await res.json()
+      if (Array.isArray(data)) return data as Team[]
+    } catch {
+      // ignore
+    }
+  }
+
+  return null
+}
+
+export const pushTeamsToRemote = async (teams: Team[]): Promise<boolean> => {
+  try {
+    if (hasSupabase) {
+      const { pushTeamsToSupabase } = await import('../lib/supabaseClient')
+      const ok = await pushTeamsToSupabase(teams)
+      if (ok) return true
+    }
+  } catch {
+    // ignore and fallback
+  }
+
+  if (REMOTE_API_URL) {
+    try {
+      await fetch(`${REMOTE_API_URL.replace(/\/$/, '')}/api/teams/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(teams),
+      })
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  return false
+}
+
+// Backwards-compatible: save locally and attempt background sync when configured
+export const saveTeamsAndSync = (teams: Team[]): void => {
+  saveTeams(teams)
+  void pushTeamsToRemote(teams)
+}
+
 export const getCategories = (): Category[] => {
   const stored = parseStoredList<Category>(localStorage.getItem(CATEGORY_STORAGE_KEY))
   if (stored && stored.length > 0) {
@@ -123,6 +207,12 @@ export const getCategories = (): Category[] => {
       if (def) {
         if (def.maxMembers !== undefined && updatedCat.maxMembers === undefined) {
           updatedCat = { ...updatedCat, maxMembers: def.maxMembers }
+        }
+        if (def.ageMin !== undefined) {
+          updatedCat = { ...updatedCat, ageMin: def.ageMin }
+        }
+        if (def.ageMax !== undefined) {
+          updatedCat = { ...updatedCat, ageMax: def.ageMax }
         }
 
         if ((!updatedCat.pdfName || updatedCat.pdfName.trim() === "") && def.pdfName) {
@@ -229,10 +319,60 @@ export const saveMatchResults = (results: MatchResult[]): void => {
   localStorage.setItem(MATCH_RESULTS_KEY, JSON.stringify(results))
 }
 
+export const fetchRemoteMatchResults = async (): Promise<MatchResult[] | null> => {
+  if (!hasSupabase) return null
+  try {
+    const { getMatchResultsFromSupabase } = await import("../lib/supabaseClient")
+    return await getMatchResultsFromSupabase()
+  } catch {
+    return null
+  }
+}
+
+export const pushMatchResultsToRemote = async (results: MatchResult[]): Promise<boolean> => {
+  if (!hasSupabase) return false
+  try {
+    const { pushMatchResultsToSupabase } = await import("../lib/supabaseClient")
+    return await pushMatchResultsToSupabase(results)
+  } catch {
+    return false
+  }
+}
+
+export const saveMatchResultsAndSync = (results: MatchResult[]): void => {
+  saveMatchResults(results)
+  void pushMatchResultsToRemote(results)
+}
+
 export const getCompetitionResults = (): CompetitionResult[] => parseStoredList<CompetitionResult>(localStorage.getItem(COMPETITION_RESULTS_KEY)) ?? []
 
 export const saveCompetitionResults = (results: CompetitionResult[]): void => {
   localStorage.setItem(COMPETITION_RESULTS_KEY, JSON.stringify(results))
+}
+
+export const fetchRemoteCompetitionResults = async (): Promise<CompetitionResult[] | null> => {
+  if (!hasSupabase) return null
+  try {
+    const { getCompetitionResultsFromSupabase } = await import("../lib/supabaseClient")
+    return await getCompetitionResultsFromSupabase()
+  } catch {
+    return null
+  }
+}
+
+export const pushCompetitionResultsToRemote = async (results: CompetitionResult[]): Promise<boolean> => {
+  if (!hasSupabase) return false
+  try {
+    const { pushCompetitionResultsToSupabase } = await import("../lib/supabaseClient")
+    return await pushCompetitionResultsToSupabase(results)
+  } catch {
+    return false
+  }
+}
+
+export const saveCompetitionResultsAndSync = (results: CompetitionResult[]): void => {
+  saveCompetitionResults(results)
+  void pushCompetitionResultsToRemote(results)
 }
 
 export const getTrackResults = (): TrackResult[] =>

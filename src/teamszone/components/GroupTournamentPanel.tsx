@@ -1,11 +1,17 @@
 import type { Team, MatchResult, CompetitionResult } from '../../admin/types'
-import { computeStandings, getFinalizedWinners, getPositionLabel } from '../utils/matchStats'
+import { computeStandings, getPublishedFinalsQualifiers } from '../utils/matchStats'
 import {
   SUMO_MAX_ROUNDS,
   areAllSumoRoundsComplete,
   getCompletedRounds,
 } from '../utils/sumoRounds'
-import { filterMatchesByGroup, filterTeamsByGroup, formatGroupName } from '../utils/groupUtils'
+import {
+  filterMatchesByGroup,
+  filterTeamsByGroup,
+  formatGroupName,
+  FINALISTS_PER_GROUP,
+  isGroupFinalsAnnounced,
+} from '../utils/groupUtils'
 
 type GroupTournamentPanelProps = {
   group: string
@@ -29,15 +35,14 @@ const GroupTournamentPanel = ({
   const groupTeams = filterTeamsByGroup(categoryTeams, group)
   const groupMatches = filterMatchesByGroup(categoryMatches, group)
   const standings = computeStandings(groupTeams, groupMatches, allTeams)
-  const winners = getFinalizedWinners(competitionResults, categoryId, allTeams, group)
-  const hasFinalResults = winners.length > 0
+  const finalsAnnounced = isGroupFinalsAnnounced(competitionResults, categoryId, group)
+  const publishedFinalists = getPublishedFinalsQualifiers(competitionResults, categoryId, allTeams, group)
   const completedRounds = getCompletedRounds(groupMatches)
   const roundsComplete = areAllSumoRoundsComplete(groupMatches)
-  const standingByTeamId = new Map(standings.map((s) => [s.team.id, s]))
 
   return (
     <div className="mb-10 rounded-2xl border border-blue-200 bg-white shadow-sm overflow-hidden">
-      <div className="bg-gradient-to-r from-blue-700 to-indigo-600 px-6 py-4">
+      <div className="bg-linear-to-r from-blue-700 to-indigo-600 px-6 py-4">
         <h2 className="text-xl font-bold text-white">{formatGroupName(group)}</h2>
         <p className="text-sm text-blue-100 mt-1">
           {groupTeams.length} team{groupTeams.length !== 1 ? 's' : ''}
@@ -64,28 +69,33 @@ const GroupTournamentPanel = ({
               ))}
             </div>
             <p className="mt-3 text-xs text-slate-600">
-              {hasFinalResults
-                ? 'Winners published for this group.'
-                : roundsComplete
-                  ? 'All rounds complete — results publishing...'
-                  : `${completedRounds.size}/${SUMO_MAX_ROUNDS} rounds recorded.`}
+              {roundsComplete
+                ? 'All rounds complete — waiting for referee confirmation.'
+                : `${completedRounds.size}/${SUMO_MAX_ROUNDS} rounds recorded.`}
             </p>
           </div>
         )}
 
-        {hasFinalResults && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-            <h3 className="text-sm font-semibold text-amber-900 mb-3">🏆 {formatGroupName(group)} Winners</h3>
-            <div className="grid gap-2 sm:grid-cols-3">
-              {winners.slice(0, 3).map((entry) => (
-                <div key={entry.id} className="rounded-lg bg-white border border-amber-200 p-3">
-                  <p className="text-xs font-semibold text-amber-700 uppercase">{getPositionLabel(entry.position)}</p>
-                  <p className="font-bold text-slate-800">{entry.team?.name}</p>
-                  <p className="text-xs text-slate-600">{entry.totalScore} pts</p>
-                </div>
+
+
+        {finalsAnnounced && publishedFinalists.length > 0 && (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+            <h3 className="text-sm font-semibold text-emerald-800 mb-2">
+              Finals qualifiers (published by referee)
+            </h3>
+            <ol className="space-y-1 text-sm text-emerald-900">
+              {publishedFinalists.map((entry) => (
+                <li key={entry.team.id}>
+                  {entry.position}. {entry.team.name} — {entry.points} pts
+                </li>
               ))}
-            </div>
+            </ol>
           </div>
+        )}
+        {!finalsAnnounced && groupMatches.length > 0 && (
+          <p className="text-sm text-slate-500 rounded-lg bg-slate-50 px-3 py-2">
+            Finals qualifiers will appear after the referee publishes the top {FINALISTS_PER_GROUP} teams per group.
+          </p>
         )}
 
         {standings.length > 0 && groupMatches.length > 0 && (
@@ -105,7 +115,10 @@ const GroupTournamentPanel = ({
                 </thead>
                 <tbody>
                   {standings.map((standing, index) => (
-                    <tr key={standing.team.id} className="border-t border-slate-100">
+                    <tr
+                      key={standing.team.id}
+                      className={`border-t border-slate-100 ${publishedFinalists.some((f) => f.team.id === standing.team.id) ? 'bg-emerald-50/60' : ''}`}
+                    >
                       <td className="py-2 px-3 text-blue-600 font-medium">{index + 1}</td>
                       <td className="py-2 px-3">{standing.team.name}</td>
                       <td className="py-2 px-3 text-center">{standing.wins}</td>
@@ -127,17 +140,13 @@ const GroupTournamentPanel = ({
               {groupMatches.map((match) => {
                 const team1 = allTeams.find((t) => t.id === match.team1Id)
                 const team2 = allTeams.find((t) => t.id === match.team2Id)
-                const winner = allTeams.find((t) => t.id === match.winnerId)
                 return (
                   <article key={match.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
                     <div className="flex flex-wrap justify-between gap-2">
                       <span className="font-medium">{team1?.name} vs {team2?.name}</span>
                       <span className="text-blue-600 font-semibold">Round {match.round}</span>
                     </div>
-                    <p className="mt-1 text-slate-700">
-                      Score: {match.team1Score} — {match.team2Score}
-                      {winner && <span className="text-green-700 font-medium"> · Winner: {winner.name}</span>}
-                    </p>
+                    <p className="mt-1 text-slate-700">Score: {match.team1Score} — {match.team2Score}</p>
                   </article>
                 )
               })}
@@ -145,32 +154,6 @@ const GroupTournamentPanel = ({
           </div>
         )}
 
-        <div>
-          <h3 className="text-sm font-semibold text-slate-800 mb-3">Teams in {formatGroupName(group)}</h3>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {groupTeams.map((team) => {
-              const standing = standingByTeamId.get(team.id)
-              return (
-                <article key={team.id} className="rounded-lg border border-blue-100 p-4">
-                  <div className="flex justify-between items-start gap-2">
-                    <h4 className="font-semibold text-slate-800">{team.name}</h4>
-                    {standing && standing.points > 0 && (
-                      <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
-                        {standing.points} pts
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-slate-500 mt-1">{team.school || 'Country N/A'}</p>
-                  {standing && (
-                    <p className="text-xs text-slate-600 mt-2">
-                      {standing.wins}W · {standing.losses}L · {standing.draws}D
-                    </p>
-                  )}
-                </article>
-              )
-            })}
-          </div>
-        </div>
       </div>
     </div>
   )

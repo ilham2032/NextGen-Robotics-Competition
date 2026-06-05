@@ -1,11 +1,9 @@
 import { Link } from 'react-router-dom'
-import { getCategories, getTeams, getTrackResults, getCompetitionResults } from '../../admin/storage'
-import { getFinalizedWinners, getPositionLabel } from '../utils/matchStats'
+import { getCategories, getTeams, getTrackResults } from '../../admin/storage'
 import {
   buildTrackRankings,
   formatTrackTime,
   getTrackResultsForCategory,
-  isTrackCategoryFinalized,
 } from '../utils/trackCategories'
 
 type TrackCategoryViewProps = {
@@ -16,20 +14,17 @@ const TrackCategoryView = ({ categoryName }: TrackCategoryViewProps) => {
   const categories = getCategories()
   const allTeams = getTeams()
   const trackResults = getTrackResults()
-  const competitionResults = getCompetitionResults()
 
   const category = categories.find((cat) => cat.name === categoryName)
   const categoryTeams = allTeams.filter((team) => team.categoryName?.trim() === categoryName)
   const categoryTrackResults = category ? getTrackResultsForCategory(trackResults, category.id) : []
   const rankings = category ? buildTrackRankings(categoryTrackResults, allTeams) : []
-  const winners = category ? getFinalizedWinners(competitionResults, category.id, allTeams) : []
-  const isFinalized = category ? isTrackCategoryFinalized(competitionResults, category.id) : false
   const rankingByTeamId = new Map(rankings.map((entry, index) => [entry.team.id, { ...entry, rank: index + 1 }]))
 
   const uniqueCountries = new Set(categoryTeams.map((t) => t.school).filter(Boolean))
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
+    <section className="min-h-screen bg-linear-to-br from-blue-50 to-cyan-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
       <div className="mx-auto max-w-6xl">
         <div className="text-center mb-8">
           <Link
@@ -70,24 +65,6 @@ const TrackCategoryView = ({ categoryName }: TrackCategoryViewProps) => {
           </div>
         </div>
 
-        {isFinalized && winners.length > 0 && (
-          <div className="mb-8 rounded-xl border border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 p-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-amber-900 mb-4">🏆 Final Rankings</h2>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {winners.slice(0, 3).map((entry) => (
-                <article key={entry.id} className="rounded-xl border border-amber-200 bg-white p-4">
-                  <p className="text-sm font-semibold text-amber-700 uppercase">{getPositionLabel(entry.position)}</p>
-                  <p className="mt-1 text-lg font-bold text-slate-800">{entry.team?.name}</p>
-                  <p className="text-sm text-emerald-700 font-medium">
-                    {entry.trackFinishTime !== undefined
-                      ? formatTrackTime(entry.trackFinishTime)
-                      : formatTrackTime(entry.totalScore)}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
-        )}
 
         {rankings.length > 0 && (
           <div className="mb-8 bg-white rounded-xl shadow-sm border border-blue-100 p-6">

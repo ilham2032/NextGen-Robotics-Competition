@@ -15,6 +15,38 @@ const Home = () => {
     setSettings(loadedSettings)
   }, [])
 
+  const registrationOpenDate = settings?.registrationOpen ? new Date(settings.registrationOpen) : null
+  const registrationCloseDate = settings?.registrationClose ? new Date(settings.registrationClose) : null
+  const isRegistrationOpen = !registrationOpenDate || new Date() >= registrationOpenDate
+  const isRegistrationClosed = registrationCloseDate ? new Date() > registrationCloseDate : false
+  const registrationAvailable = isRegistrationOpen && !isRegistrationClosed
+
+  const registerButton = registrationAvailable ? (
+    <Link
+      to="/user/auth"
+      className="group relative overflow-hidden rounded-full bg-linear-to-r from-cyan-400 to-blue-500 px-8 py-4 font-semibold text-slate-950 shadow-lg shadow-cyan-400/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-cyan-400/40"
+    >
+      <span className="relative z-10">{t('Register Team')}</span>
+      <div className="absolute inset-0 bg-linear-to-r from-cyan-300 to-blue-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+    </Link>
+  ) : (
+    <span className="inline-flex items-center justify-center rounded-full bg-slate-200 px-8 py-4 font-semibold text-slate-600 shadow-sm">
+      {registrationCloseDate && isRegistrationClosed
+        ? t('Registration Closed')
+        : registrationOpenDate
+          ? `${t('Opens on')} ${registrationOpenDate.toLocaleString()}`
+          : t('Registration Unavailable')}
+    </span>
+  )
+
+  const registrationStatusMessage = registrationAvailable
+    ? ""
+    : registrationCloseDate && isRegistrationClosed
+      ? `Registration closed on ${registrationCloseDate.toLocaleString()}.`
+      : registrationOpenDate
+        ? `Registration opens on ${registrationOpenDate.toLocaleString()}.`
+        : ""
+
   const categories = [
     {
       title: t("Mini Sumo"),
@@ -35,7 +67,7 @@ const Home = () => {
 
   return (
     <div className="bg-slate-50 text-slate-900">
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-900 px-6 pb-32 pt-28 md:px-10 md:pt-32 lg:px-16">
+      <section className="relative overflow-hidden bg-linear-to-br from-slate-950 via-blue-950 to-indigo-900 px-6 pb-32 pt-28 md:px-10 md:pt-32 lg:px-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,.4),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(6,182,212,.25),transparent_45%),radial-gradient(circle_at_center,rgba(147,51,234,.1),transparent_60%)]" />
         <div className="absolute inset-0 opacity-[0.02]">
           <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
@@ -55,24 +87,24 @@ const Home = () => {
               </p>
             </Reveal>
             <Reveal immediate animation="fade-in-left" delay={0.25}>
-              <h1 className="mt-3 bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text font-display text-5xl leading-tight font-bold text-transparent md:text-7xl lg:text-6xl">
+              <h1 className="mt-3 bg-linear-to-r from-white via-blue-100 to-cyan-200 bg-clip-text font-display text-5xl leading-tight font-bold text-transparent md:text-7xl lg:text-6xl">
                 {t('NextGen Robotics Competition')}
               </h1>
             </Reveal>
             <Reveal immediate animation="fade-in-left" delay={0.4}>
-              <p className="mt-5 text-xl font-medium text-blue-100 md:text-2xl lg:text-xl">
-                {t('August 26-27 - Build, Battle, and Innovate')}
+              <p className="mt-5 text-base font-semibold text-white md:text-lg lg:text-2xl">
+                {t('October 1-2')}
+              </p>
+              <p className="mt-3 text-xl font-medium text-blue-100 md:text-2xl lg:text-xl">
+                {t('Build, Battle, and Innovate')}
+              </p>
+              <p className="mt-3 text-base text-cyan-200 md:text-lg lg:text-base">
+                {t('Baku, Azerbaijan')}
               </p>
             </Reveal>
             <Reveal immediate animation="fade-in-up" delay={0.55}>
               <div className="mt-10 flex flex-wrap justify-center gap-4 lg:justify-start text-white">
-                <Link
-                  to="/user/auth"
-                  className="group relative overflow-hidden rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-8 py-4 font-semibold text-slate-950 shadow-lg shadow-cyan-400/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-cyan-400/40"
-                >
-                  <span className="relative z-10">{t('Register Team')}</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-300 to-blue-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                </Link>
+                {registerButton}
                 <Link
                   to="/regulations"
                   className="group rounded-full border-2 border-white/30 bg-white/10 px-8 py-4 font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/20 hover:border-white/50"
@@ -80,12 +112,15 @@ const Home = () => {
                   {t('View Regulations')}
                 </Link>
               </div>
+              {registrationStatusMessage ? (
+                <p className="mt-4 text-sm text-cyan-100">{registrationStatusMessage}</p>
+              ) : null}
             </Reveal>
           </div>
           <Reveal immediate animation="fade-in-right" delay={0.35} className="relative mx-auto w-full max-w-xl">
-            <div className="absolute -inset-6 animate-float rounded-[2rem] bg-gradient-to-r from-cyan-400/35 via-blue-500/30 to-purple-500/35 blur-2xl" />
+            <div className="absolute -inset-6 animate-float rounded-4xl bg-linear-to-r from-cyan-400/35 via-blue-500/30 to-purple-500/35 blur-2xl" />
             <img
-              className="relative h-[280px] w-full rounded-[1.5rem] border border-white/20 object-cover shadow-2xl md:h-[360px]"
+              className="relative h-70 w-full rounded-3xl border border-white/20 object-cover shadow-2xl md:h-90"
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Sum%C3%B4Rob%C3%B4-ThundeRatz.jpg/500px-Sum%C3%B4Rob%C3%B4-ThundeRatz.jpg"
               alt="Competition robot preparing for a mini sumo match"
             />
@@ -114,10 +149,11 @@ const Home = () => {
           <p className="mt-6 font-poppins text-lg leading-relaxed text-slate-600 lg:text-base">
             {t('The NextGen Robotics Competition brings together students and robotics enthusiasts to design, program, and test robots in a collaborative and competitive environment. It is where innovation, creativity, and teamwork turn ideas into real engineering solutions.')}
           </p>
-          <div className="mt-8">
+        
+            <div className="mt-8">
             <Link
               to="/about"
-              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-4 font-semibold text-white shadow-lg shadow-blue-300/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-300/50 hover:from-blue-700 hover:to-indigo-700"
+              className="group inline-flex items-center gap-2 rounded-full bg-linear-to-r from-blue-600 to-indigo-600 px-8 py-4 font-semibold text-white shadow-lg shadow-blue-300/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-300/50 hover:from-blue-700 hover:to-indigo-700"
             >
               <span className="text-white">{t('Learn More')}</span>
               <svg className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -131,19 +167,19 @@ const Home = () => {
             <h3 className="text-2xl font-semibold text-slate-900 lg:text-xl">{t('Why Join?')}</h3>
             <ul className="mt-6 space-y-4 text-slate-600">
               <li className="flex items-start gap-3">
-                <div className="mt-1 h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
+                <div className="mt-1 h-2 w-2 rounded-full bg-blue-500 shrink-0" />
                 <span>{t('Build practical robotics and coding skills.')}</span>
               </li>
               <li className="flex items-start gap-3">
-                <div className="mt-1 h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
+                <div className="mt-1 h-2 w-2 rounded-full bg-blue-500 shrink-0" />
                 <span>{t('Solve real-world challenges with your team.')}</span>
               </li>
               <li className="flex items-start gap-3">
-                <div className="mt-1 h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
+                <div className="mt-1 h-2 w-2 rounded-full bg-blue-500 shrink-0" />
                 <span>{t('Present your work to judges and industry mentors.')}</span>
               </li>
               <li className="flex items-start gap-3">
-                <div className="mt-1 h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
+                <div className="mt-1 h-2 w-2 rounded-full bg-blue-500 shrink-0" />
                 <span>{t('Connect with a community of young innovators.')}</span>
               </li>
             </ul>
@@ -160,8 +196,8 @@ const Home = () => {
         </Reveal>
         <div className="mt-12 grid gap-8 lg:grid-cols-2">
           <Reveal animation="scale-in" delay={0.15}>
-            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 p-8 text-white shadow-xl transition-transform duration-300 hover:-translate-y-1">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-indigo-600/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <div className="group relative overflow-hidden rounded-3xl bg-linear-to-br from-blue-600 to-indigo-700 p-8 text-white shadow-xl transition-transform duration-300 hover:-translate-y-1">
+              <div className="absolute inset-0 bg-linear-to-br from-blue-500/20 to-indigo-600/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               <div className="relative z-10">
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -176,8 +212,8 @@ const Home = () => {
             </div>
           </Reveal>
           <Reveal animation="scale-in" delay={0.3}>
-            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 to-pink-600 p-8 text-white shadow-xl transition-transform duration-300 hover:-translate-y-1">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <div className="group relative overflow-hidden rounded-3xl bg-linear-to-br from-purple-600 to-pink-600 p-8 text-white shadow-xl transition-transform duration-300 hover:-translate-y-1">
+              <div className="absolute inset-0 bg-linear-to-br from-purple-500/20 to-pink-500/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               <div className="relative z-10">
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -211,7 +247,7 @@ const Home = () => {
           {categories.map((category, index) => (
             <Reveal key={category.title} animation="scale-in" delay={0.1 * index}>
               <article className="group relative h-full overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <div className="absolute inset-0 bg-linear-to-br from-blue-50/50 to-indigo-50/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 <div className="relative z-10">
                   <h3 className="text-2xl font-semibold text-slate-900 lg:text-xl">{category.title}</h3>
                   <p className="mt-4 text-slate-600 leading-relaxed">{category.description}</p>
@@ -233,7 +269,7 @@ const Home = () => {
 
       <section className="mx-auto mt-20 mb-8 max-w-6xl px-6 md:px-10 lg:px-16">
         <Reveal animation="scale-in">
-          <div className="rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 px-10 py-16 text-center text-white shadow-2xl lg:px-16 lg:py-20">
+          <div className="rounded-3xl bg-linear-to-r from-blue-700 via-indigo-700 to-purple-700 px-10 py-16 text-center text-white shadow-2xl lg:px-16 lg:py-20">
             <div className="mx-auto max-w-3xl">
               <h2 className="font-display text-4xl font-bold md:text-5xl lg:text-4xl">{t('Ready to Compete?')}</h2>
               <p className="mx-auto mt-6 max-w-2xl text-xl text-blue-100 lg:text-lg">

@@ -4,6 +4,20 @@ import type { EventSettings } from "./adminDashboardTypes"
 import type { TeamRecord } from "./adminDashboardTypes"
 import type { Member, Mentor } from "../types"
 
+const toLocalDatetime = (isoDate?: string) => {
+  if (!isoDate) return ""
+  const date = new Date(isoDate)
+  if (Number.isNaN(date.getTime())) return ""
+  const tzOffsetMs = date.getTimezoneOffset() * 60 * 1000
+  return new Date(date.getTime() - tzOffsetMs).toISOString().slice(0, 16)
+}
+
+const parseToIsoDatetime = (value: string) => {
+  if (!value) return ""
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString()
+}
+
 interface AboutEventProps {
   onNotify?: (message: string) => void
   teams: TeamRecord[]
@@ -14,13 +28,24 @@ interface AboutEventProps {
 const AboutEventPage = ({ onNotify, teams, mentors, members }: AboutEventProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const [settings, setSettings] = useState<EventSettings | null>(null)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    eventName: string
+    eventDate: string
+    eventStatus: EventSettings['eventStatus']
+    venue: string
+    matchDuration: number
+    logoUrl: string
+    registrationOpen: string
+    registrationClose: string
+  }>({
     eventName: "",
     eventDate: "",
-    eventStatus: "Upcoming" as const,
+    eventStatus: "Upcoming",
     venue: "",
     matchDuration: 6,
     logoUrl: "",
+    registrationOpen: "",
+    registrationClose: "",
   })
 
   useEffect(() => {
@@ -30,10 +55,12 @@ const AboutEventPage = ({ onNotify, teams, mentors, members }: AboutEventProps) 
       setFormData({
         eventName: saved.eventName,
         eventDate: saved.eventDate,
-        eventStatus: (saved.eventStatus || "Upcoming") as any,
+        eventStatus: saved.eventStatus ?? "Upcoming",
         venue: saved.venue,
         matchDuration: saved.matchDuration,
         logoUrl: saved.logoUrl,
+        registrationOpen: toLocalDatetime(saved.registrationOpen),
+        registrationClose: toLocalDatetime(saved.registrationClose),
       })
     }
   }, [])
@@ -49,6 +76,18 @@ const AboutEventPage = ({ onNotify, teams, mentors, members }: AboutEventProps) 
       return
     }
 
+    const registrationOpenIso = parseToIsoDatetime(formData.registrationOpen)
+    const registrationCloseIso = parseToIsoDatetime(formData.registrationClose)
+
+    if (registrationOpenIso && registrationCloseIso) {
+      const openDate = new Date(registrationOpenIso)
+      const closeDate = new Date(registrationCloseIso)
+      if (openDate >= closeDate) {
+        onNotify?.("Registration close time must be after the open time")
+        return
+      }
+    }
+
     const updated: EventSettings = {
       eventName: formData.eventName,
       eventDate: formData.eventDate,
@@ -56,6 +95,8 @@ const AboutEventPage = ({ onNotify, teams, mentors, members }: AboutEventProps) 
       venue: formData.venue,
       matchDuration: formData.matchDuration,
       logoUrl: formData.logoUrl,
+      registrationOpen: registrationOpenIso,
+      registrationClose: registrationCloseIso,
       scoringRules: settings?.scoringRules || [],
     }
 
@@ -157,7 +198,10 @@ const AboutEventPage = ({ onNotify, teams, mentors, members }: AboutEventProps) 
                 <label className="block text-sm font-semibold text-slate-700">Event Status</label>
                 <select
                   value={formData.eventStatus}
-                  onChange={(e) => setFormData({ ...formData, eventStatus: e.target.value as any })}
+                  onChange={(e) => {
+                    const status = e.target.value as EventSettings['eventStatus']
+                    setFormData({ ...formData, eventStatus: status })
+                  }}
                   className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
                 >
                   <option>Upcoming</option>
@@ -201,6 +245,30 @@ const AboutEventPage = ({ onNotify, teams, mentors, members }: AboutEventProps) 
               />
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700">Registration Open</label>
+                <input
+                  type="datetime-local"
+                  value={formData.registrationOpen}
+                  onChange={(e) => setFormData({ ...formData, registrationOpen: e.target.value })}
+                  className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+                <p className="mt-2 text-sm text-slate-500">Set the date and time when team registration will start.</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700">Registration Close</label>
+                <input
+                  type="datetime-local"
+                  value={formData.registrationClose}
+                  onChange={(e) => setFormData({ ...formData, registrationClose: e.target.value })}
+                  className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                />
+                <p className="mt-2 text-sm text-slate-500">Set the date and time after which new team registration is blocked.</p>
+              </div>
+            </div>
+
             <div className="flex gap-3 pt-4">
               <button
                 onClick={handleSave}
@@ -222,26 +290,40 @@ const AboutEventPage = ({ onNotify, teams, mentors, members }: AboutEventProps) 
       {/* Event Info Cards */}
       {!isEditing && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 bg-linear-to-br from-blue-50 to-indigo-50 p-6 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Event Date</p>
             <p className="mt-2 text-2xl font-bold text-slate-900">
               {new Date(settings.eventDate).toLocaleDateString()}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-cyan-50 to-blue-50 p-6 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 bg-linear-to-br from-cyan-50 to-blue-50 p-6 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Status</p>
             <p className="mt-2 text-2xl font-bold text-slate-900">{settings.eventStatus}</p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-indigo-50 to-purple-50 p-6 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 bg-linear-to-br from-indigo-50 to-purple-50 p-6 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Match Duration</p>
             <p className="mt-2 text-2xl font-bold text-slate-900">{settings.matchDuration} min</p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-6 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 bg-linear-to-br from-blue-50 to-cyan-50 p-6 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Venue</p>
             <p className="mt-2 text-lg font-bold text-slate-900 truncate">{settings.venue}</p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-linear-to-br from-cyan-50 to-blue-50 p-6 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Registration Open</p>
+            <p className="mt-2 text-lg font-bold text-slate-900">
+              {settings.registrationOpen ? new Date(settings.registrationOpen).toLocaleString() : "Not set"}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-linear-to-br from-violet-50 to-fuchsia-50 p-6 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Registration Close</p>
+            <p className="mt-2 text-lg font-bold text-slate-900">
+              {settings.registrationClose ? new Date(settings.registrationClose).toLocaleString() : "Not set"}
+            </p>
           </div>
         </div>
       )}

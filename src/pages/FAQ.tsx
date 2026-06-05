@@ -40,7 +40,7 @@ const FAQ = () => {
   return (
     <section className="min-h-screen bg-slate-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
       <div className="mx-auto max-w-5xl">
-        <header className="rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 px-6 py-8 text-white shadow-lg sm:px-8">
+        <header className="rounded-3xl bg-linear-to-r from-blue-700 via-indigo-700 to-blue-900 px-6 py-8 text-white shadow-lg sm:px-8">
           <p className="text-xs font-semibold tracking-[0.25em] text-blue-100 uppercase">Support Center</p>
           <h1 className="mt-2 font-display text-4xl font-bold sm:text-5xl">Frequently Asked Questions</h1>
           <p className="mt-3 max-w-3xl text-sm text-blue-100 sm:text-base">

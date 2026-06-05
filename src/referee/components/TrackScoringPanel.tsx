@@ -4,7 +4,7 @@ import {
   getTrackResults,
   saveTrackResults,
   getCompetitionResults,
-  saveCompetitionResults,
+  saveCompetitionResultsAndSync,
 } from '../../admin/storage'
 import type { Team, TrackResult, CompetitionResult } from '../../admin/types'
 import {
@@ -48,6 +48,7 @@ const TrackScoringPanel = ({
 
   const isFinalized = isTrackCategoryFinalized(competitionResults, categoryId)
   const scoredCount = categoryTrackResults.length
+  const allTeamsScored = categoryTrackResults.length === categoryTeams.length
 
   const handleTimeChange = (teamId: string, value: string) => {
     setDraftTimes((current) => ({ ...current, [teamId]: value }))
@@ -130,6 +131,10 @@ const TrackScoringPanel = ({
       alert('Record at least one team finish time before publishing.')
       return
     }
+    if (!allTeamsScored) {
+      alert('Record finish times for all teams before publishing.')
+      return
+    }
     if (!window.confirm('Publish track rankings to Teams Zone? Fastest times rank highest.')) return
 
     const rankings = buildTrackRankings(categoryTrackResults, categoryTeams)
@@ -139,7 +144,7 @@ const TrackScoringPanel = ({
       ...finalized,
     ]
     setCompetitionResults(nextCompetitionResults)
-    saveCompetitionResults(nextCompetitionResults)
+    saveCompetitionResultsAndSync(nextCompetitionResults)
     alert('Track rankings published to Teams Zone!')
   }
 
@@ -192,7 +197,7 @@ const TrackScoringPanel = ({
                             onChange={(e) => handleTimeChange(team.id, e.target.value)}
                             placeholder="e.g. 45.50"
                             disabled={isFinalized}
-                            className="w-full max-w-[140px] rounded-lg border border-slate-300 px-3 py-2 focus:border-emerald-500 focus:outline-none disabled:bg-slate-100"
+                            className="w-full max-w-35 rounded-lg border border-slate-300 px-3 py-2 focus:border-emerald-500 focus:outline-none disabled:bg-slate-100"
                           />
                           {saved && (
                             <p className="text-xs text-emerald-600 mt-1">Saved: {formatTrackTime(saved.finishTime)}</p>
@@ -224,7 +229,7 @@ const TrackScoringPanel = ({
               >
                 Save All Times
               </button>
-              {!isFinalized && liveRankings.length > 0 && (
+              {!isFinalized && allTeamsScored && (
                 <button
                   type="button"
                   onClick={handlePublishRankings}
@@ -232,6 +237,11 @@ const TrackScoringPanel = ({
                 >
                   Publish Rankings
                 </button>
+              )}
+              {!isFinalized && !allTeamsScored && (
+                <span className="inline-flex items-center rounded-full bg-amber-50 px-4 py-2 text-sm font-medium text-amber-800">
+                  Record finish times for all teams to enable publishing.
+                </span>
               )}
             </div>
           </>

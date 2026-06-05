@@ -35,7 +35,7 @@ const RefereeLogin = () => {
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-500 px-6 py-24">
+    <section className="min-h-screen bg-linear-to-br from-blue-900 via-blue-700 to-cyan-500 px-6 py-24">
       <div className="mx-auto max-w-md rounded-3xl border border-white/30 bg-white p-8 shadow-2xl">
         <p className="text-sm font-semibold tracking-widest text-blue-600 uppercase">NextGen Robotics Olympiad</p>
         <h1 className="mt-2 font-display text-4xl font-bold text-blue-900">Referee Login</h1>

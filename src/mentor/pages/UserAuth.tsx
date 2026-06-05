@@ -75,8 +75,8 @@ const UserAuth = () => {
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-sky-900 px-4 py-12 sm:px-6 sm:py-20">
-      <div className="mx-auto max-w-2xl rounded-[32px] bg-white/95 p-8 shadow-2xl shadow-slate-950/20 border border-white/80 text-slate-900 sm:p-10">
+    <section className="min-h-screen bg-linear-to-br from-slate-950 via-blue-950 to-sky-900 px-4 py-12 sm:px-6 sm:py-20">
+      <div className="mx-auto max-w-2xl rounded-4xl bg-white/95 p-8 shadow-2xl shadow-slate-950/20 border border-white/80 text-slate-900 sm:p-10">
         <div className="mb-8 text-center">
           <p className="text-sm font-semibold tracking-[0.35em] text-blue-700 uppercase">NextGen Robotics</p>
           <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -208,6 +208,18 @@ const UserAuth = () => {
               required
             />
           </div>
+
+          {mode === "login" && (
+            <div className="text-right text-sm">
+              <button
+                type="button"
+                onClick={() => navigate('/user/forgot-password')}
+                className="font-semibold text-blue-700 transition hover:text-blue-900"
+              >
+                Forgot password?
+              </button>
+            </div>
+          )}
 
           {error && (
             <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>

@@ -65,7 +65,7 @@ const TermsOfService: React.FC = () => {
         <section className="p-4 md:p-6 bg-gray-50 rounded-lg shadow-sm">
           <h2 className="text-lg md:text-2xl font-semibold mb-3 md:mb-4 text-blue-700">8. {t('Contact Information')}</h2>
           <p className="leading-relaxed text-sm md:text-base">
-            If you have any questions about these Terms of Service, please contact us at legal@nextgenrobotics.com.
+            If you have any questions about these Terms of Service, please contact us at nextgenazer@gmail.com.
           </p>
         </section>
       </div>

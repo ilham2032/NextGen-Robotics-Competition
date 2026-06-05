@@ -4,7 +4,7 @@ const LegoSumo3kg = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
     
-      <section className="relative overflow-hidden bg-gradient-to-r from-blue-700 via-blue-600 to-blue-700 py-20">
+      <section className="relative overflow-hidden bg-linear-to-r from-blue-700 via-blue-600 to-blue-700 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 border border-white rounded-full"></div>
           <div className="absolute bottom-10 right-10 w-48 h-48 border border-white rounded-full"></div>
@@ -153,7 +153,7 @@ const LegoSumo3kg = () => {
         </div>
 
         {/* Contact Section */}
-        <section className="rounded-2xl bg-gradient-to-r from-blue-600 to-blue-800 p-8 text-center mt-12">
+        <section className="rounded-2xl bg-linear-to-r from-blue-600 to-blue-800 p-8 text-center mt-12">
           <h3 className="text-2xl font-bold text-white mb-4">Questions about LEGO Sumo (3kg)?</h3>
           <p className="text-blue-100 mb-6">
             Contact our technical team for clarifications on regulations

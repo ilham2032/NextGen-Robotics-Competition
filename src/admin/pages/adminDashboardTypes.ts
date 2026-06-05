@@ -53,5 +53,7 @@ export type EventSettings = {
   venue: string
   matchDuration: number
   logoUrl: string
+  registrationOpen?: string
+  registrationClose?: string
   scoringRules: ScoringRule[]
 }

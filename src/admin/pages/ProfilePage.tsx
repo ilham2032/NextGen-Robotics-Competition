@@ -29,7 +29,7 @@ const ProfilePage = ({ profile, onUpdateProfile }: ProfilePageProps) => {
   return (
     <div className="space-y-8">
       <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-xl shadow-slate-200/20">
-        <div className="bg-gradient-to-r from-cyan-700 via-blue-900 to-slate-900 px-8 py-10 text-white">
+        <div className="bg-linear-to-r from-cyan-700 via-blue-900 to-slate-900 px-8 py-10 text-white">
           <p className="uppercase tracking-[0.3em] text-xs text-cyan-200">Profile</p>
           <h1 className="mt-4 text-3xl font-semibold">Admin account</h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-200">Manage your account information and preferences for the NextGen admin console.</p>

@@ -1,8 +1,8 @@
 import YourVisaAssistance from '../assets/619395084_17896020795383433_1687352418807126550_n-removebg-preview.png'
 import Kavkaz from '../assets/491497892_17926750140050283_2377610097470685483_n-removebg-preview.png'
 import RSMEDIA from '../assets/rs-media-logo-YAGN3-1G-removebg-preview (1).png'
-import AsanXidmet from '../assets/asan-xidmt-logo-png_seeklogo-352725.png'
 import INNOVATIONS from '../assets/images.jpg'
+import ASOIU from '../assets/asoiu.png'
 
 export type OrganizationType = 'partner' | 'sponsor'
 
@@ -27,13 +27,13 @@ export const ORGANIZATIONS: OrganizationDefinition[] = [
     website: 'https://yourvisaassistance.com',
   },
   {
-    id: 'asan-xidmət',
+    id: 'asoui',
     type: 'sponsor',
-    nameKey: 'Asan Xidmət',
-    descriptionKey: 'Official partner supporting innovation, youth development, and technology initiatives to empower the next generation of engineers and creators.',
-    logo: AsanXidmet,
-    logoAlt: 'Asan Xidmət logo',
-    website: 'https://asan.gov.az',
+    nameKey: 'Azerbaijan State Oil and Industry University',
+    descriptionKey: 'Educational partner empowering students with advanced skills in programming, robotics, and technology innovation for the future.',
+    logo: ASOIU,
+    logoAlt: 'ASOIU logo',
+    website: 'https://asoiu.edu.az/',
   },
    {
     id: 'it-innovations',

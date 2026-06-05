@@ -1,19 +1,16 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import { getCategories, getTeams } from "../admin/storage"
-import type { Category, Team } from "../admin/types"
+import { getCategories } from "../admin/storage"
+import type { Category } from "../admin/types"
 import TeamPublicCard from "../Components/TeamPublicCard"
 import { isTeamPublishedOnMain } from "../utils/teamDisplay"
+import { useLiveCompetitionData } from "../hooks/useLiveCompetitionData"
 
 const Participants = () => {
   const { t } = useTranslation()
-  const [teams, setTeams] = useState<Team[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-
-  useEffect(() => {
-    setTeams(getTeams().filter(isTeamPublishedOnMain))
-    setCategories(getCategories())
-  }, [])
+  const { teams: liveTeams, isSyncing } = useLiveCompetitionData(15000)
+  const categories: Category[] = getCategories()
+  const teams = useMemo(() => liveTeams.filter(isTeamPublishedOnMain), [liveTeams])
 
   const stats = useMemo(() => {
     const uniqueCountries = new Set(teams.map((team) => team.school).filter(Boolean))
@@ -30,7 +27,29 @@ const Participants = () => {
       return teams.length > 0 ? [{ id: "all", name: t("Registered Teams"), teams }] : []
     }
 
-    const sections = categories.map((category) => ({
+    const categoryOrder = [
+      "Mega Sumo",
+      "Mini Sumo",
+      "Mini Sumo Kids",
+      "1Kg Lego Sumo",
+      "3Kg Lego Sumo",
+      "Line Follower",
+      "Lego Line",
+      "Start Up",
+    ]
+
+    const sortedCategories = [...categories].sort((a, b) => {
+      const aIndex = categoryOrder.indexOf(a.name)
+      const bIndex = categoryOrder.indexOf(b.name)
+      if (aIndex !== -1 || bIndex !== -1) {
+        if (aIndex === -1) return 1
+        if (bIndex === -1) return -1
+        return aIndex - bIndex
+      }
+      return a.name.localeCompare(b.name)
+    })
+
+    const sections = sortedCategories.map((category) => ({
       id: category.id,
       name: category.name,
       teams: teams.filter((team) => team.categoryName?.trim() === category.name),
@@ -55,6 +74,9 @@ const Participants = () => {
           <p className="mt-3 max-w-2xl text-sm text-blue-100 sm:text-base">
             {t("Explore registered teams by category and see the growing international robotics community joining NextGen Robotics Competition.")}
           </p>
+          {isSyncing && (
+            <p className="mt-3 text-xs text-blue-200">{t("Updating team list…")}</p>
+          )}
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -74,16 +96,16 @@ const Participants = () => {
 
         {categorySections.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500">
-            No teams registered yet.
+            {t("No teams registered yet.")}
           </div>
         ) : (
           categorySections.map((section) => (
             <div key={section.id} className="mt-8">
               <h2 className="font-display text-2xl font-semibold text-blue-800 sm:text-3xl">{section.name}</h2>
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div className="mt-4 grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
                 {section.teams.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">
-                    No teams registered yet.
+                    {t("No teams registered yet.")}
                   </div>
                 ) : (
                   section.teams.map((team) => <TeamPublicCard key={team.id} team={team} />)

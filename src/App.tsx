@@ -19,6 +19,7 @@ import AdminPage from './admin/adminPage'
 import AdminLogin from './admin/pages/AdminLogin'
 import ProtectedAdminRoute from './admin/ProtectedAdminRoute'
 import UserAuth from './mentor/pages/UserAuth'
+import ForgotPassword from './mentor/pages/ForgotPassword'
 import UserDashboard from './mentor/pages/UserDashboard'
 import ProtectedMentorRoute from './mentor/ProtectedMentorRoute'
 import TeamsZoneRefereeLogin from './teamszone/pages/TeamsZoneRefereeLogin'
@@ -41,6 +42,7 @@ import TeamLineFollower from './teamszone/categoryteams/teamlinefollower'
 import TeamLegoLine from './teamszone/categoryteams/teamlegoline'
 import TeamMiniSumoKids from './teamszone/categoryteams/teamstartupjr'
 import TeamMegaSumo from './teamszone/categoryteams/teammegasumo'
+import TeamStartupSenior from './teamszone/categoryteams/teamstartupsenior'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfService from './pages/TermsOfService'
 
@@ -68,6 +70,7 @@ const App = () => {
           <Route path='/news' element={<News/>}/>
           <Route path='/regulations' element={<Regulations/>}/>
           <Route path='/participants' element={<Participants/>}/>
+          <Route path='/standings/:categoryId' element={<Standing/>}/>
           <Route path='/standings' element={<Standing/>}/>
           <Route path='/partners' element={<Partners/>}/>
           <Route path='/partnership-inquiries' element={<PartnershipInquiries/>}/>
@@ -79,6 +82,7 @@ const App = () => {
           <Route path='/admin/*' element={<ProtectedAdminRoute><AdminPage/></ProtectedAdminRoute>}/>
           <Route path='/admin/clear-data' element={<ClearData/>} />
           <Route path='/user/auth' element={<UserAuth/>}/>
+          <Route path='/user/forgot-password' element={<ForgotPassword/>}/>
           <Route path='/user/dashboard' element={<ProtectedMentorRoute><UserDashboard/></ProtectedMentorRoute>}/>
           <Route path='/referee/login' element={<Navigate to='/teamszone/referee' replace/>}/>
           <Route path='/referee/dashboard' element={<Navigate to='/teamszone/referee/dashboard' replace/>}/>
@@ -104,6 +108,7 @@ const App = () => {
           <Route path='/teamszone/lego-line' element={<TeamLegoLine/>}/>
           <Route path='/teamszone/mini-sumo-kids' element={<TeamMiniSumoKids/>}/>
           <Route path='/teamszone/mega-sumo' element={<TeamMegaSumo/>}/>
+          <Route path='/teamszone/start-up-senior' element={<TeamStartupSenior/>}/>
           <Route path='/privacy' element={<PrivacyPolicy/>}/>
           <Route path='/terms' element={<TermsOfService/>}/>
         </Routes>

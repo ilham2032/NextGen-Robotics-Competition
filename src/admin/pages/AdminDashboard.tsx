@@ -1,6 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from "react"
 import { useLocation } from "react-router-dom"
-import { createId, getMembers, getMentors, getTeams, getSettings, saveTeams, saveSettings, clearAllData } from "../storage"
+import { createId, getMembers, getMentors, getTeams, getSettings, saveTeamsAndSync, saveSettings, clearAllData } from "../storage"
 import type { Member, Mentor, Team } from "../types"
 import type { EventSettings, MatchSlot, ScoringRule, TeamRecord, TeamStatus } from "./adminDashboardTypes"
 import AdminNav from "../components/AdminNav"
@@ -21,6 +21,8 @@ const defaultSettings: EventSettings = {
   venue: "Innovation Expo Center",
   matchDuration: 6,
   logoUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80",
+  registrationOpen: "",
+  registrationClose: "",
   scoringRules: defaultScoringRules,
 }
 
@@ -143,7 +145,7 @@ const AdminDashboard = () => {
 
   const saveTeamState = (nextTeams: TeamRecord[]) => {
     setTeams(nextTeams)
-    saveTeams(nextTeams)
+    saveTeamsAndSync(nextTeams)
   }
 
 
@@ -293,15 +295,15 @@ const AdminDashboard = () => {
                   </div>
 
                   <div className="grid gap-4 md:grid-cols-3">
-                    <div className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+                    <div className="rounded-2xl border border-blue-200 bg-linear-to-br from-blue-50 to-indigo-50 p-6">
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Total Teams</p>
                       <p className="mt-2 text-3xl font-bold text-blue-700">{teams.length}</p>
                     </div>
-                    <div className="rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-blue-50 p-6">
+                    <div className="rounded-2xl border border-cyan-200 bg-linear-to-br from-cyan-50 to-blue-50 p-6">
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Checked In</p>
                       <p className="mt-2 text-3xl font-bold text-cyan-700">{stats.checkedIn}</p>
                     </div>
-                    <div className="rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-purple-50 p-6">
+                    <div className="rounded-2xl border border-indigo-200 bg-linear-to-br from-indigo-50 to-purple-50 p-6">
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Pending Matches</p>
                       <p className="mt-2 text-3xl font-bold text-indigo-700">{matches.filter((m) => m.status === "Pending").length}</p>
                     </div>

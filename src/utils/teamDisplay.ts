@@ -24,7 +24,7 @@ export const getCountryCode = (countryName: string): string | null => {
 }
 
 /** All registered teams are now published on the Participants page. */
-export const isTeamPublishedOnMain = (_team: Team): boolean => true
+export const isTeamPublishedOnMain = (): boolean => true
 
 export const getTeamPaymentStatus = (team: Team): "paid" | "pending" =>
   team.paymentStatus === "pending" ? "pending" : "paid"

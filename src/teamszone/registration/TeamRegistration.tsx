@@ -1,6 +1,13 @@
-import { FormEvent, useState } from "react"
-import { getCategories, createId } from "../../admin/storage"
+import { FormEvent, useEffect, useMemo, useState } from "react"
+import { createId, getCategories, getSettings } from "../../admin/storage"
 import type { Team } from "../../admin/types"
+
+const formatLocalDatetime = (isoDate?: string) => {
+  if (!isoDate) return ""
+  const date = new Date(isoDate)
+  if (Number.isNaN(date.getTime())) return ""
+  return date.toLocaleString()
+}
 
 const TeamRegistration = () => {
   const categories = getCategories()
@@ -21,6 +28,11 @@ const TeamRegistration = () => {
   const [memberEmails, setMemberEmails] = useState<string[]>(["", "", ""])
   const [memberPhones, setMemberPhones] = useState<string[]>(["", "", ""])
   const [memberFINs, setMemberFINs] = useState<string[]>(["", "", ""])
+  const [settings, setSettings] = useState<ReturnType<typeof getSettings> | null>(null)
+
+  useEffect(() => {
+    setSettings(getSettings())
+  }, [])
 
   const handleMemberChange = (index: number, field: string, value: string | number) => {
     switch (field) {
@@ -92,6 +104,15 @@ const TeamRegistration = () => {
     return `Up to ${category.maxMembers} member${category.maxMembers === 1 ? "" : "s"} per team.`
   }
 
+  const registrationOpenDate = settings?.registrationOpen ? new Date(settings.registrationOpen) : null
+  const registrationCloseDate = settings?.registrationClose ? new Date(settings.registrationClose) : null
+  const registrationAllowed = useMemo(() => {
+    const now = new Date()
+    if (registrationOpenDate && now < registrationOpenDate) return false
+    if (registrationCloseDate && now > registrationCloseDate) return false
+    return true
+  }, [registrationOpenDate, registrationCloseDate])
+
   const validateForm = () => {
     if (!teamName.trim()) return "Team name is required"
     if (!school.trim()) return "School/Institution name is required"
@@ -118,6 +139,15 @@ const TeamRegistration = () => {
     setLoading(true)
     setError("")
     setSuccess("")
+
+    if (!registrationAllowed) {
+      const message = registrationOpenDate && new Date() < registrationOpenDate
+        ? `Registration opens on ${formatLocalDatetime(settings?.registrationOpen)}`
+        : `Registration has closed and new teams cannot be added.`
+      setError(message)
+      setLoading(false)
+      return
+    }
 
     const validationError = validateForm()
     if (validationError) {
@@ -196,7 +226,22 @@ const TeamRegistration = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        {!registrationAllowed ? (
+          <div className="rounded-3xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
+            <p className="text-xl font-semibold text-red-700">Registration is not available right now.</p>
+            <p className="mt-4 text-slate-600">
+              {registrationOpenDate && new Date() < registrationOpenDate
+                ? `Registration will open on ${formatLocalDatetime(settings?.registrationOpen)}.`
+                : registrationCloseDate && new Date() > registrationCloseDate
+                ? `Registration closed on ${formatLocalDatetime(settings?.registrationClose)}.`
+                : `New team signups are temporarily unavailable.`}
+            </p>
+            {registrationOpenDate && new Date() < registrationOpenDate && (
+              <p className="mt-3 text-sm text-slate-500">Please return after the opening time to add your team.</p>
+            )}
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-8">
           {/* Team Information */}
           <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-6">
             <h2 className="text-xl sm:text-2xl font-semibold text-blue-900 mb-6">Team Information</h2>
@@ -367,6 +412,7 @@ const TeamRegistration = () => {
             </button>
           </div>
         </form>
+        )}
 
         {/* Footer Note */}
         <div className="mt-8 text-center text-sm text-slate-600">

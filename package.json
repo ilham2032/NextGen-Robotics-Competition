@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
+    "dev:api": "vercel dev --listen 3000",
     "dev:payments": "vercel dev",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -19,6 +20,7 @@
     "@tailwindcss/vite": "^4.2.2",
     "country-code-lookup": "^0.1.5",
     "i18next": "^26.0.8",
+    "nodemailer": "^7.0.3",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "react": "^18.3.1",
@@ -31,10 +33,14 @@
     "tailwindcss": "^4.2.2",
     "xlsx": "^0.18.5"
   },
+  "optionalDependencies": {
+    "@supabase/supabase-js": "^2.16.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@types/nodemailer": "^6.4.17",
     "@vercel/node": "^5.8.2",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "eslint": "^9.15.0",

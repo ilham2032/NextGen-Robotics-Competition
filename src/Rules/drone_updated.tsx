@@ -4,7 +4,7 @@ const Drone = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
      
-      <section className="relative overflow-hidden bg-gradient-to-r from-sky-900 via-sky-800 to-sky-900 py-20">
+      <section className="relative overflow-hidden bg-linear-to-r from-sky-900 via-sky-800 to-sky-900 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 border border-white rounded-full"></div>
           <div className="absolute bottom-10 right-10 w-48 h-48 border border-white rounded-full"></div>
@@ -161,7 +161,7 @@ const Drone = () => {
         </div>
 
         {/* Contact Section */}
-        <section className="rounded-2xl bg-gradient-to-r from-sky-700 to-sky-900 p-8 text-center mt-12">
+        <section className="rounded-2xl bg-linear-to-r from-sky-700 to-sky-900 p-8 text-center mt-12">
           <h3 className="text-2xl font-bold text-white mb-4">Questions about Drone Race?</h3>
           <p className="text-sky-300 mb-6">
             Contact our technical team for clarifications on regulations

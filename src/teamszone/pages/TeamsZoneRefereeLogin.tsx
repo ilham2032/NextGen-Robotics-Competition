@@ -35,7 +35,7 @@ const TeamsZoneRefereeLogin = () => {
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-500 px-6 py-24">
+    <section className="min-h-screen bg-linear-to-br from-blue-900 via-blue-700 to-cyan-500 px-6 py-24">
       <div className="mx-auto max-w-md rounded-3xl border border-white/30 bg-white p-8 shadow-2xl">
         <Link to="/teamszone" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
           ← Back to Teams Zone
@@ -43,7 +43,7 @@ const TeamsZoneRefereeLogin = () => {
         <p className="mt-4 text-sm font-semibold tracking-widest text-blue-600 uppercase">Teams Zone Referee</p>
         <h1 className="mt-2 font-display text-4xl font-bold text-blue-900">Referee Login</h1>
         <p className="mt-3 text-sm text-slate-600">
-          Sign in to record robot battles, enter points, and announce winners for your assigned category.
+          Sign in to record robot battles, enter points, and publish finals qualifiers for your assigned category.
         </p>
 
         <form className="mt-7 space-y-4" onSubmit={handleSubmit}>

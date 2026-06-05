@@ -1,9 +1,17 @@
 import { FormEvent, useEffect, useMemo, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
-import { createId, getCategories, getMembers, getMentors, getTeams, saveMembers, saveMentors, saveTeams } from "../../admin/storage"
+import { createId, fetchRemoteTeams, getCategories, getMembers, getMentors, getTeams, saveMembers, saveMentors, saveTeams, saveTeamsAndSync } from "../../admin/storage"
 import type { Category, Member, Mentor, Team } from "../../admin/types"
 import { createPasswordHash, getCurrentMentor, signOutMentor } from "../auth"
 import { formatDateOfBirthInput, isValidDateOfBirth } from "../validation"
+import CategoryAgeRequirementsPanel from "../components/CategoryAgeRequirementsPanel"
+import { notifyEmailInBackground, sendMemberWelcomeEmail } from "../../lib/emailApi"
+import {
+  findCategoryByName,
+  formatCategoryAgeRequirement,
+  isMemberEligibleForCategory,
+  validateMembersForCategoryAge,
+} from "../../utils/categoryRules"
 
 const UserDashboard = () => {
   const navigate = useNavigate()
@@ -42,6 +50,19 @@ const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState<"users" | "create-team" | "teams" | "schedule" | "profile">("users")
   const mentorCountry = mentor?.country?.trim() ?? ""
 
+  useEffect(() => {
+    void (async () => {
+      const remote = await fetchRemoteTeams()
+      if (!remote || remote.length === 0) return
+      const local = getTeams()
+      const merged = new Map(local.map((team) => [team.id, team]))
+      remote.forEach((team) => merged.set(team.id, team))
+      const nextTeams = Array.from(merged.values())
+      saveTeams(nextTeams)
+      setAllTeams(nextTeams)
+    })()
+  }, [])
+
   const mentorMembers = useMemo(
     () => allMembers.filter((member) => member.mentorId && member.mentorId === mentor?.id),
     [allMembers, mentor?.id],
@@ -56,6 +77,16 @@ const UserDashboard = () => {
     () => new Set(mentorTeams.map((team) => team.categoryName?.trim() || "")).size,
     [mentorTeams],
   )
+
+  const selectedTeamCategory = useMemo(
+    () => (teamCategory ? findCategoryByName(categories, teamCategory) : undefined),
+    [categories, teamCategory],
+  )
+
+  const eligibleMemberCount = useMemo(() => {
+    if (!selectedTeamCategory) return mentorMembers.length
+    return mentorMembers.filter((member) => isMemberEligibleForCategory(member, selectedTeamCategory)).length
+  }, [mentorMembers, selectedTeamCategory])
 
   const navigationTabs = [
     { id: "users", label: "Users" },
@@ -97,6 +128,16 @@ const UserDashboard = () => {
       setActiveTab("teams")
     }
   }, [searchParams])
+
+  useEffect(() => {
+    if (!selectedTeamCategory) return
+    setSelectedMemberIds((ids) =>
+      ids.filter((id) => {
+        const member = mentorMembers.find((entry) => entry.id === id)
+        return member && isMemberEligibleForCategory(member, selectedTeamCategory)
+      }),
+    )
+  }, [teamCategory, selectedTeamCategory, mentorMembers])
 
   const completeTeamRegistration = (teamId: string) => {
     const teamName = mentorTeams.find((team) => team.id === teamId)?.name ?? "Team"
@@ -184,56 +225,10 @@ const UserDashboard = () => {
       }
     })
 
-  const findCategoryByName = (categoryName: string) => {
-    const normalizedCategoryName = categoryName.trim().toLowerCase()
-    return categories.find((category) => category.name.trim().toLowerCase() === normalizedCategoryName)
-  }
-
-  const getCategoryAgeHint = (categoryName: string) => {
-    const category = findCategoryByName(categoryName)
-    if (!category) {
-      return ""
-    }
-    if (category.ageMin !== undefined && category.ageMax !== undefined) {
-      return `Age ${category.ageMin}-${category.ageMax}`
-    }
-    if (category.ageMin !== undefined) {
-      return `Age ${category.ageMin}+`
-    }
-    if (category.ageMax !== undefined) {
-      return `Up to ${category.ageMax} years`
-    }
-    return ""
-  }
-
-  const validateCategoryAgeRules = (selectedMembers: Member[], categoryName: string) => {
-    const category = findCategoryByName(categoryName)
-    if (!category) {
-      return null
-    }
-
-    const minAge = category.ageMin
-    const maxAge = category.ageMax
-
-    if (minAge !== undefined) {
-      const underage = selectedMembers.filter((member) => member.age < minAge)
-      if (underage.length > 0) {
-        return `All selected members must be at least ${minAge} years old for ${category.name}.`
-      }
-    }
-
-    if (maxAge !== undefined) {
-      const overage = selectedMembers.filter((member) => member.age > maxAge)
-      if (overage.length > 0) {
-        return `All selected members must be ${maxAge} or younger for ${category.name}.`
-      }
-    }
-
-    return null
-  }
+  const getCategoryForTeam = (categoryName: string) => findCategoryByName(categories, categoryName)
 
   const validateCategoryTeamSizeRules = (selectedMembers: Member[], categoryName: string) => {
-    const category = findCategoryByName(categoryName)
+    const category = getCategoryForTeam(categoryName)
     if (!category || category.maxMembers === undefined) {
       return null
     }
@@ -246,7 +241,7 @@ const UserDashboard = () => {
   }
 
   const getCategoryMemberLimitHint = (categoryName: string) => {
-    const category = findCategoryByName(categoryName)
+    const category = getCategoryForTeam(categoryName)
     if (!category || category.maxMembers === undefined) {
       return ""
     }
@@ -321,6 +316,16 @@ const UserDashboard = () => {
     setAllMembers(nextMembers)
     saveMembers(nextMembers)
 
+    notifyEmailInBackground(
+      sendMemberWelcomeEmail({
+        name: newMember.name,
+        surname: newMember.surname,
+        email: newMember.email,
+        mentorName: `${mentor.name} ${mentor.surname}`,
+        age: newMember.age,
+      }),
+    )
+
     setMemberName("")
     setMemberSurname("")
     setMemberAgeDate("")
@@ -368,7 +373,7 @@ const UserDashboard = () => {
 
     const syncedTeams = normalizeAndSyncTeams(allTeams, nextMembers)
     setAllTeams(syncedTeams)
-    saveTeams(syncedTeams)
+    saveTeamsAndSync(syncedTeams)
 
     setEditingMemberId(null)
     setMemberError("")
@@ -385,13 +390,28 @@ const UserDashboard = () => {
 
     const syncedTeams = normalizeAndSyncTeams(allTeams, nextMembers)
     setAllTeams(syncedTeams)
-    saveTeams(syncedTeams)
+    saveTeamsAndSync(syncedTeams)
   }
 
   const toggleMemberSelection = (memberId: string) => {
-    setSelectedMemberIds((current) =>
-      current.includes(memberId) ? current.filter((id) => id !== memberId) : [...current, memberId],
-    )
+    const member = mentorMembers.find((entry) => entry.id === memberId)
+    if (!member) return
+
+    if (selectedMemberIds.includes(memberId)) {
+      setSelectedMemberIds((current) => current.filter((id) => id !== memberId))
+      return
+    }
+
+    if (selectedTeamCategory && !isMemberEligibleForCategory(member, selectedTeamCategory)) {
+      const ageLabel = formatCategoryAgeRequirement(selectedTeamCategory)
+      setTeamError(
+        `${member.name} ${member.surname} (age ${member.age}) is not eligible for ${selectedTeamCategory.name}. Required: ${ageLabel ?? "see category rules"}.`,
+      )
+      return
+    }
+
+    setTeamError("")
+    setSelectedMemberIds((current) => [...current, memberId])
   }
 
   const addTeam = (event: FormEvent<HTMLFormElement>) => {
@@ -415,7 +435,7 @@ const UserDashboard = () => {
       return
     }
 
-    const selectedCategory = findCategoryByName(teamCategory)
+    const selectedCategory = findCategoryByName(categories, teamCategory)
     if (!selectedCategory) {
       setTeamError("Selected category is no longer available. Please choose another category.")
       return
@@ -437,7 +457,8 @@ const UserDashboard = () => {
       return
     }
 
-    const categoryValidationError = validateCategoryAgeRules(selectedMembers, teamCategory)
+    const category = getCategoryForTeam(teamCategory)
+    const categoryValidationError = validateMembersForCategoryAge(selectedMembers, category)
     if (categoryValidationError) {
       setTeamError(categoryValidationError)
       return
@@ -471,7 +492,7 @@ const UserDashboard = () => {
 
     const nextTeams = [newTeam, ...allTeams]
     setAllTeams(nextTeams)
-    saveTeams(nextTeams)
+    saveTeamsAndSync(nextTeams)
 
     setTeamName("")
     setTeamCategory("")
@@ -489,7 +510,7 @@ const UserDashboard = () => {
 
     const nextTeams = allTeams.filter((team) => team.id !== teamId)
     setAllTeams(nextTeams)
-    saveTeams(nextTeams)
+    saveTeamsAndSync(nextTeams)
   }
 
   const updateTeam = (event: FormEvent<HTMLFormElement>, teamId: string) => {
@@ -515,7 +536,8 @@ const UserDashboard = () => {
       return
     }
 
-    const categoryValidationError = validateCategoryAgeRules(selectedMembers, categoryName)
+    const category = getCategoryForTeam(categoryName)
+    const categoryValidationError = validateMembersForCategoryAge(selectedMembers, category)
     if (categoryValidationError) {
       setTeamError(categoryValidationError)
       return
@@ -549,7 +571,7 @@ const UserDashboard = () => {
     )
 
     setAllTeams(nextTeams)
-    saveTeams(nextTeams)
+    saveTeamsAndSync(nextTeams)
     setEditingTeamId(null)
     setTeamError("")
   }
@@ -558,7 +580,7 @@ const UserDashboard = () => {
     <div className="min-h-screen bg-slate-950/5 text-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Hero */}
-        <div className="mb-10 rounded-[2.5rem] bg-gradient-to-br from-slate-950 via-indigo-950 to-sky-700 px-8 py-10 text-white shadow-[0_30px_90px_rgba(15,23,42,0.35)] ring-1 ring-white/10 backdrop-blur-sm sm:px-10 sm:py-12">
+        <div className="mb-10 rounded-[2.5rem] bg-linear-to-br from-slate-950 via-indigo-950 to-sky-700 px-8 py-10 text-white shadow-[0_30px_90px_rgba(15,23,42,0.35)] ring-1 ring-white/10 backdrop-blur-sm sm:px-10 sm:py-12">
           <div className="flex flex-col gap-8 xl:flex-row xl:items-center xl:justify-between">
             <div className="max-w-3xl">
               <p className="text-xs uppercase tracking-[0.35em] text-cyan-200/80">NextGen Robotics Mentor Portal</p>
@@ -636,6 +658,7 @@ const UserDashboard = () => {
                 ))}
               </nav>
             </div>
+            <CategoryAgeRequirementsPanel />
           </aside>
 
           <div className="space-y-6">
@@ -710,6 +733,9 @@ const UserDashboard = () => {
                       className="block w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-200"
                       required
                     />
+                    <p className="mt-2 text-xs text-indigo-700">
+                      Age is calculated from date of birth and must match the competition category (see age requirements in the sidebar).
+                    </p>
                   </div>
                   <div>
                     <label htmlFor="memberFin" className="block text-sm font-medium text-slate-700 mb-2">
@@ -852,16 +878,26 @@ const UserDashboard = () => {
                       required
                     >
                       <option value="">Select Category</option>
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.name}>
-                          {category.name}
-                        </option>
-                      ))}
+                      {categories.map((category) => {
+                        const ageLabel = formatCategoryAgeRequirement(category)
+                        return (
+                          <option key={category.id} value={category.name}>
+                            {category.name}
+                            {ageLabel ? ` · ${ageLabel}` : ""}
+                          </option>
+                        )
+                      })}
                     </select>
-                    {teamCategory && (
-                      <div className="space-y-1">
-                        <p className="mt-2 text-sm text-gray-500">{getCategoryAgeHint(teamCategory)}</p>
-                        <p className="text-sm text-gray-500">{getCategoryMemberLimitHint(teamCategory)}</p>
+                    {teamCategory && selectedTeamCategory && (
+                      <div className="mt-3 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3">
+                        <p className="text-sm font-semibold text-indigo-900">
+                          Participant age requirement: {formatCategoryAgeRequirement(selectedTeamCategory)}
+                        </p>
+                        <p className="mt-1 text-sm text-indigo-800">{getCategoryMemberLimitHint(teamCategory)}</p>
+                        <p className="mt-1 text-sm text-indigo-700">
+                          {eligibleMemberCount} of {mentorMembers.length} roster member
+                          {mentorMembers.length !== 1 ? "s" : ""} eligible for this category.
+                        </p>
                       </div>
                     )}
                   </div>
@@ -881,20 +917,39 @@ const UserDashboard = () => {
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        {mentorMembers.map((member) => (
-                          <label key={member.id} className="flex items-center hover:bg-white p-3 rounded-md border border-transparent hover:border-gray-200 transition-colors">
-                            <input
-                              type="checkbox"
-                              checked={selectedMemberIds.includes(member.id)}
-                              onChange={() => toggleMemberSelection(member.id)}
-                              className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                            />
-                            <div className="ml-3 flex-1">
-                              <span className="text-sm font-medium text-gray-900">{member.name} {member.surname}</span>
-                              <span className="text-sm text-gray-500 ml-2">Age: {member.age}</span>
-                            </div>
-                          </label>
-                        ))}
+                        {mentorMembers.map((member) => {
+                          const eligible =
+                            !selectedTeamCategory || isMemberEligibleForCategory(member, selectedTeamCategory)
+                          return (
+                            <label
+                              key={member.id}
+                              className={`flex items-center p-3 rounded-md border transition-colors ${
+                                eligible
+                                  ? "hover:bg-white border-transparent hover:border-gray-200 cursor-pointer"
+                                  : "bg-slate-100 border-slate-200 opacity-70 cursor-not-allowed"
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedMemberIds.includes(member.id)}
+                                onChange={() => toggleMemberSelection(member.id)}
+                                disabled={!eligible && !selectedMemberIds.includes(member.id)}
+                                className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded disabled:opacity-50"
+                              />
+                              <div className="ml-3 flex-1">
+                                <span className="text-sm font-medium text-gray-900">
+                                  {member.name} {member.surname}
+                                </span>
+                                <span className="text-sm text-gray-500 ml-2">Age {member.age}</span>
+                                {!eligible && selectedTeamCategory && (
+                                  <span className="block text-xs font-medium text-amber-700 mt-0.5">
+                                    Not eligible — requires {formatCategoryAgeRequirement(selectedTeamCategory)}
+                                  </span>
+                                )}
+                              </div>
+                            </label>
+                          )
+                        })}
                       </div>
                     )}
                   </div>
@@ -947,7 +1002,7 @@ const UserDashboard = () => {
                 setActiveTab('users')
                 setShowAddParticipantForm(true)
               }}
-              className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-sky-600 to-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-600/20 transition hover:from-sky-500 hover:to-indigo-700"
+              className="inline-flex items-center justify-center rounded-full bg-linear-to-r from-sky-600 to-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-600/20 transition hover:from-sky-500 hover:to-indigo-700"
             >
               Add participant
             </button>
@@ -1102,12 +1157,23 @@ const UserDashboard = () => {
                             className="w-full rounded-2xl border border-slate-300 px-3 py-2 text-sm"
                             required
                           />
-                          <input
+                          <select
                             name="categoryName"
                             defaultValue={team.categoryName}
                             className="w-full rounded-2xl border border-slate-300 px-3 py-2 text-sm"
                             required
-                          />
+                          >
+                            <option value="">Select category</option>
+                            {categories.map((category) => {
+                              const ageLabel = formatCategoryAgeRequirement(category)
+                              return (
+                                <option key={category.id} value={category.name}>
+                                  {category.name}
+                                  {ageLabel ? ` · ${ageLabel}` : ""}
+                                </option>
+                              )
+                            })}
+                          </select>
                           <textarea
                             name="description"
                             defaultValue={team.description}
@@ -1115,18 +1181,29 @@ const UserDashboard = () => {
                             rows={2}
                             required
                           />
-                          {mentorMembers.map((member) => (
-                            <label key={member.id} className="flex items-center gap-2 text-sm text-slate-700">
-                              <input
-                                type="checkbox"
-                                name="memberIds"
-                                value={member.id}
-                                defaultChecked={team.memberIds?.includes(member.id)}
-                                className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-                              />
-                              {member.name} {member.surname}
-                            </label>
-                          ))}
+                          {mentorMembers.map((member) => {
+                            const editCategory = getCategoryForTeam(team.categoryName ?? "")
+                            const eligible = !editCategory || isMemberEligibleForCategory(member, editCategory)
+                            return (
+                              <label
+                                key={member.id}
+                                className={`flex items-center gap-2 text-sm ${eligible ? "text-slate-700" : "text-slate-400"}`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="memberIds"
+                                  value={member.id}
+                                  defaultChecked={team.memberIds?.includes(member.id)}
+                                  disabled={!eligible && !team.memberIds?.includes(member.id)}
+                                  className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50"
+                                />
+                                {member.name} {member.surname} (age {member.age})
+                                {!eligible && editCategory && (
+                                  <span className="text-xs text-amber-700">— needs {formatCategoryAgeRequirement(editCategory)}</span>
+                                )}
+                              </label>
+                            )
+                          })}
                           <div className="flex flex-wrap gap-2">
                             <button
                               type="submit"
@@ -1188,7 +1265,12 @@ const UserDashboard = () => {
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
               <p className="text-sm text-slate-500">Category review</p>
               <p className="mt-2 text-lg font-semibold text-slate-900">{teamCategory || "Select a category first"}</p>
-              <p className="mt-2 text-sm text-slate-600">Use eligible members to match category rules and maximize your lineup.</p>
+              {teamCategory && selectedTeamCategory && (
+                <p className="mt-2 text-sm font-medium text-indigo-800">
+                  Required participant ages: {formatCategoryAgeRequirement(selectedTeamCategory)}
+                </p>
+              )}
+              <p className="mt-2 text-sm text-slate-600">Only participants within the category age range can be added to a team.</p>
             </div>
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
               <p className="text-sm text-slate-500">Mentor checkpoints</p>

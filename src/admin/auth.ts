@@ -1,7 +1,7 @@
 const ADMIN_AUTH_KEY = "nextgen_admin_authenticated"
 
-const ADMIN_USERNAME = "admin"
-const ADMIN_PASSWORD = "nextgen2026"
+const ADMIN_USERNAME = "nextgenadmin@admin.com"
+const ADMIN_PASSWORD = "nextgenrobotics2026"
 
 export const loginAdmin = (username: string, password: string): boolean => {
   const isValid = username === ADMIN_USERNAME && password === ADMIN_PASSWORD

@@ -11,7 +11,7 @@ const TeamDrone = () => {
   const uniqueCountries = new Set(categoryTeams.map(t => t.school).filter(Boolean))
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
+    <section className="min-h-screen bg-linear-to-br from-slate-50 to-gray-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="text-center mb-8">

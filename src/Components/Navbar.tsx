@@ -37,7 +37,7 @@ const Navbar = () => {
 
   return (
     <div className={`sticky-navbar ${isScrolled ? 'scrolled' : ''}`}>
-      <nav className='navbar-inner mx-auto mt-3 flex justify-between items-center rounded-2xl py-2 px-3 md:px-4 border border-white/20 bg-gradient-to-r from-blue-700/95 via-blue-600/95 to-indigo-700/95 shadow-[0_12px_36px_rgba(15,23,42,0.32)] backdrop-blur-md'>
+      <nav className='navbar-inner mx-auto mt-3 flex justify-between items-center rounded-2xl py-2 px-3 md:px-4 border border-white/20 bg-linear-to-r from-blue-700/95 via-blue-600/95 to-indigo-700/95 shadow-[0_12px_36px_rgba(15,23,42,0.32)] backdrop-blur-md'>
         <Link to='/home' className='flex items-center gap-2 pl-1'>
           <div className='leading-tight rounded-lg bg-white/12 px-2 py-1 sm:px-3'>
             <p className='font-display text-xs sm:text-sm lg:text-base text-white'>{t('NextGen Robotics')}</p>

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getCategories, getTeams, getMatchResults, getCompetitionResults } from '../../admin/storage'
-import { computeStandings, getFinalizedWinners, getPositionLabel } from '../utils/matchStats'
+import { getCategories } from '../../admin/storage'
+import { useLiveCompetitionData } from '../../hooks/useLiveCompetitionData'
+import { computeStandings } from '../utils/matchStats'
 import {
   SUMO_MAX_ROUNDS,
   areAllSumoRoundsComplete,
@@ -13,6 +14,8 @@ import {
   getGroupTeamCounts,
   getGroupsFromTeams,
   formatGroupName,
+  MAX_TEAMS_PER_GROUP,
+  FINALISTS_PER_GROUP,
 } from '../utils/groupUtils'
 import GroupTournamentPanel from './GroupTournamentPanel'
 
@@ -23,9 +26,7 @@ type CategoryTeamsViewProps = {
 
 const CategoryTeamsView = ({ categoryName, extraStat }: CategoryTeamsViewProps) => {
   const categories = getCategories()
-  const allTeams = getTeams()
-  const matchResults = getMatchResults()
-  const competitionResults = getCompetitionResults()
+  const { teams: allTeams, matchResults, competitionResults } = useLiveCompetitionData()
 
   const category = categories.find((cat) => cat.name === categoryName)
   const categoryTeams = allTeams.filter((team) => team.categoryName?.trim() === categoryName)
@@ -43,17 +44,15 @@ const CategoryTeamsView = ({ categoryName, extraStat }: CategoryTeamsViewProps) 
       setActiveGroup(groups[0])
     }
   }, [groups, activeGroup])
-  const winners = category ? getFinalizedWinners(competitionResults, category.id, allTeams) : []
-  const hasFinalResults = winners.length > 0
   const completedRounds = getCompletedRounds(categoryMatches)
   const roundsComplete = areAllSumoRoundsComplete(categoryMatches)
   const standings = category ? computeStandings(categoryTeams, categoryMatches, allTeams) : []
   const unassignedTeams = categoryTeams.filter((team) => !team.group?.trim())
   const uniqueCountries = new Set(categoryTeams.map((t) => t.school).filter(Boolean))
-  const standingByTeamId = new Map(standings.map((s) => [s.team.id, s]))
+  
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
+    <section className="min-h-screen bg-linear-to-br from-blue-50 to-cyan-50 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
       <div className="mx-auto max-w-6xl">
         <div className="text-center mb-8">
           <Link
@@ -104,7 +103,10 @@ const CategoryTeamsView = ({ categoryName, extraStat }: CategoryTeamsViewProps) 
 
         {usesGroups && (
           <div className="mb-8 rounded-xl border border-indigo-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4">Tournament Groups</h2>
+            <h2 className="text-lg font-semibold text-slate-800 mb-2">Tournament Groups</h2>
+            <p className="text-sm text-slate-500 mb-4">
+              Up to {MAX_TEAMS_PER_GROUP} teams per group · referee publishes the top {FINALISTS_PER_GROUP} teams per group for finals after group play
+            </p>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-4">
               {groups.map((group) => (
                 <div key={group} className="rounded-lg border border-indigo-100 bg-indigo-50/50 p-4 text-center">
@@ -168,36 +170,14 @@ const CategoryTeamsView = ({ categoryName, extraStat }: CategoryTeamsViewProps) 
                   ))}
                 </div>
                 <p className="text-sm text-slate-600">
-                  {hasFinalResults
-                    ? 'All 3 rounds finished. Final winners are published below.'
-                    : roundsComplete
-                      ? 'All rounds recorded — final results publishing...'
-                      : `${completedRounds.size} of ${SUMO_MAX_ROUNDS} rounds complete.`}
+                  {roundsComplete
+                    ? 'All rounds recorded — waiting for referee confirmation.'
+                    : `${completedRounds.size} of ${SUMO_MAX_ROUNDS} rounds complete.`}
                 </p>
               </div>
             )}
 
-            {hasFinalResults && (
-              <div className="mb-8 rounded-xl border border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 p-6 shadow-sm">
-                <h2 className="text-xl font-semibold text-amber-900 mb-4 flex items-center gap-2">
-                  <span>🏆</span> Final Results
-                </h2>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {winners.slice(0, 3).map((entry) => (
-                    <article
-                      key={entry.id}
-                      className="rounded-xl border border-amber-300 bg-white p-4"
-                    >
-                      <p className="text-sm font-semibold text-amber-700 uppercase tracking-wide">
-                        {getPositionLabel(entry.position)}
-                      </p>
-                      <p className="mt-1 text-lg font-bold text-slate-800">{entry.team?.name}</p>
-                      <p className="text-sm text-slate-600">{entry.totalScore} points</p>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            )}
+
 
             {standings.length > 0 && categoryMatches.length > 0 && (
               <div className="mb-8 bg-white rounded-xl shadow-sm border border-blue-100 p-6">
@@ -240,7 +220,6 @@ const CategoryTeamsView = ({ categoryName, extraStat }: CategoryTeamsViewProps) 
                   {categoryMatches.map((match) => {
                     const team1 = allTeams.find((t) => t.id === match.team1Id)
                     const team2 = allTeams.find((t) => t.id === match.team2Id)
-                    const winner = allTeams.find((t) => t.id === match.winnerId)
                     return (
                       <article key={match.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                         <div className="flex justify-between gap-2 mb-2">
@@ -249,7 +228,6 @@ const CategoryTeamsView = ({ categoryName, extraStat }: CategoryTeamsViewProps) 
                         </div>
                         <p className="text-sm">
                           {match.team1Score} — {match.team2Score}
-                          {winner && <span className="text-green-700 font-medium"> · Winner: {winner.name}</span>}
                         </p>
                       </article>
                     )
@@ -258,32 +236,6 @@ const CategoryTeamsView = ({ categoryName, extraStat }: CategoryTeamsViewProps) 
               )}
             </div>
 
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold text-slate-800 mb-4">Registered Teams</h2>
-              {categoryTeams.length === 0 ? (
-                <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-blue-100">
-                  <h3 className="text-xl font-semibold text-slate-800 mb-2">No Teams Registered Yet</h3>
-                  <Link to="/user/auth" className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700">
-                    Register via Mentor Portal
-                  </Link>
-                </div>
-              ) : (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {categoryTeams.map((team) => {
-                    const standing = standingByTeamId.get(team.id)
-                    return (
-                      <article key={team.id} className="bg-white rounded-xl shadow-sm border border-blue-100 p-6">
-                        <h3 className="text-xl font-semibold text-slate-800">{team.name}</h3>
-                        <p className="text-sm text-slate-600 mt-2">{team.school || 'Country not specified'}</p>
-                        {standing && (
-                          <p className="text-sm text-blue-600 mt-2 font-medium">{standing.points} pts · {standing.wins}W {standing.losses}L</p>
-                        )}
-                      </article>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
           </>
         )}
 

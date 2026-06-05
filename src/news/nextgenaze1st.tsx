@@ -15,7 +15,7 @@ const NextGenAzerbaijan1st = () => {
             <li className="text-slate-600">Start Up (senior)</li>
         </ul>
         <p className="text-slate-600 mt-4 text-sm lg:text-base">Join us for an unforgettable experience and showcase your skills in robotics!</p>
-        <p className="text-slate-600 mt-4 text-sm lg:text-base">Competition dates will be announced soon!</p>
+        <p className="text-slate-600 mt-4 text-sm lg:text-base">Competition dates: 1-2 October</p>
 
         <p className="text-slate-600 mt-4 text-sm lg:text-base">If you want to become our sponsor, please contact us for more information.</p>
         <h2 className="text-2xl font-bold text-blue-600 mt-6 mb-5">NextGen Robotics Competition</h2>

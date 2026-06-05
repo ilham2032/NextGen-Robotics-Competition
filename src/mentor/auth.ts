@@ -1,5 +1,6 @@
 import { createId, getMentorSession, getMentors, saveMentors, setMentorSession, clearMentorSession } from "../admin/storage"
 import type { Mentor } from "../admin/types"
+import { notifyEmailInBackground, sendMentorWelcomeEmail } from "../lib/emailApi"
 
 const encoder = new TextEncoder()
 
@@ -77,7 +78,15 @@ export const signUpMentor = async (payload: SignUpMentorInput): Promise<{ ok: bo
   saveMentors([mentor, ...mentors])
   setMentorSession(mentor.id)
 
-  return { ok: true, message: "Registration submitted successfully." }
+  notifyEmailInBackground(
+    sendMentorWelcomeEmail({
+      name: mentor.name,
+      surname: mentor.surname,
+      email: mentor.email,
+    }),
+  )
+
+  return { ok: true, message: "Registration successful! A confirmation email has been sent to your inbox." }
 }
 
 export const signInMentor = async (email: string, password: string): Promise<{ ok: boolean; message: string }> => {
@@ -99,6 +108,33 @@ export const signInMentor = async (email: string, password: string): Promise<{ o
 
   setMentorSession(mentor.id)
   return { ok: true, message: "Signed in successfully." }
+}
+
+export const resetMentorPassword = async (
+  email: string,
+  newPassword: string,
+): Promise<{ ok: boolean; message: string }> => {
+  const normalizedEmail = email.trim().toLowerCase()
+  const mentors = getMentors()
+  const mentor = mentors.find((item) => item.email === normalizedEmail)
+
+  if (!mentor) {
+    return { ok: false, message: "Account not found." }
+  }
+
+  if (newPassword.length < 8) {
+    return { ok: false, message: "Password must be at least 8 characters." }
+  }
+
+  const { passwordHash, passwordSalt } = await createPasswordHash(newPassword)
+  const updatedMentor: Mentor = {
+    ...mentor,
+    passwordHash,
+    passwordSalt,
+  }
+
+  saveMentors(mentors.map((item) => (item.id === mentor.id ? updatedMentor : item)))
+  return { ok: true, message: "Password updated successfully. You can now log in with your new password." }
 }
 
 export const getCurrentMentor = (): Mentor | null => {

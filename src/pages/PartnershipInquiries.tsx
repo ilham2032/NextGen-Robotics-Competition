@@ -67,7 +67,7 @@ const PartnershipInquiries = () => {
           </div>
         </div>
 
-        <div className="mt-10 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-white shadow-xl">
+        <div className="mt-10 rounded-2xl bg-linear-to-r from-blue-600 to-indigo-700 p-8 text-white shadow-xl">
           <h2 className="font-display text-2xl font-bold mb-4">{t('Partner with NextGen Robotics Competition')}</h2>
           <p className="text-sm leading-relaxed max-w-3xl">{t('Partnering with NextGen Robotics provides a valuable opportunity to support STEM development, increase brand visibility, and contribute to the growth of the robotics community.')}</p>
         </div>

@@ -1,4 +1,5 @@
 import type { MatchResult, Team, CompetitionResult } from '../../admin/types'
+import { FINALISTS_PER_GROUP } from './groupUtils'
 
 export type TeamStanding = {
   team: Team
@@ -69,6 +70,40 @@ export const getFinalizedWinners = (
       team: allTeams.find((t) => t.id === result.teamId),
     }))
     .filter((entry) => entry.team)
+
+/** Official finals qualifiers announced by the referee (shown on public standings). */
+export type PublishedFinalsQualifier = {
+  position: number
+  points: number
+  wins: number | undefined
+  team: Team
+  announcedAt: string | undefined
+}
+
+export const getPublishedFinalsQualifiers = (
+  competitionResults: CompetitionResult[],
+  categoryId: string,
+  allTeams: Team[],
+  group: string,
+): PublishedFinalsQualifier[] =>
+  competitionResults
+    .filter(
+      (result) =>
+        result.categoryId === categoryId &&
+        result.group === group &&
+        result.finalized &&
+        (result.qualifiedForFinals === true ||
+          (result.qualifiedForFinals === undefined && result.position <= FINALISTS_PER_GROUP)),
+    )
+    .sort((a, b) => a.position - b.position)
+    .map((result) => ({
+      position: result.position,
+      points: result.totalScore,
+      wins: undefined as number | undefined,
+      team: allTeams.find((t) => t.id === result.teamId),
+      announcedAt: result.announcedAt,
+    }))
+    .filter((entry): entry is PublishedFinalsQualifier => Boolean(entry.team))
 
 export const getFinalizedWinnersByGroup = (
   competitionResults: CompetitionResult[],

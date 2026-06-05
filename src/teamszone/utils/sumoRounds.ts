@@ -1,5 +1,6 @@
-import type { CompetitionResult, MatchResult } from '../../admin/types'
+import type { CompetitionResult, MatchResult, Team } from '../../admin/types'
 import type { TeamStanding } from './matchStats'
+import { allGroupTeamsHavePlayed, getAdvancingFinalists, getFinalsQualifierCount } from './groupUtils'
 
 export const SUMO_MAX_ROUNDS = 3
 
@@ -35,14 +36,18 @@ export const getSuggestedSumoRound = (matches: MatchResult[]): number => {
   return SUMO_MAX_ROUNDS
 }
 
-export const buildCompetitionResults = (
+/** Referee publishes top teams (by points) as official finals qualifiers for a group. */
+export const buildFinalsQualifierResults = (
   categoryId: string,
   refereeId: string,
   standings: TeamStanding[],
   createId: (prefix: string) => string,
-  group?: string,
-): CompetitionResult[] =>
-  standings.map((standing, index) => ({
+  group: string,
+): CompetitionResult[] => {
+  const announcedAt = new Date().toISOString()
+  const qualifiers = getAdvancingFinalists(standings, getFinalsQualifierCount(standings.length))
+
+  return qualifiers.map((standing, index) => ({
     id: createId('result'),
     categoryId,
     teamId: standing.team.id,
@@ -51,5 +56,29 @@ export const buildCompetitionResults = (
     matchesPlayed: standing.matchesPlayed,
     refereeId,
     finalized: true,
+    qualifiedForFinals: true,
+    announcedAt,
     group,
   }))
+}
+
+export const isGroupStageComplete = (
+  groupTeams: Team[],
+  groupMatches: MatchResult[],
+  isSumoFormat: boolean,
+): boolean => {
+  if (groupTeams.length === 0 || groupMatches.length === 0) return false
+  if (!allGroupTeamsHavePlayed(groupTeams, groupMatches)) return false
+  if (isSumoFormat && !areAllSumoRoundsComplete(groupMatches)) return false
+  return true
+}
+
+/** @deprecated Use buildFinalsQualifierResults for group finals */
+export const buildCompetitionResults = (
+  categoryId: string,
+  refereeId: string,
+  standings: TeamStanding[],
+  createId: (prefix: string) => string,
+  group?: string,
+): CompetitionResult[] =>
+  buildFinalsQualifierResults(categoryId, refereeId, standings, createId, group ?? '')

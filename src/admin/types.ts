@@ -108,6 +108,10 @@ export type CompetitionResult = {
   finalized: boolean
   /** Tournament group for grouped categories */
   group?: string
+  /** Referee announced this team for the final stage (group qualifiers) */
+  qualifiedForFinals?: boolean
+  /** ISO timestamp when the referee published finals qualification */
+  announcedAt?: string
   /** Finish time in seconds for track categories */
   trackFinishTime?: number
 }

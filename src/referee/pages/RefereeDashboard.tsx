@@ -4,21 +4,20 @@ import { signOutReferee, getCurrentReferee } from '../auth'
 import {
   createId,
   getCategories,
-  getTeams,
-  saveTeams,
-  getMatchResults,
-  saveMatchResults,
-  getCompetitionResults,
-  saveCompetitionResults,
+  saveMatchResultsAndSync,
+  saveCompetitionResultsAndSync,
+  saveTeamsAndSync,
 } from '../../admin/storage'
+import { useLiveCompetitionData } from '../../hooks/useLiveCompetitionData'
 import type { Category, Team, MatchResult, CompetitionResult } from '../../admin/types'
-import { computeStandings } from '../../teamszone/utils/matchStats'
+import { computeStandings, getPublishedFinalsQualifiers } from '../../teamszone/utils/matchStats'
 import {
   SUMO_MAX_ROUNDS,
   areAllSumoRoundsComplete,
-  buildCompetitionResults,
+  buildFinalsQualifierResults,
   getCompletedRounds,
   getSuggestedSumoRound,
+  isGroupStageComplete,
   isThreeRoundSumoCategory,
 } from '../../teamszone/utils/sumoRounds'
 import TrackScoringPanel from '../components/TrackScoringPanel'
@@ -26,15 +25,21 @@ import { isTrackCategory } from '../../teamszone/utils/trackCategories'
 import {
   applyCategoryGroupAssignments,
   assignTeamsToGroups,
+  canAssignTeamToGroup,
   categoryUsesGroups,
   clearCategoryGroupAssignments,
   filterMatchesByGroup,
   filterTeamsByGroup,
   formatGroupName,
+  FINALISTS_PER_GROUP,
+  getAdvancingFinalists,
   getGroupLabels,
   getGroupTeamCounts,
   getGroupsFromTeams,
-  isGroupFinalized,
+  allGroupTeamsHavePlayed,
+  isGroupFinalsAnnounced,
+  MAX_TEAMS_PER_GROUP,
+  getFinalsQualifierCount,
   recommendGroupCount,
   teamsShareGroup,
   updateTeamGroupInList,
@@ -45,13 +50,14 @@ const RefereeDashboard = () => {
   const currentReferee = getCurrentReferee()
 
   const [categories] = useState<Category[]>(() => getCategories())
-  const [teams, setTeams] = useState<Team[]>(() => getTeams())
-  const [matchResults, setMatchResults] = useState<MatchResult[]>(() => getMatchResults())
-  const [competitionResults, setCompetitionResults] = useState<CompetitionResult[]>(() => getCompetitionResults())
+  const { teams, matchResults, competitionResults, refresh } = useLiveCompetitionData(12000)
+  const setTeams = (nextTeams: Team[]) => {
+    saveTeamsAndSync(nextTeams)
+    void refresh()
+  }
 
   const assignedCategoryId = currentReferee?.categoryId ?? ''
   const [selectedCategory, setSelectedCategory] = useState<string>(assignedCategoryId)
-  const [groupCount, setGroupCount] = useState(2)
   const [selectedGroup, setSelectedGroup] = useState('A')
 
   const [team1Id, setTeam1Id] = useState('')
@@ -74,20 +80,15 @@ const RefereeDashboard = () => {
     return teams.filter((team) => team.categoryName?.trim() === selectedCategoryName)
   }, [selectedCategoryName, teams])
 
-  useEffect(() => {
-    if (categoryTeams.length > 0) {
-      setGroupCount(recommendGroupCount(categoryTeams.length))
-    }
-  }, [categoryTeams.length, selectedCategory])
-
+  const recommendedGroupCount = recommendGroupCount(categoryTeams.length)
   const groups = useMemo(() => getGroupsFromTeams(categoryTeams), [categoryTeams])
   const usesGroups = categoryUsesGroups(categoryTeams)
   const requiresGroups = isSumoFormat && categoryTeams.length >= 2
-  const groupLabels = getGroupLabels(groupCount)
+  const groupLabels = getGroupLabels(recommendedGroupCount)
   const groupsReady =
     categoryTeams.length >= 2 &&
     categoryTeams.every((team) => Boolean(team.group?.trim())) &&
-    groups.length >= Math.min(groupCount, recommendGroupCount(categoryTeams.length))
+    groups.length >= recommendedGroupCount
 
   useEffect(() => {
     if (groups.length > 0 && !groups.includes(selectedGroup)) {
@@ -119,111 +120,88 @@ const RefereeDashboard = () => {
 
   const isCategoryLocked = Boolean(assignedCategoryId)
   const isGroupDone = activeGroup
-    ? isGroupFinalized(competitionResults, selectedCategory, activeGroup)
+    ? isGroupFinalsAnnounced(competitionResults, selectedCategory, activeGroup)
     : competitionResults.some((r) => r.categoryId === selectedCategory && r.finalized && !r.group)
 
   const completedRounds = useMemo(() => getCompletedRounds(groupMatches), [groupMatches])
   const groupCounts = getGroupTeamCounts(categoryTeams)
+  const teamsPlayedCount = useMemo(() => {
+    const played = new Set<string>()
+    groupMatches.forEach((m) => {
+      played.add(m.team1Id)
+      played.add(m.team2Id)
+    })
+    return groupTeams.filter((t) => played.has(t.id)).length
+  }, [groupMatches, groupTeams])
 
-  const persistTeams = (nextTeams: Team[]) => {
-    setTeams(nextTeams)
-    saveTeams(nextTeams)
-  }
+  const groupStageComplete = isGroupStageComplete(groupTeams, groupMatches, isSumoFormat)
+  const qualifierCount = getFinalsQualifierCount(groupTeams.length)
 
-  const publishResults = useCallback(
+  const suggestedFinalists = useMemo(
+    () => (groupStageComplete ? getAdvancingFinalists(groupStandings, qualifierCount) : []),
+    [groupStageComplete, groupStandings, qualifierCount],
+  )
+
+  const publishedFinalists = useMemo(() => {
+    if (!activeGroup || !selectedCategory) return []
+    return getPublishedFinalsQualifiers(competitionResults, selectedCategory, teams, activeGroup)
+  }, [activeGroup, competitionResults, selectedCategory, teams])
+
+  const publishFinalsQualifiers = useCallback(
     (
       standings: ReturnType<typeof computeStandings>,
       categoryId: string,
       refereeId: string,
       existingResults: CompetitionResult[],
-      group?: string,
+      group: string,
     ) => {
-      const finalizedResults = buildCompetitionResults(categoryId, refereeId, standings, createId, group)
+      const finalizedResults = buildFinalsQualifierResults(categoryId, refereeId, standings, createId, group)
       const nextCompetitionResults = [
-        ...existingResults.filter(
-          (r) => !(r.categoryId === categoryId && (group ? r.group === group : !r.group)),
-        ),
+        ...existingResults.filter((r) => !(r.categoryId === categoryId && r.group === group)),
         ...finalizedResults,
       ]
-      setCompetitionResults(nextCompetitionResults)
-      saveCompetitionResults(nextCompetitionResults)
+      saveCompetitionResultsAndSync(nextCompetitionResults)
+      void refresh()
       return nextCompetitionResults
     },
-    [],
-  )
-
-  const tryAutoPublishGroup = useCallback(
-    (matches: MatchResult[], standings: ReturnType<typeof computeStandings>, group?: string) => {
-      if (!selectedCategory || !currentReferee || !isSumoFormat) return
-      if (!group && usesGroups) return
-      if (group && isGroupFinalized(competitionResults, selectedCategory, group)) return
-      if (!group && isGroupFinalized(competitionResults, selectedCategory, '')) return
-      if (!areAllSumoRoundsComplete(matches) || standings.length === 0) return
-
-      publishResults(standings, selectedCategory, currentReferee.id, competitionResults, group)
-    },
-    [selectedCategory, currentReferee, isSumoFormat, usesGroups, competitionResults, publishResults],
+    [refresh],
   )
 
   useEffect(() => {
-    if (!selectedCategory || !isSumoFormat || !currentReferee) return
+    if (!selectedCategory || !isSumoFormat) return
     setRound(getSuggestedSumoRound(groupMatches))
-
-    if (usesGroups) {
-      groups.forEach((group) => {
-        const gTeams = filterTeamsByGroup(categoryTeams, group)
-        const gMatches = filterMatchesByGroup(categoryMatches, group)
-        const gStandings = computeStandings(gTeams, gMatches, teams)
-        if (!isGroupFinalized(getCompetitionResults(), selectedCategory, group)) {
-          tryAutoPublishGroup(gMatches, gStandings, group)
-        }
-      })
-    } else {
-      const freshResults = getCompetitionResults()
-      const alreadyFinalized = freshResults.some(
-        (r) => r.categoryId === selectedCategory && r.finalized && !r.group,
-      )
-      if (!alreadyFinalized && areAllSumoRoundsComplete(categoryMatches)) {
-        const standings = computeStandings(categoryTeams, categoryMatches, teams)
-        if (standings.length > 0) {
-          publishResults(standings, selectedCategory, currentReferee.id, freshResults)
-        }
-      }
-    }
-  }, [
-    selectedCategory,
-    isSumoFormat,
-    currentReferee,
-    groupMatches,
-    categoryMatches,
-    categoryTeams,
-    teams,
-    usesGroups,
-    groups,
-    publishResults,
-    tryAutoPublishGroup,
-  ])
+  }, [selectedCategory, isSumoFormat, groupMatches])
 
   const handleAutoSplitGroups = () => {
     if (categoryTeams.length < 2) {
       alert('Need at least 2 teams to create groups.')
       return
     }
-    if (!window.confirm(`Split ${categoryTeams.length} teams evenly into ${groupCount} groups?`)) return
+    if (
+      !window.confirm(
+        `Split ${categoryTeams.length} teams into ${recommendedGroupCount} groups (max ${MAX_TEAMS_PER_GROUP} teams each)?`,
+      )
+    ) {
+      return
+    }
 
-    const assigned = assignTeamsToGroups(categoryTeams, groupCount)
+    const assigned = assignTeamsToGroups(categoryTeams)
     const nextTeams = applyCategoryGroupAssignments(teams, selectedCategoryName, assigned)
-    persistTeams(nextTeams)
-    setSelectedGroup(getGroupLabels(groupCount)[0])
+    setTeams(nextTeams)
+    setSelectedGroup(getGroupLabels(recommendedGroupCount)[0])
   }
 
   const handleClearGroups = () => {
     if (!window.confirm('Remove all group assignments for this category?')) return
-    persistTeams(clearCategoryGroupAssignments(teams, selectedCategoryName))
+    setTeams(clearCategoryGroupAssignments(teams, selectedCategoryName))
   }
 
   const handleTeamGroupChange = (teamId: string, group: string) => {
-    persistTeams(updateTeamGroupInList(teams, teamId, group))
+    if (group && !canAssignTeamToGroup(categoryTeams, teamId, group)) {
+      alert(`Each group can have at most ${MAX_TEAMS_PER_GROUP} teams.`)
+      return
+    }
+    setTeams(updateTeamGroupInList(teams, teamId, group))
   }
 
   const handleLogout = () => {
@@ -279,8 +257,8 @@ const RefereeDashboard = () => {
       ? [...filterMatchesByGroup(nextResults.filter((m) => m.categoryId === selectedCategory), matchGroup)]
       : nextResults.filter((m) => m.categoryId === selectedCategory)
 
-    setMatchResults(nextResults)
-    saveMatchResults(nextResults)
+    saveMatchResultsAndSync(nextResults)
+    void refresh()
 
     setTeam1Id('')
     setTeam2Id('')
@@ -293,23 +271,51 @@ const RefereeDashboard = () => {
     if (isSumoFormat) {
       setRound(getSuggestedSumoRound(nextGroupMatches))
       if (areAllSumoRoundsComplete(nextGroupMatches) && nextStandings.length > 0) {
-        publishResults(nextStandings, selectedCategory, currentReferee.id, competitionResults, matchGroup)
-        alert(
-          matchGroup
-            ? `All 3 rounds complete for ${formatGroupName(matchGroup)}! Winners published automatically.`
-            : 'All 3 rounds complete! Winners published automatically.',
-        )
+        if (allGroupTeamsHavePlayed(groupTeams, nextGroupMatches)) {
+          alert(
+            matchGroup
+              ? `Group stage complete for ${formatGroupName(matchGroup)}. Review standings and publish finals qualifiers when ready.`
+              : 'Group stage complete. Review standings and publish finals qualifiers when ready.',
+          )
+        }
       }
     } else {
       setRound((current) => current + 1)
     }
   }
 
-  const handleFinalizeResults = () => {
-    if (!selectedCategory || !currentReferee) return
-    if (!window.confirm('Announce final winners? Results will appear publicly in Teams Zone.')) return
-    publishResults(groupStandings, selectedCategory, currentReferee.id, competitionResults, activeGroup)
-    alert('Winners announced!')
+  const handleAnnounceFinalsQualifiers = () => {
+    if (!selectedCategory || !currentReferee || !activeGroup) return
+    if (!groupStageComplete) {
+      if (!allGroupTeamsHavePlayed(groupTeams, groupMatches)) {
+        alert(`Every team must play at least one battle before publishing finals (${teamsPlayedCount}/${groupTeams.length} teams have played).`)
+        return
+      }
+      if (isSumoFormat && !areAllSumoRoundsComplete(groupMatches)) {
+        alert('Complete all 3 rounds and ensure every team has played before publishing finals qualifiers.')
+        return
+      }
+      alert('Finish the group stage before publishing finals qualifiers.')
+      return
+    }
+    if (suggestedFinalists.length === 0) {
+      alert('No standings available to publish.')
+    }
+
+    const list = suggestedFinalists
+      .map((entry, index) => `${index + 1}. ${entry.team.name} (${entry.points} pts, ${entry.wins} wins)`)
+      .join('\n')
+
+    if (
+      !window.confirm(
+        `Publish these ${suggestedFinalists.length} teams as finals qualifiers for ${formatGroupName(activeGroup)}?\n\n${list}\n\nThey will appear on the public Standings page.`,
+      )
+    ) {
+      return
+    }
+
+    publishFinalsQualifiers(groupStandings, selectedCategory, currentReferee.id, competitionResults, activeGroup)
+    alert('Finals qualifiers published! They are now visible on the Standings page.')
   }
 
   if (!currentReferee) {
@@ -320,9 +326,9 @@ const RefereeDashboard = () => {
   const canRecordBattles = !isGroupDone && (!requiresGroups || groupsReady)
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-500 px-4 pb-16 pt-14 lg:px-8">
+    <section className="min-h-screen bg-linear-to-br from-blue-900 via-blue-700 to-cyan-500 px-4 pb-16 pt-14 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <header className="rounded-3xl border border-blue-200 bg-gradient-to-r from-blue-700 to-cyan-600 p-7 text-white shadow-xl">
+        <header className="rounded-3xl border border-blue-200 bg-linear-to-r from-blue-700 to-cyan-600 p-7 text-white shadow-xl">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-sm tracking-widest text-blue-100 uppercase">Teams Zone Referee</p>
@@ -370,24 +376,16 @@ const RefereeDashboard = () => {
             <div className="rounded-2xl border border-indigo-200 bg-white p-6 shadow-sm">
               <h2 className="font-display text-xl font-semibold text-indigo-900 mb-2">Group Setup</h2>
               <p className="text-sm text-slate-600 mb-4">
-                Split teams into groups before recording battles. Example: 20 teams → 10 in Group A, 10 in Group B.
-                Each group runs its own 3-round tournament.
+                Split teams into groups before recording battles (max {MAX_TEAMS_PER_GROUP} teams per group).
+                After every team has played, publish the top {FINALISTS_PER_GROUP} teams per group (by wins/points) as finals qualifiers from your account when ready.
+                {recommendedGroupCount > 0 && (
+                  <span className="block mt-2 font-medium text-indigo-800">
+                    Suggested: {recommendedGroupCount} group{recommendedGroupCount !== 1 ? 's' : ''} ({groupLabels.join(', ')})
+                  </span>
+                )}
               </p>
 
               <div className="flex flex-wrap items-end gap-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Number of Groups</label>
-                  <select
-                    value={groupCount}
-                    onChange={(e) => setGroupCount(Number(e.target.value))}
-                    className="rounded-xl border border-slate-300 px-4 py-2.5 focus:border-indigo-500 focus:outline-none"
-                    disabled={usesGroups && categoryMatches.length > 0}
-                  >
-                    {[2, 3, 4].map((n) => (
-                      <option key={n} value={n}>{n} groups ({getGroupLabels(n).join(', ')})</option>
-                    ))}
-                  </select>
-                </div>
                 <button
                   type="button"
                   onClick={handleAutoSplitGroups}
@@ -413,7 +411,7 @@ const RefereeDashboard = () => {
                       <div key={group} className="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-center">
                         <p className="font-semibold text-indigo-800">{formatGroupName(group)}</p>
                         <p className="text-2xl font-bold text-indigo-700">{groupCounts[group] ?? 0}</p>
-                        <p className="text-xs text-slate-500">teams</p>
+                        <p className="text-xs text-slate-500">/ {MAX_TEAMS_PER_GROUP} teams</p>
                       </div>
                     ))}
                   </div>
@@ -463,7 +461,7 @@ const RefereeDashboard = () => {
               <p className="text-sm font-medium text-slate-700 mb-3">Active Group</p>
               <div className="flex flex-wrap gap-2">
                 {groups.map((group) => {
-                  const done = isGroupFinalized(competitionResults, selectedCategory, group)
+                  const done = isGroupFinalsAnnounced(competitionResults, selectedCategory, group)
                   return (
                     <button
                       key={group}
@@ -501,9 +499,18 @@ const RefereeDashboard = () => {
                     Tournament Rounds{activeGroup ? ` · ${formatGroupName(activeGroup)}` : ''}
                   </h2>
                   <p className="text-sm text-slate-600 mb-4">
-                    Record battles for Round 1, 2, and 3. Winners publish automatically when all 3 rounds are complete
-                    {activeGroup ? ` for ${formatGroupName(activeGroup)}` : ''}.
+                    Record battles for Round 1, 2, and 3. When all 3 rounds are complete,
+                    {activeGroup ? ` for ${formatGroupName(activeGroup)}` : ''}. When every team has played, publish finals qualifiers.
                   </p>
+                  <p className="mb-4 text-sm text-slate-600">
+                    Teams played: {teamsPlayedCount} / {groupTeams.length}
+                    {isSumoFormat && ` · Rounds: ${completedRounds.size}/${SUMO_MAX_ROUNDS}`}
+                  </p>
+                  {groupStageComplete && !isGroupDone && (
+                    <p className="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
+                      Group stage complete. Review the top {qualifierCount} teams below and publish finals qualifiers when ready.
+                    </p>
+                  )}
                   <div className="grid grid-cols-3 gap-3">
                     {[1, 2, 3].map((roundNumber) => {
                       const done = completedRounds.has(roundNumber)
@@ -525,7 +532,7 @@ const RefereeDashboard = () => {
                   </div>
                   {isGroupDone && (
                     <p className="mt-4 rounded-lg bg-green-100 px-4 py-2 text-sm font-semibold text-green-800">
-                      {activeGroup ? `${formatGroupName(activeGroup)} winners published.` : 'Winners published.'}
+                      {activeGroup ? `${formatGroupName(activeGroup)} finals qualifiers published.` : 'Finals qualifiers published.'}
                     </p>
                   )}
                 </div>
@@ -617,14 +624,18 @@ const RefereeDashboard = () => {
                   <h2 className="font-display text-2xl font-semibold text-blue-900">
                     Standings{activeGroup ? ` · ${formatGroupName(activeGroup)}` : ''}
                   </h2>
-                  {!isSumoFormat && !isGroupDone && groupStandings.length > 0 && (
-                    <button onClick={handleFinalizeResults} className="rounded-xl bg-amber-500 px-4 py-2 font-semibold text-white hover:bg-amber-600">
-                      Announce Winners
+                  {!isGroupDone && groupStageComplete && suggestedFinalists.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleAnnounceFinalsQualifiers}
+                      className="rounded-xl bg-amber-500 px-4 py-2 font-semibold text-white hover:bg-amber-600"
+                    >
+                      Publish Finals Qualifiers
                     </button>
                   )}
                   {isGroupDone && (
                     <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
-                      {isSumoFormat ? 'Auto-Published' : 'Published'}
+                      Finals Published
                     </span>
                   )}
                 </div>
@@ -632,32 +643,85 @@ const RefereeDashboard = () => {
                 {groupTeams.length === 0 ? (
                   <p className="text-sm text-slate-500">No teams in this group.</p>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="border-b border-blue-200">
-                          <th className="text-left py-2 px-4 font-semibold">#</th>
-                          <th className="text-left py-2 px-4 font-semibold">Team</th>
-                          <th className="text-center py-2 px-4 font-semibold">W</th>
-                          <th className="text-center py-2 px-4 font-semibold">L</th>
-                          <th className="text-center py-2 px-4 font-semibold">D</th>
-                          <th className="text-center py-2 px-4 font-semibold">Pts</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {groupStandings.map((s, i) => (
-                          <tr key={s.team.id} className="border-b border-blue-100">
-                            <td className="py-3 px-4 font-medium">{i + 1}</td>
-                            <td className="py-3 px-4">{s.team.name}</td>
-                            <td className="py-3 px-4 text-center">{s.wins}</td>
-                            <td className="py-3 px-4 text-center">{s.losses}</td>
-                            <td className="py-3 px-4 text-center">{s.draws}</td>
-                            <td className="py-3 px-4 text-center font-semibold">{s.points}</td>
+                  <>
+                    {isGroupDone && publishedFinalists.length > 0 && (
+                      <div className="mb-4 rounded-xl border border-emerald-300 bg-emerald-50 p-4">
+                        <p className="text-sm font-semibold text-emerald-900 mb-2">
+                          Official finals qualifiers (published)
+                        </p>
+                        <ol className="space-y-1 text-sm text-emerald-900">
+                          {publishedFinalists.map((entry) => (
+                            <li key={entry.team.id}>
+                              {entry.position}. {entry.team.name} — {entry.points} pts
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+                    {!isGroupDone && groupStageComplete && suggestedFinalists.length > 0 && (
+                      <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                        <p className="text-sm font-semibold text-amber-900 mb-2">
+                          Suggested finals qualifiers (top {qualifierCount} by wins/points) — publish when ready
+                        </p>
+                        <ol className="space-y-1 text-sm text-amber-900">
+                          {suggestedFinalists.map((entry, index) => (
+                            <li key={entry.team.id}>
+                              {index + 1}. {entry.team.name} — {entry.points} pts, {entry.wins} W
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+                    {!isGroupDone && !groupStageComplete && groupTeams.length > 0 && (
+                      <p className="mb-4 rounded-lg bg-slate-100 px-4 py-3 text-sm text-slate-600">
+                        Record battles until every team has played
+                        {isSumoFormat ? ' and all 3 rounds are complete' : ''}. Finals qualifiers can be published after that.
+                      </p>
+                    )}
+                    <div className="overflow-x-auto rounded-xl border border-slate-200">
+                      <table className="w-full border-collapse text-sm">
+                        <thead className="bg-slate-50">
+                          <tr>
+                            <th className="text-left py-2 px-4 font-semibold">#</th>
+                            <th className="text-left py-2 px-4 font-semibold">Team</th>
+                            <th className="text-center py-2 px-4 font-semibold">W</th>
+                            <th className="text-center py-2 px-4 font-semibold">L</th>
+                            <th className="text-center py-2 px-4 font-semibold">D</th>
+                            <th className="text-center py-2 px-4 font-semibold">Pts</th>
+                            <th className="text-center py-2 px-4 font-semibold">Finals</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {groupStandings.map((s, i) => {
+                            const published = publishedFinalists.some((f) => f.team.id === s.team.id)
+                            const suggested = !isGroupDone && groupStageComplete && i < qualifierCount
+                            return (
+                              <tr
+                                key={s.team.id}
+                                className={`border-t border-slate-100 ${published ? 'bg-emerald-50/80' : suggested ? 'bg-amber-50/50' : ''}`}
+                              >
+                                <td className="py-3 px-4 font-medium">{i + 1}</td>
+                                <td className="py-3 px-4">{s.team.name}</td>
+                                <td className="py-3 px-4 text-center">{s.wins}</td>
+                                <td className="py-3 px-4 text-center">{s.losses}</td>
+                                <td className="py-3 px-4 text-center">{s.draws}</td>
+                                <td className="py-3 px-4 text-center font-semibold">{s.points}</td>
+                                <td className="py-3 px-4 text-center text-xs font-semibold">
+                                  {published ? (
+                                    <span className="text-emerald-700">Published</span>
+                                  ) : suggested ? (
+                                    <span className="text-amber-700">Pending</span>
+                                  ) : (
+                                    <span className="text-slate-400">—</span>
+                                  )}
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
                 )}
               </div>
 

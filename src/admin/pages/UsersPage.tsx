@@ -147,7 +147,7 @@ const UsersPage = ({ mentors, members, onMentorsChange, onMembersChange }: Users
   return (
     <div className="space-y-8">
       <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-xl shadow-slate-200/20">
-        <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-cyan-700 px-8 py-10 text-white">
+        <div className="bg-linear-to-r from-slate-900 via-blue-900 to-cyan-700 px-8 py-10 text-white">
           <p className="uppercase tracking-[0.3em] text-xs text-slate-300">NextGen Admin</p>
           <h1 className="mt-4 text-3xl font-semibold">User Center</h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-200">Manage mentors, participants and access for the event platform.</p>
