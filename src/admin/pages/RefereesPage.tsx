@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { createId, getCategories, getReferees, saveReferees } from '../storage'
 import type { Referee } from '../types'
 import { createPasswordHash } from '../../mentor/auth'
@@ -18,6 +19,7 @@ const emptyForm = {
 }
 
 const RefereesPage = ({ onNotify }: RefereesPageProps) => {
+  const { t } = useTranslation()
   const categories = getCategories()
   const [referees, setReferees] = useState<Referee[]>(() => getReferees())
   const [form, setForm] = useState(emptyForm)
@@ -85,7 +87,7 @@ const RefereesPage = ({ onNotify }: RefereesPageProps) => {
     <div className="space-y-8">
       <div className="rounded-3xl border border-slate-200 bg-white px-8 py-10 shadow-sm">
         <p className="text-xs font-semibold tracking-[0.25em] text-blue-600 uppercase">Teams Zone</p>
-        <h1 className="mt-2 text-3xl font-bold text-slate-900">Referee Accounts</h1>
+        <h1 className="mt-2 text-3xl font-bold text-slate-900">{t("Referee Accounts")}</h1>
         <p className="mt-3 max-w-2xl text-slate-600">
           Create login credentials for category referees. Each referee is assigned to one category and can record
           match results at{' '}
@@ -97,7 +99,7 @@ const RefereesPage = ({ onNotify }: RefereesPageProps) => {
       </div>
 
       <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h2 className="text-xl font-bold text-slate-900 mb-6">Create Referee</h2>
+        <h2 className="text-xl font-bold text-slate-900 mb-6">{t("Create Referee")}</h2>
 
         <form className="grid gap-4 md:grid-cols-2" onSubmit={handleCreate}>
           <div>

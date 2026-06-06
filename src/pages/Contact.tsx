@@ -87,19 +87,19 @@ const Contact = () => {
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
-            <h2 className="font-display text-xl font-bold text-slate-800 mb-5">Send us a Message</h2>
+            <h2 className="font-display text-xl font-bold text-slate-800 mb-5">{t('Get in Touch')}</h2>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="contact-name" className="block text-sm font-semibold text-slate-700 mb-1">
-                  Name
+                  {t('Name')}
                 </label>
                 <input
                   id="contact-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Your Name"
+                  placeholder={t('Your Name')}
                   className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
                   required
                   disabled={status === 'sending'}
@@ -108,14 +108,14 @@ const Contact = () => {
 
               <div>
                 <label htmlFor="contact-email" className="block text-sm font-semibold text-slate-700 mb-1">
-                  Email
+                  {t('Email')}
                 </label>
                 <input
                   id="contact-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your Email"
+                  placeholder={t('Your Email')}
                   className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
                   required
                   disabled={status === 'sending'}
@@ -124,13 +124,13 @@ const Contact = () => {
 
               <div>
                 <label htmlFor="contact-message" className="block text-sm font-semibold text-slate-700 mb-1">
-                  Message
+                  {t('Message')}
                 </label>
                 <textarea
                   id="contact-message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Your Message"
+                  placeholder={t('Your Message...')}
                   rows={4}
                   className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none resize-none"
                   required

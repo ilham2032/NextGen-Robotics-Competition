@@ -10,6 +10,7 @@ const formatLocalDatetime = (isoDate?: string) => {
 }
 
 const TeamRegistration = () => {
+  
   const categories = getCategories()
 
   const [loading, setLoading] = useState(false)

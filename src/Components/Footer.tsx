@@ -21,7 +21,7 @@ const Footer = () => {
           <div className='lg:col-span-1'>
             <div className='mb-6'>
               <h3 className='text-xl font-bold text-white mb-2'>NextGen Robotics</h3>
-              <p className='text-cyan-300 font-medium text-sm tracking-wider uppercase'>Competition 2026</p>
+              <p className='text-cyan-300 font-medium text-sm tracking-wider uppercase'>{t("Competition 2026")}</p>
             </div>
             <p className='text-slate-300 text-sm leading-relaxed mb-6'>
               Empowering the next generation of robotics innovators through competitive challenges,
@@ -49,14 +49,14 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className='text-lg font-semibold text-white mb-6'>Quick Links</h4>
+            <h4 className='text-lg font-semibold text-white mb-6'>{t("Quick Links")}</h4>
             <ul className='space-y-3'>
-              <li><Link to='/home' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>Home</Link></li>
-              <li><Link to='/about' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>About Us</Link></li>
-              <li><Link to='/standings' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>Live Standings</Link></li>
-              <li><Link to='/news' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>Latest News</Link></li>
-              <li><Link to='/participants' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>Participants</Link></li>
-              <li><Link to='/regulations' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>Competition Rules</Link></li>
+              <li><Link to='/home' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>{t("Home")}</Link></li>
+              <li><Link to='/about' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>{t("About")}</Link></li>
+              <li><Link to='/standings' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>{t("Standings")}</Link></li>
+              <li><Link to='/news' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>{t("News")}</Link></li>
+              <li><Link to='/participants' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>{t("Participants")}</Link></li>
+              <li><Link to='/regulations' className='text-slate-300 hover:text-cyan-300 transition-colors duration-200 text-sm'>{t("Regulations")}</Link></li>
             </ul>
           </div>
 
@@ -87,7 +87,7 @@ const Footer = () => {
 
           {/* Contact & Support */}
           <div>
-            <h4 className='text-lg font-semibold text-white mb-6'>Contact & Support</h4>
+            <h4 className='text-lg font-semibold text-white mb-6'>{t("Contact & Support")}</h4>
             <div className='space-y-4'>
               <div className='flex items-start space-x-3'>
                 <svg className='w-5 h-5 text-cyan-300 mt-0.5 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>

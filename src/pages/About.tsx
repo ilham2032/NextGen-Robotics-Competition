@@ -65,7 +65,6 @@ const About = () => {
             <h2 className='text-2xl font-semibold text-slate-900'>{t('Who can join')}</h2>
             <ul className='mt-4 space-y-3 text-slate-600'>
               <li>{t('High school and university teams')}</li>
-              <li>{t('Team size: up to 4 members')}</li>
               <li>{t('Includes robotics, AI, and strategy categories')}</li>
             </ul>
           </article>

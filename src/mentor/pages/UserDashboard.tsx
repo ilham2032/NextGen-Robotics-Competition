@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import { createId, fetchRemoteTeams, getCategories, getMembers, getMentors, getTeams, saveMembers, saveMentors, saveTeams, saveTeamsAndSync } from "../../admin/storage"
 import type { Category, Member, Mentor, Team } from "../../admin/types"
 import { createPasswordHash, getCurrentMentor, signOutMentor } from "../auth"
@@ -15,6 +16,7 @@ import {
 
 const UserDashboard = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const [mentor, setMentor] = useState<Mentor | null>(() => getCurrentMentor())
   const [allMembers, setAllMembers] = useState<Member[]>(() => getMembers())
@@ -89,11 +91,11 @@ const UserDashboard = () => {
   }, [mentorMembers, selectedTeamCategory])
 
   const navigationTabs = [
-    { id: "users", label: "Users" },
-    { id: "create-team", label: "Create Team" },
-    { id: "teams", label: "Teams" },
-    { id: "schedule", label: "Schedule" },
-    { id: "profile", label: "Profile" },
+    { id: "users", label: t("Add Participant") },
+    { id: "create-team", label: t("Create Team") },
+    { id: "teams", label: t("Teams") },
+    { id: "schedule", label: t("Event Schedule") },
+    { id: "profile", label: t("Mentor Profile") },
   ]
 
   const handleLogout = () => {
@@ -583,7 +585,7 @@ const UserDashboard = () => {
         <div className="mb-10 rounded-[2.5rem] bg-linear-to-br from-slate-950 via-indigo-950 to-sky-700 px-8 py-10 text-white shadow-[0_30px_90px_rgba(15,23,42,0.35)] ring-1 ring-white/10 backdrop-blur-sm sm:px-10 sm:py-12">
           <div className="flex flex-col gap-8 xl:flex-row xl:items-center xl:justify-between">
             <div className="max-w-3xl">
-              <p className="text-xs uppercase tracking-[0.35em] text-cyan-200/80">NextGen Robotics Mentor Portal</p>
+              <p className="text-xs uppercase tracking-[0.35em] text-cyan-200/80">{t("NextGen Robotics Mentor Portal")}</p>
               <h1 className="mt-4 text-3xl font-display font-semibold tracking-tight text-white sm:text-5xl">
                 Welcome back, {mentor?.name ?? 'Mentor'}
               </h1>
@@ -599,30 +601,30 @@ const UserDashboard = () => {
                   }}
                   className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-white/20 transition hover:bg-slate-100"
                 >
-                  Add participant
+                  {t("Add Participant")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab('create-team')}
                   className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
                 >
-                  Create a team
+                  {t("Create Team")}
                 </button>
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="rounded-[22px] bg-white/10 border border-white/15 p-5 shadow-lg shadow-slate-950/20 backdrop-blur-sm">
-                <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Participants</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-300">{t("Participants")}</p>
                 <p className="mt-4 text-3xl font-semibold text-white">{mentorMembers.length}</p>
                 <p className="mt-2 text-sm text-slate-300">Active team members</p>
               </div>
               <div className="rounded-[22px] bg-white/10 border border-white/15 p-5 shadow-lg shadow-slate-950/20 backdrop-blur-sm">
-                <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Teams</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-300">{t("Teams")}</p>
                 <p className="mt-4 text-3xl font-semibold text-white">{mentorTeams.length}</p>
                 <p className="mt-2 text-sm text-slate-300">Competition-ready squads</p>
               </div>
               <div className="rounded-[22px] bg-white/10 border border-white/15 p-5 shadow-lg shadow-slate-950/20 backdrop-blur-sm">
-                <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Categories</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-300">{t("Categories")}</p>
                 <p className="mt-4 text-3xl font-semibold text-white">{mentorCategoryCount}</p>
                 <p className="mt-2 text-sm text-slate-300">Event categories used</p>
               </div>
@@ -634,7 +636,7 @@ const UserDashboard = () => {
           <aside className="space-y-6 md:sticky md:top-8">
             <div className="rounded-4xl border border-slate-200/70 bg-white p-6 shadow-[0_32px_80px_rgba(15,23,42,0.12)]">
               <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Mentor toolkit</p>
-              <h2 className="mt-3 text-xl font-semibold text-slate-900">Navigation</h2>
+              <h2 className="mt-3 text-xl font-semibold text-slate-900">{t("Navigation")}</h2>
               <p className="mt-2 text-sm text-slate-600">Select a section to manage participants, teams, schedule, or profile.</p>
               <nav className="mt-6 space-y-2">
                 {navigationTabs.map((tab) => (
@@ -679,7 +681,7 @@ const UserDashboard = () => {
                     </svg>
                   </div>
                   <div>
-                    <h2 className="text-lg sm:text-xl font-display font-semibold text-slate-900">Add Participant</h2>
+                    <h2 className="text-lg sm:text-xl font-display font-semibold text-slate-900">{t("Add Participant")}</h2>
                     <p className="text-sm text-slate-600">Provide participant details for your team roster.</p>
                   </div>
                 </div>
@@ -696,25 +698,25 @@ const UserDashboard = () => {
               <form className="space-y-6" onSubmit={addMember}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="memberName" className="block text-sm font-medium text-slate-700 mb-2">First Name *</label>
+                    <label htmlFor="memberName" className="block text-sm font-medium text-slate-700 mb-2">{t("First Name")} *</label>
                     <input
                       id="memberName"
                       type="text"
                       value={memberName}
                       onChange={(event) => setMemberName(event.target.value)}
-                      placeholder="Enter first name"
+                      placeholder={t("Enter first name")}
                       className="block w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-200"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="memberSurname" className="block text-sm font-medium text-slate-700 mb-2">Last Name *</label>
+                    <label htmlFor="memberSurname" className="block text-sm font-medium text-slate-700 mb-2">{t("Last Name")} *</label>
                     <input
                       id="memberSurname"
                       type="text"
                       value={memberSurname}
                       onChange={(event) => setMemberSurname(event.target.value)}
-                      placeholder="Enter last name"
+                      placeholder={t("Enter last name")}
                       className="block w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-200"
                       required
                     />
@@ -723,13 +725,13 @@ const UserDashboard = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                   <div className="sm:col-span-2">
-                    <label htmlFor="memberAgeDate" className="block text-sm font-medium text-slate-700 mb-2">Date of Birth *</label>
+                    <label htmlFor="memberAgeDate" className="block text-sm font-medium text-slate-700 mb-2">{t("Date of Birth")} *</label>
                     <input
                       id="memberAgeDate"
                       type="date"
                       value={memberAgeDate}
                       onChange={(event) => setMemberAgeDate(event.target.value)}
-                      placeholder="mm/dd/yyyy"
+                      placeholder={t("mm/dd/yyyy")}
                       className="block w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-200"
                       required
                     />
@@ -739,27 +741,27 @@ const UserDashboard = () => {
                   </div>
                   <div>
                     <label htmlFor="memberFin" className="block text-sm font-medium text-slate-700 mb-2">
-                      FIN *
-                      <span className="text-xs text-slate-500 ml-1" title="Personal Identification Number - 7-12 alphanumeric characters">ⓘ</span>
+                      {t("FIN")} *
+                      <span className="text-xs text-slate-500 ml-1" title={t("Personal Identification Number - 7-12 alphanumeric characters")}>ⓘ</span>
                     </label>
                     <input
                       id="memberFin"
                       type="text"
                       value={memberFin}
                       onChange={(event) => setMemberFin(event.target.value)}
-                      placeholder="e.g., ABC123456"
+                      placeholder={t("e.g., ABC123456")}
                       className="block w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-200 uppercase"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="memberPhone" className="block text-sm font-medium text-slate-700 mb-2">Contact number *</label>
+                    <label htmlFor="memberPhone" className="block text-sm font-medium text-slate-700 mb-2">{t("Phone Number")} *</label>
                     <input
                       id="memberPhone"
                       type="tel"
                       value={memberPhone}
                       onChange={(event) => setMemberPhone(event.target.value)}
-                      placeholder="Enter phone"
+                      placeholder={t("Enter phone")}
                       className="block w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-200"
                       required
                     />
@@ -767,13 +769,13 @@ const UserDashboard = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="memberEmail" className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                  <label htmlFor="memberEmail" className="block text-sm font-medium text-gray-700 mb-2">{t("Email Address")} *</label>
                   <input
                     id="memberEmail"
                     type="email"
                     value={memberEmail}
                     onChange={(event) => setMemberEmail(event.target.value)}
-                    placeholder="member@example.com"
+                    placeholder={t("member@example.com")}
                     className="block w-full px-4 py-3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base"
                     required
                   />
@@ -802,7 +804,7 @@ const UserDashboard = () => {
                     <svg className="-ml-1 mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    Add Member
+                    {t("Add")} {t("Participants")}
                   </button>
                 </div>
               </form>
@@ -822,21 +824,21 @@ const UserDashboard = () => {
                   </div>
                 </div>
                 <div className="ml-3">
-                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Create Team</h2>
-                  <p className="text-sm text-gray-600">Form a team with selected members</p>
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">{t("Create Team")}</h2>
+                  <p className="text-sm text-gray-600">{t("Form a team with selected members")}</p>
                 </div>
               </div>
             </div>
             <div className="p-6">
               <form className="space-y-6" onSubmit={addTeam}>
                 <div>
-                  <label htmlFor="teamName" className="block text-sm font-medium text-gray-700 mb-2">Team Name *</label>
+                  <label htmlFor="teamName" className="block text-sm font-medium text-gray-700 mb-2">{t("Team Name")} *</label>
                   <input
                     id="teamName"
                     type="text"
                     value={teamName}
                     onChange={(event) => setTeamName(event.target.value)}
-                    placeholder="Enter team name"
+                    placeholder={t("Enter team name")}
                     className="block w-full px-4 py-3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base"
                     required
                   />
@@ -850,7 +852,7 @@ const UserDashboard = () => {
                     id="teamDescription"
                     value={teamDescription}
                     onChange={(event) => setTeamDescription(event.target.value)}
-                    placeholder="Describe your robot design, materials, sensors, controller, and strategy."
+                    placeholder={t("Your Message...")}
                     rows={4}
                     className="block w-full px-4 py-3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base"
                     required
@@ -869,7 +871,7 @@ const UserDashboard = () => {
                   </div>
                 </div>
                 <div>
-                    <label htmlFor="teamCategory" className="block text-sm font-medium text-gray-700 mb-2">Competition Category *</label>
+                    <label htmlFor="teamCategory" className="block text-sm font-medium text-gray-700 mb-2">{t("Competition Category")} *</label>
                     <select
                       id="teamCategory"
                       value={teamCategory}
@@ -877,7 +879,7 @@ const UserDashboard = () => {
                       className="block w-full px-4 py-3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base"
                       required
                     >
-                      <option value="">Select Category</option>
+                      <option value="">{t("Select a category...")}</option>
                       {categories.map((category) => {
                         const ageLabel = formatCategoryAgeRequirement(category)
                         return (

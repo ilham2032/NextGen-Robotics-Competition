@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { getCategories, saveCategories } from "../../admin/storage"
 import type { Category } from "../../admin/types"
 import { createId } from "../../admin/storage"
@@ -8,6 +9,7 @@ interface CategoryPageProps {
 }
 
 const CategoryPage = ({ onNotify }: CategoryPageProps) => {
+  const { t } = useTranslation()
   const [categories, setCategories] = useState<Category[]>([])
   const [isAdding, setIsAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -118,8 +120,8 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
       <div className="rounded-3xl border border-slate-200 bg-white px-6 py-7 shadow-sm sm:px-8">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Category Management</h2>
-            <p className="mt-1 text-sm text-slate-600">Create, edit, and manage competition categories</p>
+            <h2 className="text-2xl font-bold text-slate-900">{t("Category Management")}</h2>
+            <p className="mt-1 text-sm text-slate-600">{t("Create, edit, and manage competition categories")}</p>
           </div>
 
           {!isAdding && !editingId && (
@@ -127,7 +129,7 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
               onClick={() => setIsAdding(true)}
               className="rounded-lg bg-blue-700 px-6 py-3 font-semibold text-white shadow-lg shadow-blue-700/30 transition hover:bg-blue-600"
             >
-              + Add Category
+              {t("+ Add Category")}
             </button>
           )}
         </div>
@@ -136,12 +138,12 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
         {(isAdding || editingId) && (
           <div id="category-form" className="mt-6 space-y-4 rounded-2xl border-2 border-blue-200 bg-blue-50 p-6">
             <h3 className="font-semibold text-slate-900">
-              {editingId ? "Edit Category" : "Add New Category"}
+              {editingId ? t("Edit Event Details") : t("Create Category")}
             </h3>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-semibold text-slate-700">Category Name</label>
+                <label className="block text-sm font-semibold text-slate-700">{t("Category")}</label>
                 <input
                   type="text"
                   value={formData.name}
@@ -152,11 +154,11 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700">Description</label>
+                <label className="block text-sm font-semibold text-slate-700">{t("Description")}</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Describe the category rules and requirements..."
+                  placeholder={t("Your Message...")}
                   rows={3}
                   className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2 text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
                 />
@@ -164,7 +166,7 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700">PDF Name</label>
+                  <label className="block text-sm font-semibold text-slate-700">PDF {t("Name")}</label>
                   <input
                     type="text"
                     value={formData.pdfName}
@@ -175,7 +177,7 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700">Select PDF File</label>
+                  <label className="block text-sm font-semibold text-slate-700">{t("Upload")} PDF</label>
                   <input
                     type="file"
                     accept=".pdf"
@@ -204,13 +206,13 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
                     onClick={handleSaveEdit}
                     className="flex-1 rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white transition hover:bg-blue-600"
                   >
-                    Save Changes
+                    {t("Save")}
                   </button>
                   <button
                     onClick={handleCancel}
                     className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-900 transition hover:bg-slate-50"
                   >
-                    Cancel
+                    {t("Cancel")}
                   </button>
                 </>
               ) : (
@@ -219,13 +221,13 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
                     onClick={handleAdd}
                     className="flex-1 rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white transition hover:bg-blue-600"
                   >
-                    Create Category
+                    {t("Create Category")}
                   </button>
                   <button
                     onClick={handleCancel}
                     className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-900 transition hover:bg-slate-50"
                   >
-                    Cancel
+                    {t("Cancel")}
                   </button>
                 </>
               )}
@@ -238,7 +240,7 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
       <div className="grid gap-4">
         {categories.length === 0 ? (
           <div className="rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 py-12 text-center">
-            <p className="text-slate-600">No categories yet. Create one to get started.</p>
+            <p className="text-slate-600">{t("No teams have been created yet")}</p>
           </div>
         ) : (
           categories.map((category) => (
@@ -260,13 +262,13 @@ const CategoryPage = ({ onNotify }: CategoryPageProps) => {
                     onClick={() => handleEdit(category.id)}
                     className="rounded-lg bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-200"
                   >
-                    ✎ Edit
+                    ✎ {t("Edit")}
                   </button>
                   <button
                     onClick={() => handleDelete(category.id)}
                     className="rounded-lg bg-red-100 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-200"
                   >
-                    🗑 Delete
+                    🗑 {t("Delete")}
                   </button>
                 </div>
               </div>

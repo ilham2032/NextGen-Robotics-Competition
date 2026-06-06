@@ -148,7 +148,7 @@ const Regulations = () => {
                 <h2 className={style.title}>{category.name}</h2>
                 <p className={style.description}>{category.description}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                    <Link to={categoryPath} className={`${style.button} text-white`}>
+                    <Link to={categoryPath} className={`${style.button} text-white`} style={{ color: '#fff' }}>
                     View
                   </Link>
 

@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from "react"
 import { useLocation } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import { createId, getMembers, getMentors, getTeams, getSettings, saveTeamsAndSync, saveSettings, clearAllData } from "../storage"
 import type { Member, Mentor, Team } from "../types"
 import type { EventSettings, MatchSlot, ScoringRule, TeamRecord, TeamStatus } from "./adminDashboardTypes"
@@ -55,6 +56,7 @@ const createTeamRecord = (team: Team): TeamRecord => ({
 })
 
 const AdminDashboard = () => {
+  const { t } = useTranslation()
   const [teams, setTeams] = useState<TeamRecord[]>(() => {
     const saved = getTeams()
     return saved.length > 0 ? saved.map(createTeamRecord) : defaultTeams
@@ -288,7 +290,7 @@ const AdminDashboard = () => {
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div>
                     <p className="text-xs font-semibold tracking-[0.25em] text-blue-600 uppercase">Welcome back</p>
-                    <h1 className="mt-2 text-4xl font-bold text-slate-900">Admin Dashboard</h1>
+                    <h1 className="mt-2 text-4xl font-bold text-slate-900">{t("Admin Dashboard")}</h1>
                     <p className="mt-3 max-w-2xl text-slate-600">
                       Manage teams, schedule matches, track live scoring and configure event settings for a modern competition experience.
                     </p>
@@ -296,15 +298,15 @@ const AdminDashboard = () => {
 
                   <div className="grid gap-4 md:grid-cols-3">
                     <div className="rounded-2xl border border-blue-200 bg-linear-to-br from-blue-50 to-indigo-50 p-6">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Total Teams</p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">{t("Total Teams")}</p>
                       <p className="mt-2 text-3xl font-bold text-blue-700">{teams.length}</p>
                     </div>
                     <div className="rounded-2xl border border-cyan-200 bg-linear-to-br from-cyan-50 to-blue-50 p-6">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Checked In</p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">{t("Checked In")}</p>
                       <p className="mt-2 text-3xl font-bold text-cyan-700">{stats.checkedIn}</p>
                     </div>
                     <div className="rounded-2xl border border-indigo-200 bg-linear-to-br from-indigo-50 to-purple-50 p-6">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Pending Matches</p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">{t("Pending Matches")}</p>
                       <p className="mt-2 text-3xl font-bold text-indigo-700">{matches.filter((m) => m.status === "Pending").length}</p>
                     </div>
                   </div>
@@ -357,7 +359,7 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-                  <h3 className="text-xl font-bold text-slate-900">⚙️ Admin Settings</h3>
+                  <h3 className="text-xl font-bold text-slate-900">⚙️ {t("Mentor toolkit")}</h3>
                   <div className="mt-6 space-y-4">
                     <div>
                       <label className="block text-sm font-semibold text-slate-700">Current Role</label>
@@ -384,7 +386,7 @@ const AdminDashboard = () => {
                     onClick={handleClearAllData}
                     className="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
                   >
-                    Clear All Data
+                    {t("Clear")}
                   </button>
                 </div>
               </div>

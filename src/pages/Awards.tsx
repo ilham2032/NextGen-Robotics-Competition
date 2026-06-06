@@ -16,19 +16,19 @@ const Awards = () => {
         <div className='mt-8 grid gap-5 md:grid-cols-3'>
           <article className='rounded-2xl border border-yellow-200 bg-white p-6 shadow-sm'>
             <p className='text-sm font-semibold text-yellow-600 uppercase'>{t('1st Place Winner')}</p>
-            <h2 className='mt-2 text-4xl font-bold text-blue-900'>---</h2>
+            <h2 className='mt-2 text-4xl font-bold text-blue-900'>WILL BE SHARED SOON</h2>
             <p className='mt-2 text-sm text-slate-600'>{t('Awarded to the champion team in each category.')}</p>
           </article>
 
           <article className='rounded-2xl border border-slate-200 bg-white p-6 shadow-sm'>
             <p className='text-sm font-semibold text-slate-600 uppercase'>{t('2nd Place Winner')}</p>
-            <h2 className='mt-2 text-4xl font-bold text-blue-900'>---</h2>
+            <h2 className='mt-2 text-4xl font-bold text-blue-900'>WILL BE SHARED SOON</h2>
             <p className='mt-2 text-sm text-slate-600'>{t('Given to the runner-up team in each category.')}</p>
           </article>
 
           <article className='rounded-2xl border border-orange-200 bg-white p-6 shadow-sm'>
             <p className='text-sm font-semibold text-orange-600 uppercase'>{t('3rd Place Winner')}</p>
-            <h2 className='mt-2 text-4xl font-bold text-blue-900'>---</h2>
+            <h2 className='mt-2 text-4xl font-bold text-blue-900'>WILL BE SHARED SOON</h2>
             <p className='mt-2 text-sm text-slate-600'>{t('Presented to the third best team in each category.')}</p>
           </article>
         </div>
@@ -36,10 +36,10 @@ const Awards = () => {
         <div className='mt-8 rounded-2xl border border-blue-100 bg-white p-6 shadow-sm sm:p-8'>
           <h3 className='text-2xl font-display font-semibold text-blue-800'>What Winners Receive</h3>
           <ul className='mt-4 space-y-3 text-slate-700'>
-            <li>- Cash prizes for top 3 teams in every competition category.</li>
-            <li>- Official winner certificates and medal recognition.</li>
-            <li>- Featured spotlight in event news and media updates.</li>
-            <li>- Opportunity to present your robotics project to judges and guests.</li>
+            <li>Will be shared and published soon!!!</li>
+            <li>Will be shared and published soon!!!</li>
+            <li>Will be shared and published soon!!!</li>
+            <li>Will be shared and published soon!!!</li>
           </ul>
         </div>
 

@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import { COUNTRIES } from "../../data/countries"
 import { signInMentor, signUpMentor } from "../auth"
 import { formatDateOfBirthInput, isValidDateOfBirth } from "../validation"
@@ -9,6 +10,7 @@ const inputClassName =
 
 const UserAuth = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [mode, setMode] = useState<"signup" | "login">("signup")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -80,7 +82,7 @@ const UserAuth = () => {
         <div className="mb-8 text-center">
           <p className="text-sm font-semibold tracking-[0.35em] text-blue-700 uppercase">NextGen Robotics</p>
           <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-            {mode === "signup" ? "Mentor Sign Up" : "Mentor Log In"}
+            {mode === "signup" ? t("Sign Up") : t("Mentor Portal")}
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-600">
             {mode === "signup"

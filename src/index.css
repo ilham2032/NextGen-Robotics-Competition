@@ -174,13 +174,13 @@ a {
   transition: box-shadow 0.35s ease, backdrop-filter 0.35s ease;
   pointer-events: auto;
   padding: 0 0.75rem;
-  background: transparent;
+  background-color: #ffffff;
   backdrop-filter: none;
 }
 
 .sticky-navbar.scrolled {
-  box-shadow: 0 5px 20px rgba(15, 23, 42, 0.25);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 5px 20px rgba(15, 23, 42, 0.12);
+  backdrop-filter: none;
 }
 
 .navbar-inner {
