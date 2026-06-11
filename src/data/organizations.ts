@@ -17,6 +17,15 @@ export type OrganizationDefinition = {
 }
 
 export const ORGANIZATIONS: OrganizationDefinition[] = [
+   {
+    id: 'it-innovations',
+    type: 'sponsor',
+    nameKey: 'IT INNOVATIONS Academy',
+    descriptionKey: 'Educational partner empowering students with advanced skills in programming, robotics, and technology innovation for the future.',
+    logo: INNOVATIONS,
+    logoAlt: 'IT INNOVATIONS logo',
+    website: 'https://itinnovations.az/az/home',
+  },
   {
     id: 'your-visa-assistance',
     type: 'sponsor',
@@ -34,15 +43,6 @@ export const ORGANIZATIONS: OrganizationDefinition[] = [
     logo: ASOIU,
     logoAlt: 'ASOIU logo',
     website: 'https://asoiu.edu.az/',
-  },
-   {
-    id: 'it-innovations',
-    type: 'sponsor',
-    nameKey: 'IT INNOVATIONS Academy',
-    descriptionKey: 'Educational partner empowering students with advanced skills in programming, robotics, and technology innovation for the future.',
-    logo: INNOVATIONS,
-    logoAlt: 'IT INNOVATIONS logo',
-    website: 'https://itinnovations.az/az/home',
   },
     {
     id: 'victory-group',
