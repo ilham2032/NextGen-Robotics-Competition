@@ -1,4 +1,4 @@
-import { createId, getMentorSession, getMentors, saveMentors, setMentorSession, clearMentorSession } from "../admin/storage"
+import { createId, getMentorSession, getMentors, saveMentorsAndSync, setMentorSession, clearMentorSession } from "../admin/storage"
 import type { Mentor } from "../admin/types"
 import { notifyEmailInBackground, sendMentorWelcomeEmail } from "../lib/emailApi"
 
@@ -75,7 +75,7 @@ export const signUpMentor = async (payload: SignUpMentorInput): Promise<{ ok: bo
     passwordSalt,
   }
 
-  saveMentors([mentor, ...mentors])
+  saveMentorsAndSync([mentor, ...mentors])
   setMentorSession(mentor.id)
 
   notifyEmailInBackground(
@@ -133,7 +133,7 @@ export const resetMentorPassword = async (
     passwordSalt,
   }
 
-  saveMentors(mentors.map((item) => (item.id === mentor.id ? updatedMentor : item)))
+  saveMentorsAndSync(mentors.map((item) => (item.id === mentor.id ? updatedMentor : item)))
   return { ok: true, message: "Password updated successfully. You can now log in with your new password." }
 }
 

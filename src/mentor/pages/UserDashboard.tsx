@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { createId, fetchRemoteTeams, getCategories, getMembers, getMentors, getTeams, saveMembers, saveMentors, saveTeams, saveTeamsAndSync } from "../../admin/storage"
+import { createId, fetchRemoteTeams, getCategories, getMembers, getMentors, getTeams, saveMembersAndSync, saveMentorsAndSync, saveTeams, saveTeamsAndSync } from "../../admin/storage"
 import type { Category, Member, Mentor, Team } from "../../admin/types"
 import { createPasswordHash, getCurrentMentor, signOutMentor } from "../auth"
 import { formatDateOfBirthInput, isValidDateOfBirth } from "../validation"
@@ -209,7 +209,7 @@ const UserDashboard = () => {
     }
 
     const nextMentors = mentors.map((item) => (item.id === mentor.id ? updatedMentor : item))
-    saveMentors(nextMentors)
+    saveMentorsAndSync(nextMentors)
     setMentor(updatedMentor)
     setProfilePassword("")
     setProfileError("")
@@ -316,7 +316,7 @@ const UserDashboard = () => {
 
     const nextMembers = [newMember, ...allMembers]
     setAllMembers(nextMembers)
-    saveMembers(nextMembers)
+    saveMembersAndSync(nextMembers)
 
     notifyEmailInBackground(
       sendMemberWelcomeEmail({
@@ -371,7 +371,7 @@ const UserDashboard = () => {
       member.id === memberId ? { ...member, name, surname, age, fin, email, phone } : member,
     )
     setAllMembers(nextMembers)
-    saveMembers(nextMembers)
+    saveMembersAndSync(nextMembers)
 
     const syncedTeams = normalizeAndSyncTeams(allTeams, nextMembers)
     setAllTeams(syncedTeams)
@@ -388,7 +388,7 @@ const UserDashboard = () => {
 
     const nextMembers = allMembers.filter((member) => member.id !== memberId)
     setAllMembers(nextMembers)
-    saveMembers(nextMembers)
+    saveMembersAndSync(nextMembers)
 
     const syncedTeams = normalizeAndSyncTeams(allTeams, nextMembers)
     setAllTeams(syncedTeams)

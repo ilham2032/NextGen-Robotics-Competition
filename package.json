@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
+    "dev:backend": "cd backend && py -3 manage.py runserver",
     "dev:api": "vercel dev --listen 3000",
     "dev:payments": "vercel dev",
     "build": "tsc -b && vite build",

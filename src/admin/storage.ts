@@ -130,6 +130,10 @@ const hasSupabase = Boolean(
 
 const REMOTE_API_URL = typeof import.meta !== 'undefined' ? (import.meta.env?.VITE_REMOTE_API_URL as string) || '' : ''
 
+const remoteApiBase = (): string => REMOTE_API_URL.replace(/\/$/, '')
+
+const hasRemoteApi = (): boolean => Boolean(REMOTE_API_URL)
+
 // Try Supabase first (if present), then fallback to optional remote API, then localStorage
 export const fetchRemoteTeams = async (): Promise<Team[] | null> => {
   try {
@@ -143,9 +147,9 @@ export const fetchRemoteTeams = async (): Promise<Team[] | null> => {
     // ignore and fallback
   }
 
-  if (REMOTE_API_URL) {
+  if (hasRemoteApi()) {
     try {
-      const res = await fetch(`${REMOTE_API_URL.replace(/\/$/, '')}/api/teams`)
+      const res = await fetch(`${remoteApiBase()}/api/teams`)
       if (!res.ok) return null
       const data = await res.json()
       if (Array.isArray(data)) return data as Team[]
@@ -155,6 +159,60 @@ export const fetchRemoteTeams = async (): Promise<Team[] | null> => {
   }
 
   return null
+}
+
+export const fetchRemoteMembers = async (): Promise<Member[] | null> => {
+  if (!hasRemoteApi()) return null
+  try {
+    const res = await fetch(`${remoteApiBase()}/api/members/`)
+    if (!res.ok) return null
+    const data = await res.json()
+    if (Array.isArray(data)) return data as Member[]
+  } catch {
+    // ignore
+  }
+  return null
+}
+
+export const fetchRemoteMentors = async (): Promise<Mentor[] | null> => {
+  if (!hasRemoteApi()) return null
+  try {
+    const res = await fetch(`${remoteApiBase()}/api/mentors/`)
+    if (!res.ok) return null
+    const data = await res.json()
+    if (Array.isArray(data)) return data as Mentor[]
+  } catch {
+    // ignore
+  }
+  return null
+}
+
+export const pushMentorsToRemote = async (mentors: Mentor[]): Promise<boolean> => {
+  if (!hasRemoteApi() || mentors.length === 0) return false
+  try {
+    const res = await fetch(`${remoteApiBase()}/api/mentors/sync/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(mentors),
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}
+
+export const pushMembersToRemote = async (members: Member[]): Promise<boolean> => {
+  if (!hasRemoteApi() || members.length === 0) return false
+  try {
+    const res = await fetch(`${remoteApiBase()}/api/members/sync/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(members),
+    })
+    return res.ok
+  } catch {
+    return false
+  }
 }
 
 export const pushTeamsToRemote = async (teams: Team[]): Promise<boolean> => {
@@ -168,14 +226,18 @@ export const pushTeamsToRemote = async (teams: Team[]): Promise<boolean> => {
     // ignore and fallback
   }
 
-  if (REMOTE_API_URL) {
+  if (hasRemoteApi()) {
     try {
-      await fetch(`${REMOTE_API_URL.replace(/\/$/, '')}/api/teams/sync`, {
+      // Mentors and members must exist before team member references resolve.
+      await pushMentorsToRemote(getMentors())
+      await pushMembersToRemote(getMembers())
+
+      const res = await fetch(`${remoteApiBase()}/api/teams/sync/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(teams),
       })
-      return true
+      return res.ok
     } catch {
       return false
     }
@@ -188,6 +250,16 @@ export const pushTeamsToRemote = async (teams: Team[]): Promise<boolean> => {
 export const saveTeamsAndSync = (teams: Team[]): void => {
   saveTeams(teams)
   void pushTeamsToRemote(teams)
+}
+
+export const saveMembersAndSync = (members: Member[]): void => {
+  saveMembers(members)
+  void pushMembersToRemote(members)
+}
+
+export const saveMentorsAndSync = (mentors: Mentor[]): void => {
+  saveMentors(mentors)
+  void pushMentorsToRemote(mentors)
 }
 
 export const getCategories = (): Category[] => {
