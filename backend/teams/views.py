@@ -101,7 +101,6 @@ class MemberViewSet(viewsets.ModelViewSet):
         return queryset
 
     @action(detail=False, methods=["post"], url_path="sync")
-    @transaction.atomic
     def sync(self, request: Request) -> Response:
         payload = request.data
         if isinstance(payload, list):
@@ -115,15 +114,26 @@ class MemberViewSet(viewsets.ModelViewSet):
             )
 
         saved: list[Member] = []
-        for member_payload in members_data:
-            serializer = MemberSerializer(data=member_payload)
-            serializer.is_valid(raise_exception=True)
-            saved.append(serializer.save())
+        errors: list[dict[str, Any]] = []
 
-        return Response(
-            {"synced": len(saved), "members": MemberSerializer(saved, many=True).data},
-            status=status.HTTP_200_OK,
-        )
+        for index, member_payload in enumerate(members_data):
+            serializer = MemberSerializer(data=member_payload)
+            if serializer.is_valid():
+                with transaction.atomic():
+                    saved.append(serializer.save())
+            else:
+                errors.append(
+                    {"index": index, "id": member_payload.get("id"), "errors": serializer.errors},
+                )
+
+        result: dict[str, Any] = {
+            "synced": len(saved),
+            "members": MemberSerializer(saved, many=True).data,
+        }
+        if errors:
+            result["partial_errors"] = errors
+
+        return Response(result, status=status.HTTP_200_OK)
 
 
 class MentorViewSet(viewsets.ModelViewSet):
@@ -135,7 +145,6 @@ class MentorViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "post", "put", "patch", "head", "options"]
 
     @action(detail=False, methods=["post"], url_path="sync")
-    @transaction.atomic
     def sync(self, request: Request) -> Response:
         payload = request.data
         if isinstance(payload, list):
@@ -149,15 +158,26 @@ class MentorViewSet(viewsets.ModelViewSet):
             )
 
         saved: list[Mentor] = []
-        for mentor_payload in mentors_data:
-            serializer = MentorSerializer(data=mentor_payload)
-            serializer.is_valid(raise_exception=True)
-            saved.append(serializer.save())
+        errors: list[dict[str, Any]] = []
 
-        return Response(
-            {"synced": len(saved), "mentors": MentorSerializer(saved, many=True).data},
-            status=status.HTTP_200_OK,
-        )
+        for index, mentor_payload in enumerate(mentors_data):
+            serializer = MentorSerializer(data=mentor_payload)
+            if serializer.is_valid():
+                with transaction.atomic():
+                    saved.append(serializer.save())
+            else:
+                errors.append(
+                    {"index": index, "id": mentor_payload.get("id"), "errors": serializer.errors},
+                )
+
+        result: dict[str, Any] = {
+            "synced": len(saved),
+            "mentors": MentorSerializer(saved, many=True).data,
+        }
+        if errors:
+            result["partial_errors"] = errors
+
+        return Response(result, status=status.HTTP_200_OK)
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
