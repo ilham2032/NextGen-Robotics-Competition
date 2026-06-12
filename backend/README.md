@@ -48,18 +48,6 @@ Then run the frontend (`npm run dev`) in a second terminal.
 ```bash
 curl -X POST http://127.0.0.1:8000/api/teams/ \
   -H "Content-Type: application/json" \
-  -d '{
-    "id": "team-demo-001",
-    "name": "Robo Warriors",
-    "school": "Azerbaijan",
-    "members": 2,
-    "description": "Autonomous sumo robot with edge sensors",
-    "categoryName": "Mini Sumo",
-    "memberIds": [],
-    "memberNames": ["Ali Mammadov", "Leyla Hasanova"],
-    "mentorId": "mentor-demo-001",
-    "mentorName": "John Smith"
-  }'
 ```
 
 ## Admin panel
