@@ -124,12 +124,16 @@ REST_FRAMEWORK = {
 }
 
 # ── CORS (allow Vite dev server + production frontend) ───────────────────────
+_cors_defaults = ",".join([
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://next-gen-robotics-competition.vercel.app",
+    "https://nextgenaze.com",
+    "https://www.nextgenaze.com",
+])
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
-    for origin in os.getenv(
-        "CORS_ALLOWED_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173",
-    ).split(",")
+    for origin in os.getenv("CORS_ALLOWED_ORIGINS", _cors_defaults).split(",")
     if origin.strip()
 ]
 
