@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from typing import Any
 
 from django.db import transaction
@@ -213,3 +214,45 @@ class LegacyTeamsListView(APIView):
     def get(self, _request: Request) -> Response:
         teams = Team.objects.prefetch_related("members").all()
         return Response(TeamSerializer(teams, many=True).data)
+
+
+@api_view(["POST"])
+@transaction.atomic
+def reset_all(request: Request) -> Response:
+    """
+    Wipe all teams, members, and mentors from the shared backend.
+
+    Requires header X-Admin-Token matching the ADMIN_RESET_TOKEN env var
+    (if that env var is set). If ADMIN_RESET_TOKEN is unset, this endpoint
+    is disabled entirely.
+    """
+    expected_token = os.getenv("ADMIN_RESET_TOKEN", "")
+    if not expected_token:
+        return Response(
+            {"detail": "Reset endpoint is disabled (ADMIN_RESET_TOKEN not configured)."},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+    provided_token = request.headers.get("X-Admin-Token", "")
+    if provided_token != expected_token:
+        return Response({"detail": "Invalid admin token."}, status=status.HTTP_403_FORBIDDEN)
+
+    team_count = Team.objects.count()
+    member_count = Member.objects.count()
+    mentor_count = Mentor.objects.count()
+
+    Member.objects.all().delete()
+    Team.objects.all().delete()
+    Mentor.objects.all().delete()
+
+    return Response(
+        {
+            "detail": "All teams, members, and mentors deleted.",
+            "deleted": {
+                "teams": team_count,
+                "members": member_count,
+                "mentors": mentor_count,
+            },
+        },
+        status=status.HTTP_200_OK,
+    )

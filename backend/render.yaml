@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     rootDir: backend
-    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py seed_categories"
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py seed_categories && python manage.py createsuperuser --noinput || true"
     startCommand: "gunicorn config.wsgi:application"
     envVars:
       - key: DJANGO_SECRET_KEY
@@ -17,6 +17,8 @@ services:
         value: "https://your-frontend.vercel.app"
       - key: CSRF_TRUSTED_ORIGINS
         value: "https://*.onrender.com"
+      - key: ADMIN_RESET_TOKEN
+        generateValue: true
       - key: DATABASE_URL
         fromDatabase:
           name: nextgen-robotics-db

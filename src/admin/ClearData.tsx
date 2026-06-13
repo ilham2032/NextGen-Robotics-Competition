@@ -1,12 +1,20 @@
 import { useEffect, useState } from 'react'
-import { clearAllData } from './storage'
 import { Link } from 'react-router-dom'
 
 const ClearData = () => {
   const [done, setDone] = useState(false)
 
   const handleClear = () => {
-    clearAllData()
+    // Local-only clear: remove this browser's data without touching the shared backend
+    localStorage.removeItem('nextgen_admin_teams')
+    localStorage.removeItem('nextgen_mentors')
+    localStorage.removeItem('nextgen_members')
+    localStorage.removeItem('nextgen_referees')
+    localStorage.removeItem('nextgen_mentor_session')
+    localStorage.removeItem('nextgen_referee_session')
+    localStorage.removeItem('nextgen_match_results')
+    localStorage.removeItem('nextgen_competition_results')
+    localStorage.removeItem('nextgen_track_results')
     setDone(true)
   }
 

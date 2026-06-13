@@ -265,12 +265,14 @@ const AdminDashboard = () => {
 
   const handleClearAllData = () => {
     if (window.confirm("Are you sure you want to delete ALL teams, mentors, and users? This action cannot be undone.")) {
-      clearAllData()
-      setTeams([])
-      setMentors([])
-      setMembers([])
-      setMatches([])
-      notify("All data has been cleared")
+      void (async () => {
+        const remoteOk = await clearAllData()
+        setTeams([])
+        setMentors([])
+        setMembers([])
+        setMatches([])
+        notify(remoteOk ? "All data has been cleared everywhere" : "Local data cleared, but the shared backend could not be reset")
+      })()
     }
   }
 

@@ -246,6 +246,26 @@ export const pushTeamsToRemote = async (teams: Team[]): Promise<boolean> => {
   return false
 }
 
+// Wipe all teams/members/mentors from the shared backend (admin "Clear All Data")
+export const resetRemoteData = async (): Promise<boolean> => {
+  if (!hasRemoteApi()) return false
+
+  const adminToken = typeof import.meta !== 'undefined' ? (import.meta.env?.VITE_ADMIN_RESET_TOKEN as string) || '' : ''
+
+  try {
+    const res = await fetch(`${remoteApiBase()}/api/reset/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(adminToken ? { 'X-Admin-Token': adminToken } : {}),
+      },
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}
+
 // Backwards-compatible: save locally and attempt background sync when configured
 export const saveTeamsAndSync = (teams: Team[]): void => {
   saveTeams(teams)
@@ -468,8 +488,8 @@ export const saveSettings = (settings: EventSettings): void => {
   localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings))
 }
 
-export const clearAllData = (): void => {
-  // Clear all user/member related data
+export const clearAllData = async (): Promise<boolean> => {
+  // Clear all user/member related data locally
   localStorage.removeItem(TEAM_STORAGE_KEY)
   localStorage.removeItem(MENTOR_STORAGE_KEY)
   localStorage.removeItem(MEMBER_STORAGE_KEY)
@@ -479,4 +499,7 @@ export const clearAllData = (): void => {
   localStorage.removeItem(MATCH_RESULTS_KEY)
   localStorage.removeItem(COMPETITION_RESULTS_KEY)
   localStorage.removeItem(TRACK_RESULTS_KEY)
+
+  // Also wipe the shared backend so other devices/sites see the reset
+  return resetRemoteData()
 }
