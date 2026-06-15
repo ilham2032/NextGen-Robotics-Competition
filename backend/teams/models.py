@@ -57,9 +57,11 @@ class Member(models.Model):
     id = models.CharField(max_length=64, primary_key=True)
     mentor = models.ForeignKey(
         Mentor,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="members",
         db_column="mentor_id",
+        null=True,
+        blank=True,
     )
     name = models.CharField(max_length=120)
     surname = models.CharField(max_length=120)

@@ -98,7 +98,7 @@ class MentorSerializer(serializers.ModelSerializer):
 
 
 class MemberSerializer(serializers.ModelSerializer):
-    mentorId = serializers.CharField(source="mentor_id")
+    mentorId = serializers.CharField(source="mentor_id", required=False, allow_blank=True, default="")
 
     class Meta:
         model = Member
@@ -114,8 +114,8 @@ class MemberSerializer(serializers.ModelSerializer):
         ]
 
     def validate_mentorId(self, value: str) -> str:
-        if not Mentor.objects.filter(id=value).exists():
-            raise serializers.ValidationError("Mentor does not exist.")
+        # mentorId stored as-is; mentor FK is nullable so sync works
+        # regardless of whether the mentor was synced first.
         return value
 
     def create(self, validated_data: dict[str, Any]) -> Member:
