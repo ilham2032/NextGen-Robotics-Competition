@@ -118,13 +118,19 @@ class MemberSerializer(serializers.ModelSerializer):
         # regardless of whether the mentor was synced first.
         return value
 
+    def to_representation(self, instance: Member) -> dict[str, Any]:
+        data = super().to_representation(instance)
+        if data.get("mentorId") is None:
+            data["mentorId"] = ""
+        return data
+
     def create(self, validated_data: dict[str, Any]) -> Member:
         member_id = self.initial_data.get("id")
         if not member_id:
             raise serializers.ValidationError({"id": "Member id is required."})
 
-        mentor_id = validated_data.pop("mentor_id")
-        mentor = Mentor.objects.get(id=mentor_id)
+        mentor_id = validated_data.pop("mentor_id", "") or ""
+        mentor = Mentor.objects.filter(id=mentor_id).first() if mentor_id else None
 
         member, _created = Member.objects.update_or_create(
             id=member_id,
