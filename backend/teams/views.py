@@ -76,6 +76,10 @@ class TeamViewSet(viewsets.ModelViewSet):
         if errors and not saved:
             return Response({"detail": "Sync failed.", "errors": errors}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Delete teams from DB that are no longer in the payload (frontend is source of truth)
+        incoming_ids = {t.get("id") for t in teams_data if t.get("id")}
+        Team.objects.exclude(id__in=incoming_ids).delete()
+
         response_data = TeamSerializer(saved, many=True).data
         result: dict[str, Any] = {
             "synced": len(saved),
