@@ -12,6 +12,27 @@ export const isValidDateOfBirth = (value: string): boolean => {
   return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day
 }
 
+export const getAgeFromDateOfBirth = (value: string, today = new Date()): number | null => {
+  if (!isValidDateOfBirth(value)) {
+    return null
+  }
+
+  const [day, month, year] = value.trim().split("/").map(Number)
+  let age = today.getFullYear() - year
+  const birthdayThisYear = new Date(today.getFullYear(), month - 1, day)
+
+  if (today < birthdayThisYear) {
+    age -= 1
+  }
+
+  return age
+}
+
+export const isMentorOldEnough = (value: string): boolean => {
+  const age = getAgeFromDateOfBirth(value)
+  return age !== null && age >= 18
+}
+
 export const formatDateOfBirthInput = (value: string): string => {
   const digits = value.replace(/\D/g, "").slice(0, 8)
 

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { COUNTRIES } from "../../data/countries"
 import { signInMentor, signUpMentor } from "../auth"
-import { formatDateOfBirthInput, isValidDateOfBirth } from "../validation"
+import { formatDateOfBirthInput, isMentorOldEnough, isValidDateOfBirth } from "../validation"
 
 const inputClassName =
   "w-full rounded-[20px] border border-blue-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-200"
@@ -51,6 +51,11 @@ const UserAuth = () => {
 
       if (!isValidDateOfBirth(dateOfBirth)) {
         setError("Please enter a valid date of birth in dd/mm/yyyy format.")
+        return
+      }
+
+      if (!isMentorOldEnough(dateOfBirth)) {
+        setError("Mentors must be at least 18 years old to sign up.")
         return
       }
 

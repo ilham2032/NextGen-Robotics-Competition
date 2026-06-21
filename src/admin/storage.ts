@@ -129,10 +129,16 @@ const hasSupabase = Boolean(
 )
 
 const REMOTE_API_URL = typeof import.meta !== 'undefined' ? (import.meta.env?.VITE_REMOTE_API_URL as string) || '' : ''
+const ADMIN_TOKEN = typeof import.meta !== 'undefined' ? (import.meta.env?.VITE_ADMIN_RESET_TOKEN as string) || '' : ''
 
 const remoteApiBase = (): string => REMOTE_API_URL.replace(/\/$/, '')
 
 const hasRemoteApi = (): boolean => Boolean(REMOTE_API_URL)
+
+const adminHeaders = (): Record<string, string> => ({
+  'Content-Type': 'application/json',
+  ...(ADMIN_TOKEN ? { 'X-Admin-Token': ADMIN_TOKEN } : {}),
+})
 
 // Try Supabase first (if present), then fallback to optional remote API, then localStorage
 export const fetchRemoteTeams = async (): Promise<Team[] | null> => {
@@ -192,7 +198,7 @@ export const pushMentorsToRemote = async (mentors: Mentor[]): Promise<boolean> =
   try {
     const res = await fetch(`${remoteApiBase()}/api/mentors/sync/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: adminHeaders(),
       body: JSON.stringify(mentors),
     })
     return res.ok
@@ -206,7 +212,7 @@ export const pushMembersToRemote = async (members: Member[]): Promise<boolean> =
   try {
     const res = await fetch(`${remoteApiBase()}/api/members/sync/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: adminHeaders(),
       body: JSON.stringify(members),
     })
     return res.ok
@@ -234,7 +240,7 @@ export const pushTeamsToRemote = async (teams: Team[]): Promise<boolean> => {
 
       const res = await fetch(`${remoteApiBase()}/api/teams/sync/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: adminHeaders(),
         body: JSON.stringify(teams),
       })
       return res.ok

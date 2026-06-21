@@ -9,7 +9,6 @@ import Regulations from './pages/Regulations'
 import Standing from './pages/Standing'
 import Contact from './pages/Contact'
 import Footer from './Components/Footer'
-import Awards from './pages/Awards'
 import Participants from './pages/Participants'
 import FAQ from './pages/FAQ'
 import Minisumo from './Rules/minisumo'
@@ -76,7 +75,6 @@ const App = () => {
           <Route path='/partnership-inquiries' element={<PartnershipInquiries/>}/>
           <Route path='/contact' element={<Contact/>}/>
           <Route path='/faq' element={<FAQ/>}/>
-          <Route path='/awards' element={<Awards/>}/>
           <Route path='/' element={<Home/>}/>
           <Route path='/admin/login' element={<AdminLogin/>}/>
           <Route path='/admin/*' element={<ProtectedAdminRoute><AdminPage/></ProtectedAdminRoute>}/>

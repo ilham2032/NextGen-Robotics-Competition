@@ -20,12 +20,13 @@ const mergeById = <T extends { id: string }>(local: T[], remote: T[] | null): T[
 }
 
 const hydrateTeams = (remote: Team[] | null): Team[] => {
-  const local = getTeams()
-  const merged = mergeById(local, remote)
-  if (remote && remote.length > 0) {
-    saveTeams(merged)
+  if (remote !== null) {
+    // Backend is the source of truth — replace local cache entirely
+    saveTeams(remote)
+    return remote
   }
-  return merged
+  // No remote data available, fall back to local
+  return getTeams()
 }
 
 const hydrateMatchResults = (remote: MatchResult[] | null): MatchResult[] => {

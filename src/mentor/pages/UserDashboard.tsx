@@ -250,9 +250,9 @@ const UserDashboard = () => {
     return `Up to ${category.maxMembers} member${category.maxMembers === 1 ? "" : "s"} per team.`
   }
 
-  const getAssignedMemberIds = (excludeTeamId?: string) =>
+  const getAssignedMemberIds = (categoryName: string, excludeTeamId?: string) =>
     allTeams
-      .filter((team) => team.id !== excludeTeamId)
+      .filter((team) => team.id !== excludeTeamId && (team.categoryName?.trim() || "") === categoryName.trim())
       .flatMap((team) => team.memberIds ?? [])
 
   const addMember = (event: FormEvent<HTMLFormElement>) => {
@@ -472,10 +472,10 @@ const UserDashboard = () => {
       return
     }
 
-    const assignedMemberIds = getAssignedMemberIds()
+    const assignedMemberIds = getAssignedMemberIds(teamCategory)
     const duplicateMembers = selectedMemberIds.filter((memberId) => assignedMemberIds.includes(memberId))
     if (duplicateMembers.length > 0) {
-      setTeamError("One or more selected members are already assigned to another team. Each member may only join one team.")
+      setTeamError("One or more selected members are already registered in this category. A participant may join multiple categories, but only once per category.")
       return
     }
 
@@ -551,10 +551,10 @@ const UserDashboard = () => {
       return
     }
 
-    const assignedMemberIds = getAssignedMemberIds(teamId)
+    const assignedMemberIds = getAssignedMemberIds(categoryName, teamId)
     const duplicateMembers = memberIds.filter((memberId) => assignedMemberIds.includes(memberId))
     if (duplicateMembers.length > 0) {
-      setTeamError("One or more selected members are already assigned to another team. Each member may only join one team.")
+      setTeamError("One or more selected members are already registered in this category. A participant may join multiple categories, but only once per category.")
       return
     }
 

@@ -1,6 +1,9 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+const savedLanguage =
+  typeof window !== 'undefined' ? localStorage.getItem('nextgen_language') || 'en' : 'en';
+
 const resources = {
   en: {
     translation: {
@@ -16,6 +19,8 @@ const resources = {
       "FAQ": "FAQ",
       "Contact": "Contact",
       "Sign Up": "Sign Up",
+      "Language": "Language",
+      "Choose language": "Choose language",
       "NextGen Robotics": "NextGen Robotics",
       "COMPETITION": "COMPETITION",
 
@@ -27,7 +32,14 @@ const resources = {
       "1st Edition": "1st Edition",
       "NextGen Robotics Competition": "NextGen Robotics Competition",
       "July 23-24 - Build, Battle, and Innovate": "July 23-24 - Build, Battle, and Innovate",
+      "October 1-2": "October 1-2",
+      "Build, Battle, and Innovate": "Build, Battle, and Innovate",
+      "Baku, Azerbaijan": "Baku, Azerbaijan",
       "Register Team": "Register Team",
+      "Registration Closed": "Registration Closed",
+      "Registration Unavailable": "Registration Unavailable",
+      "Opens on": "Opens on",
+      "Event Starts In": "Event Starts In",
 
       // Home page additional content
       "View Regulations": "View Regulations",
@@ -42,17 +54,24 @@ const resources = {
       "Present your work to judges and industry mentors.": "Present your work to judges and industry mentors.",
       "Connect with a community of young innovators.": "Connect with a community of young innovators.",
       "Our Mission": "Our Mission",
+      "Empowering the next generation of engineers and innovators through robotics competition": "Empowering the next generation of engineers and innovators through robotics competition",
       "Innovating for Real-World Impact": "Innovating for Real-World Impact",
       "We challenge teams to create smart and efficient robots that address everyday problems while sharpening critical thinking and engineering discipline.": "We challenge teams to create smart and efficient robots that address everyday problems while sharpening critical thinking and engineering discipline.",
       "Inspiring Future Technologists": "Inspiring Future Technologists",
       "Through competition and collaboration, participants gain confidence, teamwork experience, and a stronger foundation to shape tomorrow's technology.": "Through competition and collaboration, participants gain confidence, teamwork experience, and a stronger foundation to shape tomorrow's technology.",
       "Categories": "Categories",
+      "Explore different competition categories": "Explore different competition categories",
       "See all details": "See all details",
       "Learn category": "Learn category",
+      "Autonomous robots face off in an intense arena challenge where strategy and mechanical precision decide the winner.": "Autonomous robots face off in an intense arena challenge where strategy and mechanical precision decide the winner.",
+      "A beginner-friendly category for younger innovators to learn engineering, coding, and teamwork through competition.": "A beginner-friendly category for younger innovators to learn engineering, coding, and teamwork through competition.",
+      "Start Up": "Start Up",
+      "Teams present creative robotics projects that solve everyday problems with practical and impactful solutions.": "Teams present creative robotics projects that solve everyday problems with practical and impactful solutions.",
 
       // Home page footer section
       "Ready to Compete?": "Ready to Compete?",
       "Gather your team, review the regulations, and take your place in the first edition of the NextGen Robotics Competition.": "Gather your team, review the regulations, and take your place in the first edition of the NextGen Robotics Competition.",
+      "Join Now": "Join Now",
 
       // About page
       "About NextGen Robotics": "About NextGen Robotics",
@@ -296,6 +315,8 @@ const resources = {
       "FAQ": "FAQ",
       "Contact": "Əlaqə",
       "Sign Up": "Qeydiyyat",
+      "Language": "Dil",
+      "Choose language": "Dil seçin",
       "NextGen Robotics": "NextGen Robotics",
       "COMPETITION": "YARIŞ",
 
@@ -307,7 +328,14 @@ const resources = {
       "1st Edition": "1-ci Buraxılış",
       "NextGen Robotics Competition": "NextGen Robot Texnikası Yarışması",
       "July 23-24 - Build, Battle, and Innovate": "23-24 İyul - Qur, Döyüş və İnnovasiya Et",
+      "October 1-2": "1-2 oktyabr",
+      "Build, Battle, and Innovate": "Qur, yarış və yenilik et",
+      "Baku, Azerbaijan": "Bakı, Azərbaycan",
       "Register Team": "Komanda Qeydiyyatı",
+      "Registration Closed": "Qeydiyyat bağlanıb",
+      "Registration Unavailable": "Qeydiyyat əlçatan deyil",
+      "Opens on": "Açılış tarixi",
+      "Event Starts In": "Tədbirin başlamasına qalıb",
 
       // Home page additional content
       "View Regulations": "Qaydaları Görün",
@@ -322,17 +350,24 @@ const resources = {
       "Present your work to judges and industry mentors.": "İşinizi hakim və sənaye mentorlarına təqdim edin.",
       "Connect with a community of young innovators.": "Gənc innovatorlar icması ilə əlaqə yaradın.",
       "Our Mission": "Missiyamız",
+      "Empowering the next generation of engineers and innovators through robotics competition": "Robot texnikası yarışı vasitəsilə mühəndis və innovatorların növbəti nəslini gücləndiririk",
       "Innovating for Real-World Impact": "Real Dünya Təsiri üçün İnnovasiya",
       "We challenge teams to create smart and efficient robots that address everyday problems while sharpening critical thinking and engineering discipline.": "Biz komandaları hər gün problemlərini həll edən ağıllı və səmərəli robotlar yaratmağa çağırırıq, eyni zamanda tənqidi düşünmə və mühəndislik intizamını kəskinləşdiririk.",
       "Inspiring Future Technologists": "Gələcək Texnoloqları İlhamlandırmaq",
       "Through competition and collaboration, participants gain confidence, teamwork experience, and a stronger foundation to shape tomorrow's technology.": "Rəqabət və əməkdaşlıq vasitəsilə iştirakçılar özünəinam, komanda iş təcrübəsi qazanır və sabahın texnologiyasını formalaşdırmaq üçün daha güclü təməl əldə edirlər.",
       "Categories": "Kateqoriyalar",
+      "Explore different competition categories": "Müxtəlif yarış kateqoriyalarını kəşf edin",
       "See all details": "Bütün detalları görün",
       "Learn category": "Kateqoriyanı öyrənin",
+      "Autonomous robots face off in an intense arena challenge where strategy and mechanical precision decide the winner.": "Avtonom robotlar strategiya və mexaniki dəqiqliyin qalibi müəyyən etdiyi gərgin arena sınağında qarşılaşır.",
+      "A beginner-friendly category for younger innovators to learn engineering, coding, and teamwork through competition.": "Gənc innovatorların yarış vasitəsilə mühəndislik, kodlaşdırma və komanda işini öyrənməsi üçün başlanğıc səviyyəli kateqoriya.",
+      "Start Up": "Startap",
+      "Teams present creative robotics projects that solve everyday problems with practical and impactful solutions.": "Komandalar gündəlik problemləri praktik və təsirli həllərlə aradan qaldıran yaradıcı robot texnikası layihələri təqdim edir.",
 
       // Home page footer section
       "Ready to Compete?": "Rəqabətə Hazırsınız?",
       "Gather your team, review the regulations, and take your place in the first edition of the NextGen Robotics Competition.": "Komandanızı toplayın, qaydaları nəzərdən keçirin və NextGen Robot Texnikası Yarışmasının ilk buraxılışında yerinizi tutun.",
+      "Join Now": "İndi qoşulun",
 
       // About page
       "About NextGen Robotics": "NextGen Robotics Haqqında",
@@ -561,6 +596,302 @@ const resources = {
       // Additional UI Elements
       "Personal Identification Number - 7-12 alphanumeric characters": "Şəxsi Şəxsiyyət Nömrəsi - 7-12 alfanumerik simvol",
     }
+  },
+  ru: {
+    translation: {
+      // Navbar
+      "Home": "Главная",
+      "About": "О нас",
+      "Standings": "Рейтинг",
+      "News": "Новости",
+      "Participants": "Участники",
+      "Regulations": "Правила",
+      "Partners": "Партнеры",
+      "Awards": "Награды",
+      "FAQ": "FAQ",
+      "Contact": "Контакты",
+      "Sign Up": "Регистрация",
+      "Language": "Язык",
+      "Choose language": "Выберите язык",
+      "NextGen Robotics": "NextGen Robotics",
+      "COMPETITION": "СОРЕВНОВАНИЕ",
+
+      // Home page
+      "Empowering the Next Generation": "Поддерживаем новое поколение",
+      "Join the ultimate robotics competition": "Присоединяйтесь к главному соревнованию по робототехнике",
+      "Register Now": "Зарегистрироваться",
+      "Learn More": "Подробнее",
+      "1st Edition": "1-й сезон",
+      "NextGen Robotics Competition": "Соревнование NextGen Robotics",
+      "July 23-24 - Build, Battle, and Innovate": "23-24 июля - создавай, соревнуйся и внедряй инновации",
+      "October 1-2": "1-2 октября",
+      "Build, Battle, and Innovate": "Создавай, соревнуйся и внедряй инновации",
+      "Baku, Azerbaijan": "Баку, Азербайджан",
+      "Register Team": "Зарегистрировать команду",
+      "Registration Closed": "Регистрация закрыта",
+      "Registration Unavailable": "Регистрация недоступна",
+      "Opens on": "Откроется",
+      "Event Starts In": "До начала события",
+
+      // Home page additional content
+      "View Regulations": "Посмотреть правила",
+      "Expected Participants": "Ожидаемые участники",
+      "Schools and Teams": "Школы и команды",
+      "Competition and Exhibition": "Соревнование и выставка",
+      "What is NextGen Competition?": "Что такое соревнование NextGen?",
+      "The NextGen Robotics Competition brings together students and robotics enthusiasts to design, program, and test robots in a collaborative and competitive environment. It is where innovation, creativity, and teamwork turn ideas into real engineering solutions.": "Соревнование NextGen Robotics объединяет студентов и энтузиастов робототехники, чтобы проектировать, программировать и тестировать роботов в совместной и соревновательной среде. Здесь инновации, креативность и командная работа превращают идеи в реальные инженерные решения.",
+      "Why Join?": "Почему стоит участвовать?",
+      "Build practical robotics and coding skills.": "Развивайте практические навыки робототехники и программирования.",
+      "Solve real-world challenges with your team.": "Решайте реальные задачи вместе с командой.",
+      "Present your work to judges and industry mentors.": "Представляйте свою работу судьям и отраслевым наставникам.",
+      "Connect with a community of young innovators.": "Станьте частью сообщества молодых инноваторов.",
+      "Our Mission": "Наша миссия",
+      "Empowering the next generation of engineers and innovators through robotics competition": "Развиваем новое поколение инженеров и инноваторов через соревнования по робототехнике",
+      "Innovating for Real-World Impact": "Инновации для реального результата",
+      "We challenge teams to create smart and efficient robots that address everyday problems while sharpening critical thinking and engineering discipline.": "Мы предлагаем командам создавать умных и эффективных роботов, которые решают повседневные задачи и развивают критическое мышление и инженерную дисциплину.",
+      "Inspiring Future Technologists": "Вдохновляем будущих технологов",
+      "Through competition and collaboration, participants gain confidence, teamwork experience, and a stronger foundation to shape tomorrow's technology.": "Через соревнование и сотрудничество участники получают уверенность, опыт командной работы и прочную основу для создания технологий будущего.",
+      "Categories": "Категории",
+      "Explore different competition categories": "Изучите разные категории соревнования",
+      "See all details": "Все детали",
+      "Learn category": "Изучить категорию",
+      "Autonomous robots face off in an intense arena challenge where strategy and mechanical precision decide the winner.": "Автономные роботы встречаются в напряженном испытании на арене, где победителя определяют стратегия и механическая точность.",
+      "A beginner-friendly category for younger innovators to learn engineering, coding, and teamwork through competition.": "Категория для начинающих, где юные инноваторы изучают инженерию, программирование и командную работу через соревнование.",
+      "Start Up": "Стартап",
+      "Teams present creative robotics projects that solve everyday problems with practical and impactful solutions.": "Команды представляют творческие проекты в робототехнике, которые решают повседневные проблемы практичными и полезными способами.",
+
+      // Home page footer section
+      "Ready to Compete?": "Готовы соревноваться?",
+      "Gather your team, review the regulations, and take your place in the first edition of the NextGen Robotics Competition.": "Соберите команду, изучите правила и займите свое место в первом сезоне соревнования NextGen Robotics.",
+      "Join Now": "Присоединиться",
+
+      // About page
+      "About NextGen Robotics": "О NextGen Robotics",
+      "General": "Общее",
+      "Competition Dates": "Даты соревнования",
+
+      // Privacy Policy
+      "Privacy Policy": "Политика конфиденциальности",
+      "Effective Date": "Дата вступления в силу",
+      "Introduction": "Введение",
+      "Information We Collect": "Какие данные мы собираем",
+      "Personal Information": "Персональная информация",
+      "Usage Data": "Данные использования",
+      "How We Use Your Information": "Как мы используем вашу информацию",
+      "Information Sharing": "Передача информации",
+      "Data Security": "Безопасность данных",
+      "Your Rights": "Ваши права",
+      "Changes to This Policy": "Изменения в этой политике",
+      "Contact Us": "Связаться с нами",
+
+      // Terms of Service
+      "Terms of Service": "Условия использования",
+      "Acceptance of Terms": "Принятие условий",
+      "Description of Service": "Описание сервиса",
+      "User Responsibilities": "Обязанности пользователя",
+      "Intellectual Property": "Интеллектуальная собственность",
+      "Limitation of Liability": "Ограничение ответственности",
+      "Termination": "Прекращение",
+      "Governing Law": "Применимое право",
+      "Contact Information": "Контактная информация",
+
+      // Partners & Sponsors page
+      "Visit website": "Перейти на сайт",
+      "Partners & Sponsors": "Партнеры и спонсоры",
+      "Organizations powering NextGen": "Организации, поддерживающие NextGen",
+      "Partners & Sponsors page intro": "Благодарим спонсоров и партнеров, чья поддержка делает соревнование NextGen Robotics возможным. Познакомьтесь с организациями, стоящими за нашим событием.",
+      "View sponsors": "Смотреть спонсоров",
+      "View partners": "Смотреть партнеров",
+      "Partnership inquiries": "Вопросы партнерства",
+      "Our Sponsors": "Наши спонсоры",
+      "Sponsors section description": "Спонсоры предоставляют важное финансирование и услуги, которые помогают нам проводить соревнование по робототехнике мирового уровня.",
+      "Our Partners": "Наши партнеры",
+      "Partners section description": "Партнеры сотрудничают с нами в образовании, медиа, работе с сообществом и развитии молодежной робототехники в регионе.",
+      "Sponsor": "Спонсор",
+      "Partner": "Партнер",
+      "Sponsor description: Your Visa Assistance": "Официальный спонсор, предоставляющий визовую консультацию и туристическую поддержку, чтобы международные команды могли участвовать уверенно.",
+      "Sponsor description: Kapital Bank": "Официальный финансовый спонсор, инвестирующий в образование, инновации и успех молодых инженеров.",
+      "Partner description: Kavkaz Robotics School": "Образовательный партнер, предоставляющий практическое обучение робототехнике и инженерную подготовку к соревнованиям.",
+      "Partner description: RS Media Team": "Медиа-партнер, обеспечивающий освещение события, видеопроизводство и создание цифрового контента.",
+      "Partner description: Victory Group": "Стратегический партнер, поддерживающий развитие сообщества и продвижение события в регионе.",
+      "Interested in partnering with us?": "Хотите стать нашим партнером?",
+      "Partnership CTA description": "Мы рады новым спонсорам и партнерам, которые разделяют нашу миссию вдохновлять новое поколение инноваторов в робототехнике.",
+      "Your Visa Assistance": "Your Visa Assistance",
+      "Kapital Bank": "Kapital Bank",
+      "Kavkaz Robotics School": "Kavkaz Robotics School",
+      "RS Media Team": "RS Media Team",
+      "Victory Group": "Victory Group",
+
+      // Buttons & Actions
+      "Save": "Сохранить",
+      "Cancel": "Отмена",
+      "Edit": "Редактировать",
+      "Remove": "Убрать",
+      "Delete": "Удалить",
+      "Add": "Добавить",
+      "+ Add Category": "+ Добавить категорию",
+      "Create Category": "Создать категорию",
+      "Create": "Создать",
+      "Submit": "Отправить",
+      "Close": "Закрыть",
+      "Back": "Назад",
+      "Next": "Далее",
+      "Previous": "Назад",
+      "Update": "Обновить",
+      "Refresh": "Обновить",
+      "Download": "Скачать",
+      "Upload": "Загрузить",
+      "Export": "Экспорт",
+      "Search": "Поиск",
+      "Filter": "Фильтр",
+      "Clear": "Очистить",
+      "Reset": "Сбросить",
+      "Copy": "Копировать",
+      "Paste": "Вставить",
+      "View": "Просмотр",
+      "Show": "Показать",
+      "Hide": "Скрыть",
+      "More": "Больше",
+      "Less": "Меньше",
+
+      // Form Labels & Fields
+      "Username": "Имя пользователя",
+      "Password": "Пароль",
+      "Name": "Имя",
+      "Surname": "Фамилия",
+      "First Name": "Имя",
+      "Last Name": "Фамилия",
+      "Email": "Email",
+      "Email Address": "Email адрес",
+      "Phone": "Телефон",
+      "Phone Number": "Номер телефона",
+      "FIN": "FIN",
+      "Date of Birth": "Дата рождения",
+      "Country": "Страна",
+      "Address": "Адрес",
+      "City": "Город",
+      "State": "Регион",
+      "Postal Code": "Почтовый индекс",
+      "Organization": "Организация",
+      "School": "Школа",
+      "Team Name": "Название команды",
+      "Team Size": "Размер команды",
+      "Category": "Категория",
+      "Experience Level": "Уровень опыта",
+      "Role": "Роль",
+      "Position": "Должность",
+
+      // Form Placeholders
+      "admin": "admin",
+      "Enter password": "Введите пароль",
+      "Enter username": "Введите имя пользователя",
+      "Enter your name": "Введите ваше имя",
+      "Enter first name": "Введите имя",
+      "Enter last name": "Введите фамилию",
+      "Enter your email": "Введите ваш email",
+      "Your Name": "Ваше имя",
+      "Your Email": "Ваш email",
+      "Your Message": "Ваше сообщение",
+      "Your Message...": "Ваше сообщение...",
+      "dd/mm/yyyy": "дд/мм/гггг",
+      "mm/dd/yyyy": "мм/дд/гггг",
+      "Select country": "Выберите страну",
+      "Select a country": "Выберите страну",
+      "Select Category": "Выберите категорию",
+      "Select a category": "Выберите категорию",
+      "Select category": "Выберите категорию",
+      "Select a category...": "Выберите категорию...",
+      "Choose a category...": "Выберите категорию...",
+      "Select Team 1...": "Выберите команду 1...",
+      "Select Team 2...": "Выберите команду 2...",
+      "e.g., ABC123456": "например, ABC123456",
+      "Enter phone": "Введите телефон",
+      "member@example.com": "member@example.com",
+      "Unassigned": "Не назначено",
+
+      // Page & Section Headers
+      "Teams Zone": "Зона команд",
+      "Admin Dashboard": "Панель администратора",
+      "Admin Login": "Вход администратора",
+      "NextGen Robotics Mentor Portal": "Портал наставника NextGen Robotics",
+      "Partnership Inquiries": "Запросы партнерства",
+      "Competition Categories": "Категории соревнования",
+      "Navigation": "Навигация",
+      "Add Participant": "Добавить участника",
+      "Create Team": "Создать команду",
+      "Form a team with selected members": "Сформируйте команду из выбранных участников",
+      "Registered Teams": "Зарегистрированные команды",
+      "Event Schedule": "Расписание события",
+      "Mentor Profile": "Профиль наставника",
+      "Create Referee": "Создать судью",
+      "Referee Accounts": "Аккаунты судей",
+      "Category Management": "Управление категориями",
+      "Create, edit, and manage competition categories": "Создавайте, редактируйте и управляйте категориями соревнования",
+      "User Center": "Центр пользователя",
+      "Mentor registrations": "Регистрации наставников",
+      "Edit Event Details": "Редактировать детали события",
+      "Mentor Portal": "Портал наставника",
+      "Referee Portal": "Портал судьи",
+      "Teams": "Команды",
+      "Mentor toolkit": "Инструменты наставника",
+      "Event settings": "Настройки события",
+      "Dark mode": "Темный режим",
+      "Live Competition Hub": "Центр live-соревнования",
+
+      // Table Headers
+      "Age": "Возраст",
+      "Actions": "Действия",
+
+      // Status & Messages
+      "Loading event information...": "Загрузка информации о событии...",
+      "Loading secure card form...": "Загрузка безопасной формы оплаты...",
+      "No teams have been created yet": "Команды пока не созданы",
+      "No Teams Registered Yet": "Пока нет зарегистрированных команд",
+      "Awaiting track time": "Ожидание времени трека",
+      "No mentor registrations yet": "Пока нет регистраций наставников",
+      "Card payments are not active yet": "Оплата картой пока не активна",
+
+      // Statistics Labels
+      "Total Teams": "Всего команд",
+      "Checked In": "Отмечены",
+      "Pending Matches": "Ожидающие матчи",
+      "Battles Played": "Проведенные бои",
+
+      // Countdown
+      "Days": "Дни",
+      "Hours": "Часы",
+      "Minutes": "Минуты",
+      "Seconds": "Секунды",
+
+      // Navigation Tooltips
+      "Close participant form": "Закрыть форму участника",
+      "Expand": "Развернуть",
+      "Collapse": "Свернуть",
+
+      // Footer
+      "Quick Links": "Быстрые ссылки",
+      "Contact & Support": "Контакты и поддержка",
+      "Competition 2026": "Соревнование 2026",
+
+      // Category Names
+      "Mega Sumo": "Mega Sumo",
+      "Mini Sumo": "Mini Sumo",
+      "Mini Sumo Kids": "Mini Sumo Kids",
+      "1kg Lego Sumo": "1kg Lego Sumo",
+      "3kg Lego Sumo": "3kg Lego Sumo",
+      "Lego Line": "Lego Line",
+      "Line Follower": "Line Follower",
+      "Start Up (senior)": "Start Up (senior)",
+      "Lego Sumo": "Lego Sumo",
+      "LegoLine": "Lego Line",
+      "BotsCombat": "BotsCombat",
+      "Drone": "Дрон",
+      "LineFollower": "Line Follower",
+      "DroneRacing": "Гонки дронов",
+
+      // Additional UI Elements
+      "Personal Identification Number - 7-12 alphanumeric characters": "Персональный идентификационный номер - 7-12 буквенно-цифровых символов",
+    }
   }
 };
 
@@ -568,7 +899,8 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'en',
+    lng: savedLanguage,
+    fallbackLng: 'en',
     interpolation: {
       escapeValue: false
     }

@@ -4,7 +4,7 @@ import os
 from typing import Any
 
 from django.db import transaction
-from rest_framework import status, viewsets
+from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -19,22 +19,39 @@ from .serializers import (
 )
 
 
+# ── Permission: require X-Admin-Token header ──────────────────────────────────
+class HasAdminToken(permissions.BasePermission):
+    """Allow only requests that supply the correct X-Admin-Token header."""
+
+    def has_permission(self, request: Request, view: Any) -> bool:
+        expected = os.getenv("ADMIN_RESET_TOKEN", "")
+        if not expected:
+            # Token not configured — block all access to protected endpoints
+            return False
+        return request.headers.get("X-Admin-Token", "") == expected
+
+
+# ── Public serializer: only safe fields exposed to anonymous visitors ─────────
+class PublicTeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = ["id", "name", "country"]
+
+
 class TeamViewSet(viewsets.ModelViewSet):
     """
     REST API for competition teams.
+    All write operations and full data access require X-Admin-Token.
+    """
 
+    queryset = Team.objects.prefetch_related("members").all()
+    serializer_class = TeamSerializer
+    permission_classes = [HasAdminToken]
     Endpoints:
       GET    /api/teams/          — list all teams (used by Participants page)
       POST   /api/teams/          — register a new team
       GET    /api/teams/{id}/     — retrieve team details
       PUT    /api/teams/{id}/     — update team
-      PATCH  /api/teams/{id}/     — partial update
-      DELETE /api/teams/{id}/     — remove team
-      POST   /api/teams/sync/     — bulk upsert (frontend compatibility)
-    """
-
-    queryset = Team.objects.prefetch_related("members", "mentor", "category").all()
-    serializer_class = TeamSerializer
     lookup_field = "id"
 
     def get_serializer_context(self) -> dict[str, Any]:
@@ -92,11 +109,12 @@ class TeamViewSet(viewsets.ModelViewSet):
 
 
 class MemberViewSet(viewsets.ModelViewSet):
-    """REST API for individual participants."""
+    """REST API for individual participants. Requires X-Admin-Token."""
 
     queryset = Member.objects.select_related("mentor").all()
     serializer_class = MemberSerializer
     lookup_field = "id"
+    permission_classes = [HasAdminToken]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -142,11 +160,12 @@ class MemberViewSet(viewsets.ModelViewSet):
 
 
 class MentorViewSet(viewsets.ModelViewSet):
-    """REST API for mentor accounts."""
+    """REST API for mentor accounts. Requires X-Admin-Token."""
 
     queryset = Mentor.objects.all()
     serializer_class = MentorSerializer
     lookup_field = "id"
+    permission_classes = [HasAdminToken]
     http_method_names = ["get", "post", "put", "patch", "head", "options"]
 
     @action(detail=False, methods=["post"], url_path="sync")
@@ -210,14 +229,15 @@ def health_check(_request: Request) -> Response:
 
 class LegacyTeamsListView(APIView):
     """
-    Backwards-compatible endpoint: GET /api/teams returns a flat JSON array.
-
-    The frontend fetchRemoteTeams() expects Team[] directly, not paginated results.
+    Public endpoint: GET /api/teams returns only id, name, country.
+    No authentication required — safe for public consumption.
     """
 
+    permission_classes = [permissions.AllowAny]
+
     def get(self, _request: Request) -> Response:
-        teams = Team.objects.prefetch_related("members").all()
-        return Response(TeamSerializer(teams, many=True).data)
+        teams = Team.objects.all()
+        return Response(PublicTeamSerializer(teams, many=True).data)
 
 
 @api_view(["POST"])

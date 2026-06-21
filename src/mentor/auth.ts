@@ -1,6 +1,7 @@
 import { createId, getMentorSession, getMentors, saveMentorsAndSync, setMentorSession, clearMentorSession } from "../admin/storage"
 import type { Mentor } from "../admin/types"
 import { notifyEmailInBackground, sendMentorWelcomeEmail } from "../lib/emailApi"
+import { isMentorOldEnough, isValidDateOfBirth } from "./validation"
 
 const encoder = new TextEncoder()
 
@@ -50,6 +51,15 @@ export const signUpMentor = async (payload: SignUpMentorInput): Promise<{ ok: bo
   const mentors = getMentors()
   const email = payload.email.trim().toLowerCase()
   const fin = payload.fin.trim().toUpperCase()
+  const dateOfBirth = payload.dateOfBirth.trim()
+
+  if (!isValidDateOfBirth(dateOfBirth)) {
+    return { ok: false, message: "Please enter a valid date of birth in dd/mm/yyyy format." }
+  }
+
+  if (!isMentorOldEnough(dateOfBirth)) {
+    return { ok: false, message: "Mentors must be at least 18 years old to sign up." }
+  }
 
   if (mentors.some((mentor) => mentor.email === email)) {
     return { ok: false, message: "This email is already registered." }
@@ -67,7 +77,7 @@ export const signUpMentor = async (payload: SignUpMentorInput): Promise<{ ok: bo
     surname: payload.surname.trim(),
     fin,
     email,
-    dateOfBirth: payload.dateOfBirth.trim(),
+    dateOfBirth,
     country: payload.country,
     registeredAt: new Date().toISOString(),
     phone: payload.phone?.trim() ?? "",

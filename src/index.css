@@ -174,7 +174,7 @@ a {
   transition: box-shadow 0.35s ease, backdrop-filter 0.35s ease;
   pointer-events: auto;
   padding: 0 0.75rem;
-  background-color: #ffffff;
+  background: transparent;
   backdrop-filter: none;
 }
 
@@ -184,7 +184,7 @@ a {
 }
 
 .navbar-inner {
-  width: calc(100% - 1.5rem);
-  max-width: 1300px;
+  width: calc(100% - 0.25rem);
+  max-width: 1680px;
   min-height: 64px;
 }
