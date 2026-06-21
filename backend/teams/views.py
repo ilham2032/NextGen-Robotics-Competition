@@ -22,13 +22,12 @@ from .serializers import (
 class PublicTeamSerializer(serializers.ModelSerializer):
     """Public-safe fields only: no member/mentor personal data."""
 
-    country = serializers.CharField(source="school")
     members = serializers.IntegerField(source="member_count")
     categoryName = serializers.CharField(source="category_name", required=False, allow_blank=True)
 
     class Meta:
         model = Team
-        fields = ["id", "name", "country", "categoryName", "members"]
+        fields = ["id", "name", "school", "categoryName", "members"]
 
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -202,7 +201,7 @@ def health_check(_request: Request) -> Response:
 
 
 class LegacyTeamsListView(APIView):
-    """Public endpoint: GET /api/teams returns only id, name, country, categoryName, members."""
+    """Public endpoint: GET /api/teams returns only id, name, school, categoryName, members."""
 
     def get(self, _request: Request) -> Response:
         teams = Team.objects.all()
