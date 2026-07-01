@@ -24,10 +24,11 @@ class PublicTeamSerializer(serializers.ModelSerializer):
 
     members = serializers.IntegerField(source="member_count")
     categoryName = serializers.CharField(source="category_name", required=False, allow_blank=True)
+    mentorId = serializers.CharField(source="mentor_id", default="", allow_blank=True)
 
     class Meta:
         model = Team
-        fields = ["id", "name", "school", "categoryName", "members"]
+        fields = ["id", "name", "school", "categoryName", "members", "mentorId"]
 
 
 class TeamViewSet(viewsets.ModelViewSet):
